@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  TrackersViewController.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 23.03.2023.
@@ -7,7 +7,8 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class TrackersViewController: UIViewController {
+    weak var coordinator: CoordinatorProtocol?
     
     private lazy var collectionView: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
@@ -18,10 +19,19 @@ class ViewController: UIViewController {
         
         return collectionView
     }()
-
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        tabBarItem = UITabBarItem(title: "Трекеры", image: UIImage(systemName: "record.circle.fill"), tag: 0)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        view.backgroundColor = .systemBackground
         setupCollectionView()
     }
     
@@ -36,11 +46,9 @@ class ViewController: UIViewController {
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
-
-
 }
 
-extension ViewController: UICollectionViewDataSource {
+extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 15
     }
