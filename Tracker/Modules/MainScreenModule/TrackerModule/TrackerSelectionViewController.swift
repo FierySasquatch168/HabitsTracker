@@ -46,12 +46,8 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
         return stackView
     }()
     
-    private lazy var dismissButton: UIButton = {
-        let button = UIButton()
-        let image = UIImage(systemName: Constants.Icons.xmark)
-        button.setImage(image, for: .normal)
-        button.tintColor = .YPBlack
-        button.clipsToBounds = true
+    private lazy var dismissButton: CustomDismissButton = {
+        let button = CustomDismissButton()
         button.addTarget(self, action: #selector(dismissDidTapped), for: .touchUpInside)
         return button
     }()
