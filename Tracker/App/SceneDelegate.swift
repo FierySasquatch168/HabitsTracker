@@ -8,7 +8,7 @@
 import UIKit
 
 protocol RouterDelegate: AnyObject {
-    func setupRootViewController(_ viewController: UIViewController?)
+    func setupRootViewController(_ viewController: Presentable?)
 }
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -56,7 +56,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 
 extension SceneDelegate: RouterDelegate {
-    func setupRootViewController(_ viewController: UIViewController?) {
-        window?.rootViewController = viewController
+    func setupRootViewController(_ viewController: Presentable?) {
+        window?.rootViewController = viewController?.toPresent()
     }
 }

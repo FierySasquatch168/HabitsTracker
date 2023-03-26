@@ -7,13 +7,18 @@
 
 import UIKit
 
-final class TrackersViewController: UIViewController {
+protocol TrackerToCoordinatorProtocol {
+    var addTrackerButtonPressed: (() -> Void)? { get set }
+}
+
+final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
     
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
     
-    var headToTrackerSelection: (() -> Void)?
+    var addTrackerButtonPressed: (() -> Void)?
     
+    //TODO: вынести в отдельный класс
     var categories: [TrackerCategory] = []
     var visibleCategories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
@@ -58,7 +63,7 @@ final class TrackersViewController: UIViewController {
     
     private let emptyStateImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "EmptyState")
+        imageView.image = UIImage(named: Constants.Icons.emptyState)
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -97,6 +102,7 @@ final class TrackersViewController: UIViewController {
         checkForEmptyState()
     }
     
+    //TODO: вынести в отдельный класс
     private func checkForEmptyState() {
         if visibleCategories.isEmpty {
             emptyStateStackView.isHidden = false
@@ -107,11 +113,12 @@ final class TrackersViewController: UIViewController {
     
     @objc
     private func addTracker() {
-
+        // сообщить о событии
+        addTrackerButtonPressed?()
     }
 }
 
-// MARK: - Data Source
+// MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1
@@ -123,12 +130,12 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - TextFieldDelegate
+// MARK: - Ext TextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
     
 }
 
-// MARK: - NavigationAttributes
+// MARK: - Ext NavigationAttributes
 private extension TrackersViewController {
     func setupNavigationAttributes() {
         setupLeftButtonItem()
@@ -137,7 +144,7 @@ private extension TrackersViewController {
     }
     
     func setupLeftButtonItem() {
-        let leftItem = UIBarButtonItem(image: UIImage(systemName: "plus"), style: .plain, target: self, action: #selector(addTracker))
+        let leftItem = UIBarButtonItem(image: UIImage(systemName: Constants.Icons.plus), style: .plain, target: self, action: #selector(addTracker))
         leftItem.tintColor = .YPBlack
         navigationItem.leftBarButtonItem = leftItem
     }
@@ -155,7 +162,7 @@ private extension TrackersViewController {
     }
 }
 
-// MARK: - Constraints
+// MARK: - Ext Constraints
 private extension TrackersViewController {
     func setupConstraints() {
         setupMainStackView()

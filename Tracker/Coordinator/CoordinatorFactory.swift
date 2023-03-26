@@ -16,6 +16,7 @@ protocol CoordinatorFactoryProtocol {
 
 final class CoordinatorFactory  {
     private let modulesFactory: ModulesFactoryProtocol = ModulesFactory()
+    private let navigationControllerFactory: NavigationControllerFactoryProtocol = NavigationControllerFactory()
 }
 
 extension CoordinatorFactory: CoordinatorFactoryProtocol {
@@ -28,10 +29,10 @@ extension CoordinatorFactory: CoordinatorFactoryProtocol {
     }
     
     func makeTrackerCoordinator(with router: Routable) -> CoordinatorProtocol {
-        TrackerCoordinator(factory: modulesFactory, router: router)
+        TrackerCoordinator(factory: modulesFactory, router: router, navigationControllerFactory: navigationControllerFactory)
     }
     
     func makeStatisticsCoordinator(with router: Routable) -> CoordinatorProtocol {
-        StatisticsCoordinator(factory: modulesFactory, router: router)
+        StatisticsCoordinator(factory: modulesFactory, router: router, navigationControllerFactory: navigationControllerFactory)
     }
 }

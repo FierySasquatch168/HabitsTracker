@@ -10,41 +10,34 @@ import UIKit
 // Nice place for DI
 
 protocol ModulesFactoryProtocol {
-    func makeSplashScreenView() -> UIViewController
-    func makeTrackerScreenView() -> UIViewController
-    func makeTrackerSelectionScreenView() -> UIViewController
-    func makeStatisticsScreenView() -> UIViewController
+    func makeSplashScreenView() -> Presentable
+    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol
+    func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol
+    func makeStatisticsScreenView() -> Presentable
 }
 
 final class ModulesFactory: ModulesFactoryProtocol {
-    func makeSplashScreenView() -> UIViewController {
+    func makeSplashScreenView() -> Presentable {
         return SplashViewController()
     }
     
-    func makeTrackerScreenView() -> UIViewController {
-        return createNavigationController(.trackers, largeTitle: true)
+    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
+        return TrackersViewController()
     }
     
-    func makeTrackerSelectionScreenView() -> UIViewController {
+    func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol {
         return TrackerSelectionViewController()
     }
     
-    func makeStatisticsScreenView() -> UIViewController {
-        return createNavigationController(.statistics, largeTitle: true)
+    func makeTrackerHabitScreenView() -> Presentable {
+        TrackerHabitViewController()
     }
-}
-
-private extension ModulesFactoryProtocol {
-    func createNavigationController(_ item: MainTabBarItem, largeTitle: Bool) -> UIViewController {
-        let rootViewController = item.viewController
-        let navigationController = UINavigationController(rootViewController: rootViewController)
-        
-        navigationController.navigationBar.prefersLargeTitles = largeTitle
-        navigationController.tabBarItem.title = item.title
-        navigationController.tabBarItem.image = item.tabImage
-        
-        rootViewController.navigationItem.title = item.title
-        
-        return navigationController
+    
+    func makeTrackerSingleEventScreenView() -> Presentable {
+        TrackerSingleEventViewController()
+    }
+    
+    func makeStatisticsScreenView() -> Presentable {
+        return StatisticsViewController()
     }
 }

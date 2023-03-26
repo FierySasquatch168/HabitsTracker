@@ -11,21 +11,12 @@ enum MainTabBarItem: String {
     case trackers = "Трекеры"
     case statistics = "Статистика"
     
-    var viewController: UIViewController {
-        switch self {
-        case .trackers:
-            return TrackersViewController()
-        case .statistics:
-            return StatisticsViewController()
-        }
-    }
-    
     var tabImage: UIImage? {
         switch self {
         case .trackers:
-            return UIImage(systemName: "record.circle.fill")
+            return UIImage(systemName: Constants.Icons.trackersTabIcon)
         case .statistics:
-            return UIImage(systemName: "hare.fill")
+            return UIImage(systemName: Constants.Icons.statisticsTabIcon)
         }
     }
     

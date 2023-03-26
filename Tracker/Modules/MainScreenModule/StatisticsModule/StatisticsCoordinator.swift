@@ -11,10 +11,12 @@ final class StatisticsCoordinator: MainCoordinator, CoordinatorProtocol {
     
     private var factory: ModulesFactoryProtocol
     private var router: Routable
+    private var navigationControllerFactory: NavigationControllerFactoryProtocol
     
-    init(factory: ModulesFactoryProtocol, router: Routable) {
+    init(factory: ModulesFactoryProtocol, router: Routable, navigationControllerFactory: NavigationControllerFactoryProtocol) {
         self.factory = factory
         self.router = router
+        self.navigationControllerFactory = navigationControllerFactory
     }
     
     func start() {
@@ -24,7 +26,9 @@ final class StatisticsCoordinator: MainCoordinator, CoordinatorProtocol {
 
 private extension StatisticsCoordinator {
     func createScreen() {
-        let trackerMainScreen = factory.makeStatisticsScreenView()
-        router.addTabBarItem(trackerMainScreen)
+        let statisticsMainScreen = factory.makeStatisticsScreenView()
+        var navController = navigationControllerFactory.createNavigationController(.statistics, largeTitle: true, rootViewController: statisticsMainScreen)
+        
+        router.addTabBarItem(navController)
     }
 }
