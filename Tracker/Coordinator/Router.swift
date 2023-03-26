@@ -9,7 +9,10 @@ import UIKit
 
 protocol Routable {
     func setupRootViewController(viewController: UIViewController)
+    func presentViewController(_ viewController: UIViewController, animated: Bool, presentationStyle: UIModalPresentationStyle)
+    func dismissViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?)
     func addTabBarItem(_ tab: UIViewController)
+    
 }
 
 final class Router {
@@ -26,6 +29,17 @@ extension Router: Routable {
     func setupRootViewController(viewController: UIViewController) {
         currentViewController = viewController
         delegate?.setupRootViewController(currentViewController)
+    }
+    
+    func presentViewController(_ viewController: UIViewController, animated: Bool, presentationStyle: UIModalPresentationStyle) {
+        viewController.modalPresentationStyle = presentationStyle
+        currentViewController?.present(viewController, animated: true)
+        currentViewController = viewController
+    }
+    
+    func dismissViewController(_ viewController: UIViewController, animated: Bool, completion: (() -> Void)?) {
+        self.currentViewController = viewController
+        viewController.dismiss(animated: animated, completion: completion)
     }
     
     func addTabBarItem(_ tab: UIViewController) {

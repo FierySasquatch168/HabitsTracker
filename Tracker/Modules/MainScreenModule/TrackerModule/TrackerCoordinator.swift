@@ -5,7 +5,7 @@
 //  Created by Aleksandr Eliseev on 25.03.2023.
 //
 
-import Foundation
+import UIKit
 
 final class TrackerCoordinator: MainCoordinator, CoordinatorProtocol {
     
