@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		3738E12529D024FE00FB1B21 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738E12429D024FE00FB1B21 /* UIViewController+Ext.swift */; };
 		3738E12729D033F300FB1B21 /* NavigationControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738E12629D033F300FB1B21 /* NavigationControllerFactory.swift */; };
+		3754A13929D189A100AEFBD5 /* HabitCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754A13829D189A100AEFBD5 /* HabitCell.swift */; };
+		3754A13B29D18A9500AEFBD5 /* CustomHeaderLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754A13A29D18A9500AEFBD5 /* CustomHeaderLabel.swift */; };
 		3759225429CF7362004538BA /* TrackerSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759225329CF7362004538BA /* TrackerSelectionViewController.swift */; };
 		37784D8929CF289600505FFC /* ModulesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8829CF289600505FFC /* ModulesFactory.swift */; };
 		37784D8C29CF2B5D00505FFC /* TrackerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */; };
@@ -46,6 +48,8 @@
 /* Begin PBXFileReference section */
 		3738E12429D024FE00FB1B21 /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
 		3738E12629D033F300FB1B21 /* NavigationControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerFactory.swift; sourceTree = "<group>"; };
+		3754A13829D189A100AEFBD5 /* HabitCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HabitCell.swift; sourceTree = "<group>"; };
+		3754A13A29D18A9500AEFBD5 /* CustomHeaderLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomHeaderLabel.swift; sourceTree = "<group>"; };
 		3759225329CF7362004538BA /* TrackerSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerSelectionViewController.swift; sourceTree = "<group>"; };
 		37784D8829CF289600505FFC /* ModulesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModulesFactory.swift; sourceTree = "<group>"; };
 		37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCoordinator.swift; sourceTree = "<group>"; };
@@ -93,14 +97,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3754A13629D1892100AEFBD5 /* HabitScreen */ = {
+			isa = PBXGroup;
+			children = (
+				378440A829D0BCD6001AE972 /* TrackerHabitViewController.swift */,
+				3754A13829D189A100AEFBD5 /* HabitCell.swift */,
+			);
+			path = HabitScreen;
+			sourceTree = "<group>";
+		};
+		3754A13729D1893400AEFBD5 /* SingleEvent */ = {
+			isa = PBXGroup;
+			children = (
+				378440AA29D0BCE5001AE972 /* TrackerSingleEventViewController.swift */,
+			);
+			path = SingleEvent;
+			sourceTree = "<group>";
+		};
 		37784D8A29CF2B3200505FFC /* TrackerModule */ = {
 			isa = PBXGroup;
 			children = (
 				37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */,
 				37FD82ED29CCAC7300EA9128 /* TrackersViewController.swift */,
 				3759225329CF7362004538BA /* TrackerSelectionViewController.swift */,
-				378440A829D0BCD6001AE972 /* TrackerHabitViewController.swift */,
-				378440AA29D0BCE5001AE972 /* TrackerSingleEventViewController.swift */,
+				3754A13629D1892100AEFBD5 /* HabitScreen */,
+				3754A13729D1893400AEFBD5 /* SingleEvent */,
 			);
 			path = TrackerModule;
 			sourceTree = "<group>";
@@ -130,6 +151,7 @@
 			children = (
 				378440A329D0B28F001AE972 /* CustomActionButton.swift */,
 				378440B229D0D4DA001AE972 /* CustomDismissButton.swift */,
+				3754A13A29D18A9500AEFBD5 /* CustomHeaderLabel.swift */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -349,6 +371,7 @@
 				37C7E6AB29CDC434002027E3 /* SplashViewController.swift in Sources */,
 				37FD82EE29CCAC7300EA9128 /* TrackersViewController.swift in Sources */,
 				37784D8C29CF2B5D00505FFC /* TrackerCoordinator.swift in Sources */,
+				3754A13929D189A100AEFBD5 /* HabitCell.swift in Sources */,
 				37784DAA29CF4D5400505FFC /* MainTabBarItem.swift in Sources */,
 				37C7E6B629CDDF56002027E3 /* SplashScreenCoordinator.swift in Sources */,
 				37784D9529CF3A8000505FFC /* TrackerRecord.swift in Sources */,
@@ -364,6 +387,7 @@
 				37784D8929CF289600505FFC /* ModulesFactory.swift in Sources */,
 				37C7E6A929CDC326002027E3 /* UIColor+Ext.swift in Sources */,
 				37784D9129CF3A6C00505FFC /* Tracker.swift in Sources */,
+				3754A13B29D18A9500AEFBD5 /* CustomHeaderLabel.swift in Sources */,
 				378440B329D0D4DB001AE972 /* CustomDismissButton.swift in Sources */,
 				37FD830729CCB70800EA9128 /* ReuseIdentifier+Ext.swift in Sources */,
 				378440A429D0B28F001AE972 /* CustomActionButton.swift in Sources */,

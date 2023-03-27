@@ -19,8 +19,14 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
     var headToSingleEvent: (() -> Void)?
     var returnOnCancel: (() -> Void)?
     
+    private var headerLabeltext = "Создание трекера"
     private var habitsButtonHeader = "Привычка"
     private var singleEventButtonHeader = "Нерегулярное событие"
+    
+    private lazy var headerLabel: CustomHeaderLabel = {
+        let label = CustomHeaderLabel(headerText: headerLabeltext)
+        return label
+    }()
     
     private lazy var habitsButton: CustomActionButton = {
         let button = CustomActionButton(title: habitsButtonHeader)
@@ -90,6 +96,7 @@ private extension TrackerSelectionViewController {
     func setupConstraints() {
         setupButtonsStackView()
         setupDismissButton()
+        setupHeaderLabel()
     }
     
     func setupButtonsStackView() {
@@ -113,6 +120,16 @@ private extension TrackerSelectionViewController {
             dismissButton.heightAnchor.constraint(equalToConstant: 50),
             dismissButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
             dismissButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10)
+        ])
+    }
+    
+    func setupHeaderLabel() {
+        view.addSubview(headerLabel)
+        headerLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            headerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
+            headerLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
     }
 }
