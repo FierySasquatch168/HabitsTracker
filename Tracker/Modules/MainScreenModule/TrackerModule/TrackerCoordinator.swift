@@ -43,14 +43,34 @@ private extension TrackerCoordinator {
             print("TrackerCoordinator showTrackerSelectionScreen returnOnCancel done")
         }
         
+        trackerSelectionScreen.headToHabit = { [weak self] in
+            self?.showTrackerHabitScreen()
+        }
+        
+        trackerSelectionScreen.headToSingleEvent = { [weak self] in
+            self?.showHabitSingleEventScreen()
+        }
+        
         router.presentViewController(trackerSelectionScreen, animated: true, presentationStyle: .pageSheet)
     }
     
     func showTrackerHabitScreen() {
+        var trackerHabitScrenn = factory.makeTrackerHabitScreenView()
+        trackerHabitScrenn.returnOnCancel = { [weak self] in
+            self?.router.dismissViewController(trackerHabitScrenn, animated: true, completion: nil)
+            print("TrackerCoordinator showTrackerHabitScreen returnOnCancel done")
+        }
         
+        router.presentViewController(trackerHabitScrenn, animated: true, presentationStyle: .pageSheet)
     }
     
     func showHabitSingleEventScreen() {
+        var trackerSingleEventScreen = factory.makeTrackerSingleEventScreenView()
+        trackerSingleEventScreen.returnOnCancel = { [weak self] in
+            self?.router.dismissViewController(trackerSingleEventScreen, animated: true, completion: nil)
+            print("TrackerCoordinator showHabitSingleEventScreen returnOnCancel done")
+        }
         
+        router.presentViewController(trackerSingleEventScreen, animated: true, presentationStyle: .pageSheet)
     }
 }

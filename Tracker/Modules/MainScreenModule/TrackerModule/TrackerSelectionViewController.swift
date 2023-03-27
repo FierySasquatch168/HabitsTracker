@@ -57,10 +57,14 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
         super.viewDidLoad()
 
         view.backgroundColor = .YPWhite
-        presentationController?.delegate = self
         
         setupConstraints()
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        presentationController?.delegate = self
     }
     
     @objc

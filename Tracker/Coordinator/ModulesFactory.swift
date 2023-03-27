@@ -13,6 +13,8 @@ protocol ModulesFactoryProtocol {
     func makeSplashScreenView() -> Presentable
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol
     func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol
+    func makeTrackerHabitScreenView() -> Presentable & TrackerHabitToCoordinatorProtocol
+    func makeTrackerSingleEventScreenView() -> Presentable & TrackerSingleEventToCoordinatorProtocol
     func makeStatisticsScreenView() -> Presentable
 }
 
@@ -29,11 +31,11 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return TrackerSelectionViewController()
     }
     
-    func makeTrackerHabitScreenView() -> Presentable {
+    func makeTrackerHabitScreenView() -> Presentable & TrackerHabitToCoordinatorProtocol {
         TrackerHabitViewController()
     }
     
-    func makeTrackerSingleEventScreenView() -> Presentable {
+    func makeTrackerSingleEventScreenView() -> Presentable & TrackerSingleEventToCoordinatorProtocol {
         TrackerSingleEventViewController()
     }
     
