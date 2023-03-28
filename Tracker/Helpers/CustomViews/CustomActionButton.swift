@@ -7,16 +7,16 @@
 
 import UIKit
 
-class CustomActionButton: UIButton {
+final class CustomActionButton: UIButton {
 
-    init(title: String) {
+    init(title: String, backGroundColor: UIColor?, titleColor: UIColor?) {
         super.init(frame: .zero)
         
         setTitle(title, for: .normal)
         layer.cornerRadius = 16
         titleLabel?.font = UIFont(name: CustomFonts.YPMedium.rawValue, size: 16)
-        setTitleColor(.YPWhite, for: .normal)
-        backgroundColor = .YPBlack
+        setTitleColor(titleColor, for: .normal)
+        backgroundColor = backGroundColor
         titleLabel?.textAlignment = .center
     }
     

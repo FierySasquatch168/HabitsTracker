@@ -32,7 +32,10 @@ final class ModulesFactory: ModulesFactoryProtocol {
     }
     
     func makeTrackerHabitScreenView() -> Presentable & TrackerHabitToCoordinatorProtocol {
-        TrackerHabitViewController()
+        let vc = TrackerHabitViewController()
+        vc.colorModel = ColorModel()
+        vc.emojieModel = EmojieModel()
+        return vc
     }
     
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerSingleEventToCoordinatorProtocol {

@@ -14,7 +14,3 @@ struct Tracker: Identifiable {
     let emoji: String
     let timetable: String
 }
-
-/*
- название, цвет, эмоджи и распиcание
- */

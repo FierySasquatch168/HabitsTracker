@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CustomHeaderLabel: UILabel {
+final class CustomHeaderLabel: UILabel {
 
     init(headerText: String) {
         super.init(frame: .zero)

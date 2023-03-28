@@ -1,5 +1,5 @@
 //
-//  FirstCollectionViewCell.swift
+//  MainCollectionViewCell.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 23.03.2023.
@@ -7,11 +7,11 @@
 
 import UIKit
 
-class FirstCollectionViewCell: UICollectionViewCell {
+final class MainCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .red
+        
     }
     
     required init?(coder: NSCoder) {

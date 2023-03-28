@@ -29,13 +29,13 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
     }()
     
     private lazy var habitsButton: CustomActionButton = {
-        let button = CustomActionButton(title: habitsButtonHeader)
+        let button = CustomActionButton(title: habitsButtonHeader, backGroundColor: .YPBlack, titleColor: .YPWhite)
         button.addTarget(self, action: #selector(didSelectTracker), for: .touchUpInside)
         return button
     }()
     
     private lazy var singleEventButton: CustomActionButton = {
-        let button = CustomActionButton(title: singleEventButtonHeader)
+        let button = CustomActionButton(title: singleEventButtonHeader, backGroundColor: .YPBlack, titleColor: .YPWhite)
         button.addTarget(self, action: #selector(didSelectTracker), for: .touchUpInside)
         return button
     }()

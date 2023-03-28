@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CustomDismissButton: UIButton {
+final class CustomDismissButton: UIButton {
 
     init() {
         super.init(frame: .zero)
