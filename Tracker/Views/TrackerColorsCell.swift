@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol TrackerColorsCellDelegate: AnyObject {
+    func textDidChange(text: String?)
+}
+
 final class TrackerColorsCell: UICollectionViewCell {
+    weak var delegate: TrackerColorsCellDelegate?
+    
     lazy var colorImage: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.cornerRadius = 8
@@ -22,8 +28,11 @@ final class TrackerColorsCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private func setupUI() {
+}
+
+// MARK: - Constraints
+private extension TrackerColorsCell {
+    func setupUI() {
         contentView.addSubview(colorImage)
         colorImage.translatesAutoresizingMaskIntoConstraints = false
         

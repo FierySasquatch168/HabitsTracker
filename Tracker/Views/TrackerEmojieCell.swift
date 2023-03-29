@@ -7,7 +7,13 @@
 
 import UIKit
 
+protocol TrackerEmojieCellDelegate: AnyObject {
+    func textDidChange(text: String?)
+}
+
 final class TrackerEmojieCell: UICollectionViewCell {
+    weak var delegate: TrackerEmojieCellDelegate?
+    
     lazy var emojieLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
@@ -24,8 +30,11 @@ final class TrackerEmojieCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private func setupUI() {
+}
+
+// MARK: - Constraints
+private extension TrackerEmojieCell {
+    func setupUI() {
         addSubview(emojieLabel)
         emojieLabel.translatesAutoresizingMaskIntoConstraints = false
         

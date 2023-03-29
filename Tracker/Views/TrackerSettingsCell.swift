@@ -1,5 +1,5 @@
 //
-//  TrackerCategoryCell.swift
+//  TrackerSettingsCell.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 27.03.2023.
@@ -7,7 +7,13 @@
 
 import UIKit
 
-final class TrackerCategoryCell: UICollectionViewCell {
+protocol TrackerSettingsCellDelegate: AnyObject {
+    func textDidChange(text: String?)
+}
+
+final class TrackerSettingsCell: UICollectionViewCell {
+    weak var delegate: TrackerSettingsCellDelegate?
+    
     private lazy var chevronImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(systemName: "chevron.right")
@@ -30,23 +36,56 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return textView
     }()
     
-    lazy var cellSeparator: UIImageView = {
+    private lazy var cellSeparator: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "BottomDivider")
         imageView.clipsToBounds = true
-        imageView.tintColor = .YPBlack
         return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupTextView()
-        setupImageView()
         
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: Main func
+    
+    func setupCategory(title: String, for row: Int) {
+        textView.text = title
+        
+        if row > 0 {
+            installSeparator()
+        }
+    }
+}
+
+// MARK: - Separator installation
+private extension TrackerSettingsCell {
+    // is set up from collectionView when separator is needed
+    func installSeparator() {
+        contentView.addSubview(cellSeparator)
+        cellSeparator.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            cellSeparator.topAnchor.constraint(equalTo: topAnchor),
+            cellSeparator.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            cellSeparator.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            cellSeparator.heightAnchor.constraint(equalToConstant: 0.5)
+        ])
+    }
+}
+
+// MARK: - Constraints
+private extension TrackerSettingsCell {
+    
+    func setupConstraints() {
+        setupTextView()
+        setupImageView()
     }
     
     func setupTextView() {
@@ -72,26 +111,6 @@ final class TrackerCategoryCell: UICollectionViewCell {
             chevronImageView.widthAnchor.constraint(equalToConstant: 11),
             chevronImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             chevronImageView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -24)
-        ])
-    }
-    
-    func setupCategory(title: String, for row: Int) {
-        textView.text = title
-        
-        if row > 0 {
-            setupSeparator()
-        }
-    }
-    
-    func setupSeparator() {
-        contentView.addSubview(cellSeparator)
-        cellSeparator.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            cellSeparator.topAnchor.constraint(equalTo: topAnchor),
-            cellSeparator.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            cellSeparator.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            cellSeparator.heightAnchor.constraint(equalToConstant: 0.5)
         ])
     }
 }

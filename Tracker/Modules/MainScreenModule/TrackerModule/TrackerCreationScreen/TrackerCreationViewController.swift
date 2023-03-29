@@ -1,5 +1,5 @@
 //
-//  TrackerHabitViewController.swift
+//  TrackerCreationViewController.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 27.03.2023.
@@ -7,30 +7,37 @@
 
 import UIKit
 
-protocol TrackerHabitToCoordinatorProtocol {
+protocol TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)? { get set }
+    var saveTracker: (() -> Void)? { get set }
     var emojieModel: EmojieModel? { get set }
     var colorModel: ColorModel? { get set }
+    var settings: [String] { get set }
+    var headerLabeltext: String { get set }
 }
 
 // MARK: REFACTOR!
 
-final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordinatorProtocol {
+final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)?
+    var saveTracker: (() -> Void)?
+    // initialized in ModuleFactory
     var emojieModel: EmojieModel?
     var colorModel: ColorModel?
+    var settings: [String] = []
+    var headerLabeltext: String = ""
     
     private var dataSource: DataSource?
     
     private typealias DataSource = UICollectionViewDiffableDataSource<String, AnyHashable>
     private typealias Snapshot = NSDiffableDataSourceSnapshot<String, AnyHashable>
     
-    private var headerLabeltext = "Новая привычка"
+    
     private var cancelButtonTitle = "Отменить"
     private var createButtonTitle = "Создать"
     
     private var headers = ["TextView", "TextField","Emojie", "Цвет"]
-    private var categories = ["Категория", "Расписание"]
+    
    
     private lazy var headerLabel: CustomHeaderLabel = {
         let label = CustomHeaderLabel(headerText: headerLabeltext)
@@ -41,6 +48,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         let button = CustomActionButton(title: cancelButtonTitle, backGroundColor: .clear, titleColor: .YPRed)
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor.YPRed?.cgColor
+        button.addTarget(self, action: #selector(cancelDidTap), for: .touchUpInside)
         return button
     }()
     
@@ -67,7 +75,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: compositionalLayout)
                 
         collectionView.register(TrackerNameCell.self, forCellWithReuseIdentifier: TrackerNameCell.reuseIdentifier)
-        collectionView.register(TrackerCategoryCell.self, forCellWithReuseIdentifier: TrackerCategoryCell.reuseIdentifier)
+        collectionView.register(TrackerSettingsCell.self, forCellWithReuseIdentifier: TrackerSettingsCell.reuseIdentifier)
         collectionView.register(TrackerEmojieCell.self, forCellWithReuseIdentifier: TrackerEmojieCell.reuseIdentifier)
         collectionView.register(TrackerColorsCell.self, forCellWithReuseIdentifier: TrackerColorsCell.reuseIdentifier)
         
@@ -78,7 +86,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         
         return collectionView
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -87,6 +95,17 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         createDataSource()
         
         presentationController?.delegate = self
+    }
+    
+    @objc
+    private func cancelDidTap() {
+        returnOnCancel?()
+    }
+    
+    @objc
+    private func saveDidTap() {
+        // add trackerCreation
+        saveTracker?()
     }
     
     private func createDataSource() {
@@ -114,12 +133,13 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         switch headers[indexPath.section] {
         case "TextView":
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerNameCell.reuseIdentifier, for: indexPath) as? TrackerNameCell else { return UICollectionViewCell() }
+            cell.delegate = self
             cell.setupUI()
             return cell
             
         case "TextField":
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCategoryCell.reuseIdentifier, for: indexPath) as? TrackerCategoryCell else { return UICollectionViewCell() }
-            cell.setupCategory(title: categories[indexPath.row], for: indexPath.row)
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerSettingsCell.reuseIdentifier, for: indexPath) as? TrackerSettingsCell else { return UICollectionViewCell() }
+            cell.setupCategory(title: settings[indexPath.row], for: indexPath.row)
             return cell
             
         case "Emojie":
@@ -141,7 +161,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         var snapshot = Snapshot()
         snapshot.appendSections(headers)
         snapshot.appendItems([""], toSection: headers[0])
-        snapshot.appendItems(["Категория", "Расписание"], toSection: headers[1])
+        snapshot.appendItems(settings, toSection: headers[1])
         
         if let emojies = emojieModel?.emojies, let colors = colorModel?.colors {
             snapshot.appendItems(emojies, toSection: headers[2])
@@ -182,8 +202,8 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
     }
     
     private func createCategorieSection() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(0.5)))
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(150)), subitems: [item])
+        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/CGFloat(settings.count))))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(CGFloat(75 * settings.count))), subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
         let decorationItem = NSCollectionLayoutDecorationItem.background(elementKind: RoundedBackgroundView.reuseIdentifier)
         section.decorationItems = [decorationItem]
@@ -222,7 +242,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
 }
 
 // MARK: - Ext Constraints
-private extension TrackerHabitViewController {
+private extension TrackerCreationViewController {
     func setupConstraints() {
         setupHeaderLabel()
         setupButtonStackView()
@@ -265,9 +285,15 @@ private extension TrackerHabitViewController {
 }
 
 // MARK: - Ext UIAdaptivePresentationControllerDelegate
-extension TrackerHabitViewController: UIAdaptivePresentationControllerDelegate {
+extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         returnOnCancel?()
     }
 }
 
+// MARK: - TextFieldDelegate
+extension TrackerCreationViewController: TrackerNameCellDelegate {
+    func textDidChange(text: String?) {
+        print(text)
+    }
+}
