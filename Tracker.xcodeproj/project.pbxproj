@@ -16,6 +16,7 @@
 		3754A13929D189A100AEFBD5 /* TrackerNameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754A13829D189A100AEFBD5 /* TrackerNameCell.swift */; };
 		3754A13B29D18A9500AEFBD5 /* CustomHeaderLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3754A13A29D18A9500AEFBD5 /* CustomHeaderLabel.swift */; };
 		3759225429CF7362004538BA /* TrackerSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3759225329CF7362004538BA /* TrackerSelectionViewController.swift */; };
+		3767A53729D489CB00B1B5A9 /* CustomTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767A53629D489CB00B1B5A9 /* CustomTextField.swift */; };
 		37784D8929CF289600505FFC /* ModulesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8829CF289600505FFC /* ModulesFactory.swift */; };
 		37784D8C29CF2B5D00505FFC /* TrackerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */; };
 		37784D8F29CF2C4000505FFC /* StatisticsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8E29CF2C4000505FFC /* StatisticsCoordinator.swift */; };
@@ -62,6 +63,7 @@
 		3754A13829D189A100AEFBD5 /* TrackerNameCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerNameCell.swift; sourceTree = "<group>"; };
 		3754A13A29D18A9500AEFBD5 /* CustomHeaderLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomHeaderLabel.swift; sourceTree = "<group>"; };
 		3759225329CF7362004538BA /* TrackerSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerSelectionViewController.swift; sourceTree = "<group>"; };
+		3767A53629D489CB00B1B5A9 /* CustomTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTextField.swift; sourceTree = "<group>"; };
 		37784D8829CF289600505FFC /* ModulesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModulesFactory.swift; sourceTree = "<group>"; };
 		37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCoordinator.swift; sourceTree = "<group>"; };
 		37784D8E29CF2C4000505FFC /* StatisticsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsCoordinator.swift; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 				378440B229D0D4DA001AE972 /* CustomDismissButton.swift */,
 				3754A13A29D18A9500AEFBD5 /* CustomHeaderLabel.swift */,
 				37518A3229D3703D00F0DA71 /* RoundedBackgroundView.swift */,
+				3767A53629D489CB00B1B5A9 /* CustomTextField.swift */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -402,6 +405,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3767A53729D489CB00B1B5A9 /* CustomTextField.swift in Sources */,
 				37C7E6B229CDDA64002027E3 /* Router.swift in Sources */,
 				3738E12729D033F300FB1B21 /* NavigationControllerFactory.swift in Sources */,
 				378440AB29D0BCE5001AE972 /* TrackerSingleEventViewController.swift in Sources */,

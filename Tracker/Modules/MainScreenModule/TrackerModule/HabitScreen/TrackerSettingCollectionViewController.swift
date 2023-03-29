@@ -119,7 +119,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
             
         case "TextField":
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerCategoryCell.reuseIdentifier, for: indexPath) as? TrackerCategoryCell else { return UICollectionViewCell() }
-            cell.setupCategory(title: categories[indexPath.row])
+            cell.setupCategory(title: categories[indexPath.row], for: indexPath.row)
             return cell
             
         case "Emojie":
@@ -177,7 +177,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(75)), subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets.bottom = 30
+        section.contentInsets.bottom = 24
         return section
     }
     
@@ -185,7 +185,6 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(0.5)))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(150)), subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets.bottom = 30
         let decorationItem = NSCollectionLayoutDecorationItem.background(elementKind: RoundedBackgroundView.reuseIdentifier)
         section.decorationItems = [decorationItem]
         return section
@@ -193,12 +192,10 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
     
     private func createEmojieSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1/7), heightDimension: .fractionalWidth(1/7)))
-        item.contentInsets.bottom = 12
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(144)), subitems: [item])
         group.interItemSpacing = NSCollectionLayoutSpacing.flexible(10)
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets.top = 30
-        section.contentInsets.bottom = 30
+        section.contentInsets.top = 60
         addStandardHeader(to: section)
         
         return section
@@ -210,7 +207,7 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(144)), subitems: [item])
         group.interItemSpacing = NSCollectionLayoutSpacing.flexible(10)
         let section = NSCollectionLayoutSection(group: group)
-        section.contentInsets.top = 30
+        section.contentInsets.top = 70
         addStandardHeader(to: section)
         return section
     }
@@ -218,6 +215,8 @@ final class TrackerHabitViewController: UIViewController & TrackerHabitToCoordin
     private func addStandardHeader(to section: NSCollectionLayoutSection) {
         let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(18))
         let headerElement = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize, elementKind: UICollectionView.elementKindSectionHeader, alignment: .topLeading)
+        headerElement.contentInsets.top = 30
+        headerElement.contentInsets.bottom = 30
         section.boundarySupplementaryItems = [headerElement]
     }
 }

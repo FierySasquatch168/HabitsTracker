@@ -9,9 +9,10 @@ import UIKit
 
 final class TrackerNameCell: UICollectionViewCell {
     
-    private lazy var textField: UITextField = {
-        let textField = UITextField()
+    private lazy var textField: CustomTextField = {
+        let textField = CustomTextField()
         textField.placeholder = "Введите название трекера"
+        textField.textInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
         textField.backgroundColor = .YPBackground
         textField.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
         textField.contentVerticalAlignment = .center

@@ -30,10 +30,19 @@ final class TrackerCategoryCell: UICollectionViewCell {
         return textView
     }()
     
+    lazy var cellSeparator: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "BottomDivider")
+        imageView.clipsToBounds = true
+        imageView.tintColor = .YPBlack
+        return imageView
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupTextView()
         setupImageView()
+        
     }
     
     required init?(coder: NSCoder) {
@@ -66,7 +75,23 @@ final class TrackerCategoryCell: UICollectionViewCell {
         ])
     }
     
-    func setupCategory(title: String) {
+    func setupCategory(title: String, for row: Int) {
         textView.text = title
+        
+        if row > 0 {
+            setupSeparator()
+        }
+    }
+    
+    func setupSeparator() {
+        contentView.addSubview(cellSeparator)
+        cellSeparator.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            cellSeparator.topAnchor.constraint(equalTo: topAnchor),
+            cellSeparator.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            cellSeparator.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            cellSeparator.heightAnchor.constraint(equalToConstant: 0.5)
+        ])
     }
 }
