@@ -33,19 +33,29 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let vc = TrackerCreationViewController()
-        vc.colorModel = ColorModel()
-        vc.emojieModel = EmojieModel()
-        vc.settings = HabitTrackerModel.settings
-        vc.headerLabeltext = HabitTrackerModel.title
+        vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
+                                         headers: vc.headers,
+                                         settings: HabitTrackerModel.settings)
+        
+        vc.dataSourceManager = DataSourceManager(headers: vc.headers,
+                                                 emojieModel: EmojieModel(),
+                                                 colorModel: ColorModel(),
+                                                 settings: HabitTrackerModel.settings,
+                                                 headerLabeltext: HabitTrackerModel.title)
         return vc
     }
     
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let vc = TrackerCreationViewController()
-        vc.colorModel = ColorModel()
-        vc.emojieModel = EmojieModel()
-        vc.settings = SingleEventTrackerModel.settings
-        vc.headerLabeltext = SingleEventTrackerModel.title
+        vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
+                                         headers: vc.headers,
+                                         settings: SingleEventTrackerModel.settings)
+        
+        vc.dataSourceManager = DataSourceManager(headers: vc.headers,
+                                                 emojieModel: EmojieModel(),
+                                                 colorModel: ColorModel(),
+                                                 settings: SingleEventTrackerModel.settings,
+                                                 headerLabeltext: SingleEventTrackerModel.title)
         return vc
     }
     
