@@ -21,7 +21,6 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
-    var compositionalLayout: UICollectionViewLayout?
     
     private var cancelButtonTitle = "Отменить"
     private var createButtonTitle = "Создать"
@@ -59,6 +58,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }()
     
     private lazy var collectionView: UICollectionView = {
+        let compositionalLayout = layoutManager?.createCompositionalLayout()
         compositionalLayout?.register(RoundedBackgroundView.self, forDecorationViewOfKind: RoundedBackgroundView.reuseIdentifier)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: compositionalLayout ?? UICollectionViewFlowLayout())
                 
@@ -80,7 +80,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
 
         view.backgroundColor = .YPWhite
         setupConstraints()
-        compositionalLayout = layoutManager?.createCompositionalLayout()
+        
         dataSourceManager?.createDataSource(collectionView: collectionView)
         
         presentationController?.delegate = self

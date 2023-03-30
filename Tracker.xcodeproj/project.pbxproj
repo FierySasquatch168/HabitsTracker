@@ -127,9 +127,8 @@
 			isa = PBXGroup;
 			children = (
 				37AE418E29D1E893005EDD79 /* TrackerCreationViewController.swift */,
-				3767A54629D4B99400B1B5A9 /* LayoutManager.swift */,
-				3767A54C29D4BB6700B1B5A9 /* HeaderCreator.swift */,
-				3767A54E29D4BBF400B1B5A9 /* DataSourceManager.swift */,
+				3784DAE529D56FA600BC0528 /* LayoutManager */,
+				3784DAE629D56FC100BC0528 /* DataSourceManager */,
 				3767A55029D4C3BE00B1B5A9 /* LayoutDataProtocol.swift */,
 			);
 			path = TrackerCreationScreen;
@@ -184,6 +183,23 @@
 				378440A629D0BA63001AE972 /* Constants.swift */,
 			);
 			path = Constants;
+			sourceTree = "<group>";
+		};
+		3784DAE529D56FA600BC0528 /* LayoutManager */ = {
+			isa = PBXGroup;
+			children = (
+				3767A54C29D4BB6700B1B5A9 /* HeaderCreator.swift */,
+				3767A54629D4B99400B1B5A9 /* LayoutManager.swift */,
+			);
+			path = LayoutManager;
+			sourceTree = "<group>";
+		};
+		3784DAE629D56FC100BC0528 /* DataSourceManager */ = {
+			isa = PBXGroup;
+			children = (
+				3767A54E29D4BBF400B1B5A9 /* DataSourceManager.swift */,
+			);
+			path = DataSourceManager;
 			sourceTree = "<group>";
 		};
 		37AE419429D1EA2A005EDD79 /* TrackerMainScreen */ = {

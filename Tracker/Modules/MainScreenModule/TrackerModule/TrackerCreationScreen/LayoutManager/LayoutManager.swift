@@ -25,13 +25,14 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
     
     func createCompositionalLayout() -> UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { [weak self] sectionIndex, environment in
+            print("createCompositionalLayout")
             return self?.sectionFor(index: sectionIndex, environment: environment, headers: self?.headers ?? [""])
         }
     }
     
     func sectionFor(index: Int, environment: NSCollectionLayoutEnvironment, headers: [String]) -> NSCollectionLayoutSection {
         let section = headers[index]
-        
+        print("sectionFor")
         switch section {
         case headers[0]:
             return createTextFieldSection()
@@ -49,6 +50,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(75)), subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
         section.contentInsets.bottom = 24
+        print("createTextFieldSection")
         return section
     }
     
@@ -58,6 +60,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         let section = NSCollectionLayoutSection(group: group)
         let decorationItem = NSCollectionLayoutDecorationItem.background(elementKind: RoundedBackgroundView.reuseIdentifier)
         section.decorationItems = [decorationItem]
+        print("createCategorieSection")
         return section
     }
     
@@ -68,6 +71,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         let section = NSCollectionLayoutSection(group: group)
         section.contentInsets.top = 60
         headerCreator.addStandardHeader(to: section)
+        print("createEmojieSection")
         
         return section
     }
@@ -80,6 +84,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         let section = NSCollectionLayoutSection(group: group)
         section.contentInsets.top = 70
         headerCreator.addStandardHeader(to: section)
+        print("createColorSection")
         return section
     }
 }
