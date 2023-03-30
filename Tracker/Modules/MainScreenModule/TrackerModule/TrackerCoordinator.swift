@@ -61,6 +61,10 @@ private extension TrackerCoordinator {
             print("TrackerCoordinator showTrackerHabitScreen returnOnCancel done")
         }
         
+        trackerHabitScrenn.timeTableTapped = { [weak self] in
+            self?.showTrackerTimeTableScreen()
+        }
+        
         router.presentViewController(trackerHabitScrenn, animated: true, presentationStyle: .pageSheet)
     }
     
@@ -72,5 +76,20 @@ private extension TrackerCoordinator {
         }
         
         router.presentViewController(trackerSingleEventScreen, animated: true, presentationStyle: .pageSheet)
+    }
+    
+    func showTrackerTimeTableScreen() {
+        var trackerTimetableScreen = factory.makeTimeTableScreenView()
+        trackerTimetableScreen.returnOnCancel = { [weak self] in
+            self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)
+            print("TrackerCoordinator showTrackerTimeTableScreen returnOnCancel done")
+        }
+        
+        trackerTimetableScreen.returnOnReady = { [ weak self] in
+            // add some property to transfer
+            self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)
+        }
+        
+        router.presentViewController(trackerTimetableScreen, animated: true, presentationStyle: .pageSheet)
     }
 }

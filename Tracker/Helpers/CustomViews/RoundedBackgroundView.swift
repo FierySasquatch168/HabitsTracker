@@ -26,7 +26,6 @@ final class RoundedBackgroundView: UICollectionReusableView {
             NSLayoutConstraint.activate([
                 backgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
                 backgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
-//                trailingAnchor.constraint(equalTo: backgroundView.trailingAnchor),
                 backgroundView.topAnchor.constraint(equalTo: topAnchor),
                 backgroundView.bottomAnchor.constraint(equalTo: bottomAnchor)
             ])

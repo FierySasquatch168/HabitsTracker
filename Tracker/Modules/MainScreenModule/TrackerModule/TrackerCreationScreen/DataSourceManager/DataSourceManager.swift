@@ -8,8 +8,8 @@
 import UIKit
 
 protocol DataSourceManagerProtocol {
+    var trackerNameCellDelegate: TrackerNameCellDelegate? { get set }
     func createDataSource(collectionView: UICollectionView)
-    func cell(collectionView: UICollectionView, indexPath: IndexPath, item: AnyHashable) -> UICollectionViewCell
     func getTitle() -> String
 }
 
@@ -74,24 +74,24 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     }
     
     func cell(collectionView: UICollectionView, indexPath: IndexPath, item: AnyHashable) -> UICollectionViewCell {
-        switch headers[indexPath.section] {
-        case "TextView":
+        switch indexPath.section {
+        case 0:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerNameCell.reuseIdentifier, for: indexPath) as? TrackerNameCell else { return UICollectionViewCell() }
             cell.delegate = trackerNameCellDelegate
             cell.setupUI()
             return cell
             
-        case "TextField":
+        case 1:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerSettingsCell.reuseIdentifier, for: indexPath) as? TrackerSettingsCell else { return UICollectionViewCell() }
             cell.setupCategory(title: settings[indexPath.row], for: indexPath.row)
             return cell
             
-        case "Emojie":
+        case 2:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerEmojieCell.reuseIdentifier, for: indexPath) as? TrackerEmojieCell else { return UICollectionViewCell() }
-            cell.emojieLabel.text = emojieModel.getEmojie(for: indexPath.row)
+            cell.setupCellWithValuesOf(item: item)
             return cell
             
-        case "Цвет":
+        case 3:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerColorsCell.reuseIdentifier, for: indexPath) as? TrackerColorsCell else { return UICollectionViewCell() }
             cell.colorImage.backgroundColor = colorModel.getColor(for: indexPath.row)
             return cell
