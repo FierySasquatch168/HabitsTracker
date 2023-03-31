@@ -30,6 +30,10 @@ final class TrackerEmojieCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    func setupCellWithValuesOf(item: AnyHashable) {
+        emojieLabel.text = item.description
+    }
 }
 
 // MARK: - Constraints

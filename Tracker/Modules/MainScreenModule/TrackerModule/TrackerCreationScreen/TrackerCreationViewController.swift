@@ -10,6 +10,7 @@ import UIKit
 protocol TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)? { get set }
     var saveTracker: (() -> Void)? { get set }
+    var timeTableTapped: (() -> Void)? { get set }
 }
 
 // MARK: REFACTOR!
@@ -18,15 +19,14 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     var returnOnCancel: (() -> Void)?
     var saveTracker: (() -> Void)?
+    var timeTableTapped: (() -> Void)?
     
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
     
     private var cancelButtonTitle = "Отменить"
     private var createButtonTitle = "Создать"
-    
-    var headers = ["TextView", "TextField","Emojie", "Цвет"]
-   
+       
     private lazy var headerLabel: CustomHeaderLabel = {
         let label = CustomHeaderLabel(headerText: dataSourceManager?.getTitle() ?? "Error")
         return label
@@ -58,22 +58,32 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }()
     
     private lazy var collectionView: UICollectionView = {
+        // layout
         let compositionalLayout = layoutManager?.createCompositionalLayout()
         compositionalLayout?.register(RoundedBackgroundView.self, forDecorationViewOfKind: RoundedBackgroundView.reuseIdentifier)
+        
+        // collectionView
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: compositionalLayout ?? UICollectionViewFlowLayout())
-                
+        
+        // cells
         collectionView.register(TrackerNameCell.self, forCellWithReuseIdentifier: TrackerNameCell.reuseIdentifier)
         collectionView.register(TrackerSettingsCell.self, forCellWithReuseIdentifier: TrackerSettingsCell.reuseIdentifier)
         collectionView.register(TrackerEmojieCell.self, forCellWithReuseIdentifier: TrackerEmojieCell.reuseIdentifier)
         collectionView.register(TrackerColorsCell.self, forCellWithReuseIdentifier: TrackerColorsCell.reuseIdentifier)
         
-        // MARK: UICV header
+        // header
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.reuseIdentifier)
         
+        // delegate
+        collectionView.delegate = self
+        
+        // settings
         collectionView.showsVerticalScrollIndicator = false
         
         return collectionView
     }()
+    
+    //MARK: Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -141,6 +151,28 @@ private extension TrackerCreationViewController {
     }
 }
 
+// MARK: - Ext CollectionViewDelegate
+extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch indexPath.section {
+        case 0:
+            dataSourceManager?.trackerNameCellDelegate = self
+            print("\(indexPath)")
+        case 1:
+            if indexPath.row == 1 {
+                timeTableTapped?()
+            }
+        case 2:
+            print("\(indexPath)")
+        case 3:
+            print("\(indexPath)")
+        default:
+            print("TrackerCreationViewController didSelectItemAt failed")
+            break
+        }
+    }
+}
+
 // MARK: - Ext UIAdaptivePresentationControllerDelegate
 extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
@@ -148,7 +180,7 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
     }
 }
 
-// MARK: - TextFieldDelegate
+// MARK: - Ext TextFieldDelegate
 extension TrackerCreationViewController: TrackerNameCellDelegate {
     func textDidChange(text: String?) {
         print(text)

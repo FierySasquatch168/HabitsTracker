@@ -23,17 +23,23 @@ final class TrackerSettingsCell: UICollectionViewCell {
         return imageView
     }()
     
-    private lazy var textView: UITextView = {
-        let textView = UITextView()
-        textView.backgroundColor = .clear
-        textView.textAlignment = .left
-        textView.textColor = .YPBlack
-        textView.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
-        textView.textContainerInset.left = 16
-        textView.textContainerInset.top = 26
-        textView.textContainerInset.bottom = 26
-        textView.isEditable = false
-        return textView
+    private lazy var settingsLabel: UILabel = {
+        let label = UILabel()
+        // color
+//        label.backgroundColor = .clear
+        // title
+        label.textColor = .YPBlack
+        label.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
+        label.textAlignment = .left
+//        label.titleLabel?.textAlignment = .left
+//        label.titleLabel?.textColor = .YPBlack
+//        label.titleLabel?.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
+        // textAlignment
+//        label.contentVerticalAlignment = .center
+//        label.contentHorizontalAlignment = .leading
+//        label.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 28)
+        
+        return label
     }()
     
     private lazy var cellSeparator: UIImageView = {
@@ -56,7 +62,7 @@ final class TrackerSettingsCell: UICollectionViewCell {
     // MARK: Main func
     
     func setupCategory(title: String, for row: Int) {
-        textView.text = title
+        settingsLabel.text = title
         
         if row > 0 {
             installSeparator()
@@ -84,20 +90,22 @@ private extension TrackerSettingsCell {
 private extension TrackerSettingsCell {
     
     func setupConstraints() {
+        // wrap main label into stackview with secondary label hidden
+        // show secondary label when settings are set
         setupTextView()
         setupImageView()
     }
     
     func setupTextView() {
-        contentView.addSubview(textView)
-        textView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(settingsLabel)
+        settingsLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             // textView
-            textView.topAnchor.constraint(equalTo: topAnchor),
-            textView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            textView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            textView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            settingsLabel.topAnchor.constraint(equalTo: topAnchor),
+            settingsLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
+            settingsLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            settingsLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 16),
         ])
     }
     

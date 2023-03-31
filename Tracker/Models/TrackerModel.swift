@@ -1,5 +1,5 @@
 //
-//  Tracker.swift
+//  TrackerCategory.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 25.03.2023.
@@ -7,10 +7,20 @@
 
 import Foundation
 
+struct TrackerCategory {
+    let name: String // Важное, неважное и т.д.
+    let trackers: [Tracker]
+}
+
 struct Tracker: Identifiable {
     let id = UUID()
     let name: String
     let color: String
     let emoji: String
     let timetable: String
+}
+
+struct TrackerRecord: Identifiable {
+    let id = UUID()
+    let date: Date
 }
