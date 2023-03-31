@@ -26,9 +26,7 @@
 		37784D8929CF289600505FFC /* ModulesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8829CF289600505FFC /* ModulesFactory.swift */; };
 		37784D8C29CF2B5D00505FFC /* TrackerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */; };
 		37784D8F29CF2C4000505FFC /* StatisticsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8E29CF2C4000505FFC /* StatisticsCoordinator.swift */; };
-		37784D9129CF3A6C00505FFC /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D9029CF3A6C00505FFC /* Tracker.swift */; };
-		37784D9329CF3A7500505FFC /* TrackerCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D9229CF3A7500505FFC /* TrackerCategory.swift */; };
-		37784D9529CF3A8000505FFC /* TrackerRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D9429CF3A8000505FFC /* TrackerRecord.swift */; };
+		37784D9329CF3A7500505FFC /* TrackerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D9229CF3A7500505FFC /* TrackerModel.swift */; };
 		37784DA229CF4BD300505FFC /* YandexSansDisplay-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37784DA129CF4BD300505FFC /* YandexSansDisplay-Bold.ttf */; };
 		37784DA429CF4BEA00505FFC /* YandexSansDisplay-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37784DA329CF4BEA00505FFC /* YandexSansDisplay-Regular.ttf */; };
 		37784DA629CF4BF500505FFC /* YandexSansText-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37784DA529CF4BF500505FFC /* YandexSansText-Medium.ttf */; };
@@ -82,9 +80,7 @@
 		37784D8829CF289600505FFC /* ModulesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModulesFactory.swift; sourceTree = "<group>"; };
 		37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCoordinator.swift; sourceTree = "<group>"; };
 		37784D8E29CF2C4000505FFC /* StatisticsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsCoordinator.swift; sourceTree = "<group>"; };
-		37784D9029CF3A6C00505FFC /* Tracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
-		37784D9229CF3A7500505FFC /* TrackerCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCategory.swift; sourceTree = "<group>"; };
-		37784D9429CF3A8000505FFC /* TrackerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerRecord.swift; sourceTree = "<group>"; };
+		37784D9229CF3A7500505FFC /* TrackerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerModel.swift; sourceTree = "<group>"; };
 		37784DA129CF4BD300505FFC /* YandexSansDisplay-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YandexSansDisplay-Bold.ttf"; sourceTree = "<group>"; };
 		37784DA329CF4BEA00505FFC /* YandexSansDisplay-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YandexSansDisplay-Regular.ttf"; sourceTree = "<group>"; };
 		37784DA529CF4BF500505FFC /* YandexSansText-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YandexSansText-Medium.ttf"; sourceTree = "<group>"; };
@@ -140,6 +136,50 @@
 				3767A55029D4C3BE00B1B5A9 /* LayoutDataProtocol.swift */,
 			);
 			path = TrackerCreationScreen;
+			sourceTree = "<group>";
+		};
+		3754B34529D6CF5F004E7B98 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				3754B34729D6CF82004E7B98 /* TrackersScreen */,
+				3754B34829D6CF95004E7B98 /* TrackerSettingsScreen */,
+				3754B34929D6CFAA004E7B98 /* TrackerTimetableScreen */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		3754B34629D6CF63004E7B98 /* ReusableViews */ = {
+			isa = PBXGroup;
+			children = (
+				37518A3029D3358F00F0DA71 /* HeaderView.swift */,
+			);
+			path = ReusableViews;
+			sourceTree = "<group>";
+		};
+		3754B34729D6CF82004E7B98 /* TrackersScreen */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = TrackersScreen;
+			sourceTree = "<group>";
+		};
+		3754B34829D6CF95004E7B98 /* TrackerSettingsScreen */ = {
+			isa = PBXGroup;
+			children = (
+				3754A13829D189A100AEFBD5 /* TrackerNameCell.swift */,
+				37AE419629D1EA85005EDD79 /* TrackerSettingsCell.swift */,
+				37AE419029D1E9B0005EDD79 /* TrackerEmojieCell.swift */,
+				37AE419229D1E9BF005EDD79 /* TrackerColorsCell.swift */,
+			);
+			path = TrackerSettingsScreen;
+			sourceTree = "<group>";
+		};
+		3754B34929D6CFAA004E7B98 /* TrackerTimetableScreen */ = {
+			isa = PBXGroup;
+			children = (
+				3794D44F29D5DB57006FDE95 /* TrackerTimeTableCell.swift */,
+			);
+			path = TrackerTimetableScreen;
 			sourceTree = "<group>";
 		};
 		37784D8A29CF2B3200505FFC /* TrackerModule */ = {
@@ -324,9 +364,7 @@
 		37FD82FD29CCB59900EA9128 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				37784D9229CF3A7500505FFC /* TrackerCategory.swift */,
-				37784D9029CF3A6C00505FFC /* Tracker.swift */,
-				37784D9429CF3A8000505FFC /* TrackerRecord.swift */,
+				37784D9229CF3A7500505FFC /* TrackerModel.swift */,
 				374C2ACF29D21F07005399F5 /* EmojieModel.swift */,
 				374C2AD129D21F60005399F5 /* ColorModel.swift */,
 				3767A53A29D4AC4900B1B5A9 /* HabitTrackerModel.swift */,
@@ -338,12 +376,8 @@
 		37FD82FE29CCB59E00EA9128 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				3754A13829D189A100AEFBD5 /* TrackerNameCell.swift */,
-				37AE419629D1EA85005EDD79 /* TrackerSettingsCell.swift */,
-				37AE419029D1E9B0005EDD79 /* TrackerEmojieCell.swift */,
-				37AE419229D1E9BF005EDD79 /* TrackerColorsCell.swift */,
-				37518A3029D3358F00F0DA71 /* HeaderView.swift */,
-				3794D44F29D5DB57006FDE95 /* TrackerTimeTableCell.swift */,
+				3754B34529D6CF5F004E7B98 /* Cells */,
+				3754B34629D6CF63004E7B98 /* ReusableViews */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -460,7 +494,6 @@
 				3754A13929D189A100AEFBD5 /* TrackerNameCell.swift in Sources */,
 				37784DAA29CF4D5400505FFC /* MainTabBarItem.swift in Sources */,
 				37C7E6B629CDDF56002027E3 /* SplashScreenCoordinator.swift in Sources */,
-				37784D9529CF3A8000505FFC /* TrackerRecord.swift in Sources */,
 				3767A54D29D4BB6700B1B5A9 /* HeaderCreator.swift in Sources */,
 				37FD82EA29CCAC7300EA9128 /* AppDelegate.swift in Sources */,
 				3767A54F29D4BBF400B1B5A9 /* DataSourceManager.swift in Sources */,
@@ -472,7 +505,7 @@
 				37C7E6A729CDBE69002027E3 /* MainTabBarController.swift in Sources */,
 				37FD82EC29CCAC7300EA9128 /* SceneDelegate.swift in Sources */,
 				374C2AD229D21F60005399F5 /* ColorModel.swift in Sources */,
-				37784D9329CF3A7500505FFC /* TrackerCategory.swift in Sources */,
+				37784D9329CF3A7500505FFC /* TrackerModel.swift in Sources */,
 				3738E12529D024FE00FB1B21 /* UIViewController+Ext.swift in Sources */,
 				37784D8929CF289600505FFC /* ModulesFactory.swift in Sources */,
 				3794D45229D5E26B006FDE95 /* TrackerCollectionSections.swift in Sources */,
@@ -481,7 +514,6 @@
 				37AE419129D1E9B0005EDD79 /* TrackerEmojieCell.swift in Sources */,
 				37518A3129D3358F00F0DA71 /* HeaderView.swift in Sources */,
 				37AE418F29D1E893005EDD79 /* TrackerCreationViewController.swift in Sources */,
-				37784D9129CF3A6C00505FFC /* Tracker.swift in Sources */,
 				3754A13B29D18A9500AEFBD5 /* CustomHeaderLabel.swift in Sources */,
 				3767A54729D4B99400B1B5A9 /* LayoutManager.swift in Sources */,
 				378440B329D0D4DB001AE972 /* CustomDismissButton.swift in Sources */,

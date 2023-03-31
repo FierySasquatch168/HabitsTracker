@@ -7,8 +7,19 @@
 
 import UIKit
 
+protocol TrackerTimeTableCellDelegate: AnyObject {
+    func didToggleSwitch(text: String?)
+}
+
 final class TrackerTimeTableCell: UICollectionViewCell {
-//    var switchToggled: ((String?) -> Void)?
+    weak var delegate: TrackerTimeTableCellDelegate?
+    
+    var switchToggled: Bool = false {
+        didSet {
+            delegate?.didToggleSwitch(text: weekDayLabel.text)
+        }
+    }
+    
     private lazy var weekDayLabel: UILabel = {
         let label = UILabel()
         label.textColor = .YPBlack
@@ -19,7 +30,7 @@ final class TrackerTimeTableCell: UICollectionViewCell {
     private lazy var switcher: UISwitch = {
         let switcher = UISwitch()
         switcher.onTintColor = .YPBlue
-        switcher.addTarget(self, action: #selector(switchValueChanged), for: .valueChanged)
+        switcher.addTarget(self, action: #selector(toggleSwitch), for: .valueChanged)
         return switcher
     }()
     
@@ -41,29 +52,19 @@ final class TrackerTimeTableCell: UICollectionViewCell {
         return imageView
     }()
     
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupConstraints()
-        
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setupWeekday(title: String, for row: Int) {
+    func configCellWith(title: String, for row: Int) {
         weekDayLabel.text = title
         
         if row > 0 {
             installSeparator()
         }
+        
+        setupConstraints()
     }
     
     @objc
-    private func switchValueChanged() {
-        // doesn't work
-//        switchToggled?(weekDayLabel.text)
-        print("it works!")
+    private func toggleSwitch(_ sender: UISwitch) {
+        switchToggled = sender.isOn
     }
 }
 

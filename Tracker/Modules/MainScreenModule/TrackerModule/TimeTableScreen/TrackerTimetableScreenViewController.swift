@@ -90,7 +90,8 @@ extension TrackerTimetableScreenViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerTimeTableCell.reuseIdentifier, for: indexPath) as? TrackerTimeTableCell else { return UICollectionViewCell() }
-        cell.setupWeekday(title: WeekDays.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row)
+        cell.delegate = self
+        cell.configCellWith(title: WeekDays.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row)
         return cell
     }
 }
@@ -103,8 +104,20 @@ extension TrackerTimetableScreenViewController: UICollectionViewDelegateFlowLayo
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerTimeTableCell.reuseIdentifier, for: indexPath) as? TrackerTimeTableCell else { return }
-        // TODO: implement switch valueChanged action
         
+        cell.switchToggled.toggle()
+    }
+}
+
+// MARK: - Ext Cell delegate
+extension TrackerTimetableScreenViewController: TrackerTimeTableCellDelegate {
+    func didToggleSwitch(text: String?) {
+        guard let text = text else { return }
+        if !selectedWeekDays.contains(text) {
+            selectedWeekDays.append(text)
+        } else {
+            selectedWeekDays.removeAll(where: { $0 == text })
+        }
     }
 }
 
