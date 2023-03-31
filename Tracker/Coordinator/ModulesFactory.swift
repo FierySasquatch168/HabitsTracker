@@ -15,6 +15,7 @@ protocol ModulesFactoryProtocol {
     func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol
+    func makeTrackerCategorieScreenView() -> Presentable & TrackerCategoryToCoordinatorProtocol
     func makeTimeTableScreenView() -> Presentable & TrackerTimeTableToCoordinatorProtocol
     func makeStatisticsScreenView() -> Presentable
 }
@@ -58,6 +59,10 @@ final class ModulesFactory: ModulesFactoryProtocol {
                                                  settings: SingleEventTrackerModel.settings,
                                                  headerLabeltext: SingleEventTrackerModel.title)
         return vc
+    }
+    
+    func makeTrackerCategorieScreenView() -> Presentable & TrackerCategoryToCoordinatorProtocol {
+        return TrackerCategoryScreen()
     }
     
     func makeTimeTableScreenView() -> Presentable & TrackerTimeTableToCoordinatorProtocol {

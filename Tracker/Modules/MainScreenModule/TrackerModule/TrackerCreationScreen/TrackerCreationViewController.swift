@@ -11,15 +11,15 @@ protocol TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)? { get set }
     var saveTracker: (() -> Void)? { get set }
     var timeTableTapped: (() -> Void)? { get set }
+    var categoryTapped: (() -> Void)? { get set }
 }
-
-// MARK: REFACTOR!
 
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
     
     var returnOnCancel: (() -> Void)?
     var saveTracker: (() -> Void)?
     var timeTableTapped: (() -> Void)?
+    var categoryTapped: (() -> Void)?
     
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
@@ -91,8 +91,10 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         view.backgroundColor = .YPWhite
         setupConstraints()
         
+        // dataSource
         dataSourceManager?.createDataSource(collectionView: collectionView)
-        
+        // delegates
+        dataSourceManager?.trackerNameCellDelegate = self
         presentationController?.delegate = self
     }
     
@@ -105,6 +107,45 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private func saveDidTap() {
         // add trackerCreation
         saveTracker?()
+    }
+}
+
+// MARK: - Ext CollectionViewDelegate
+extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        switch indexPath.section {
+        case 0:
+            print("\(indexPath)")
+        case 1:
+            if indexPath.row == 0 {
+                categoryTapped?()
+            }
+            
+            if indexPath.row == 1 {
+                timeTableTapped?()
+            }
+        case 2:
+            print("\(indexPath)")
+        case 3:
+            print("\(indexPath)")
+        default:
+            print("TrackerCreationViewController didSelectItemAt failed")
+            break
+        }
+    }
+}
+
+// MARK: - Ext UIAdaptivePresentationControllerDelegate
+extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegate {
+    func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+        returnOnCancel?()
+    }
+}
+
+// MARK: - Ext TextFieldDelegate
+extension TrackerCreationViewController: TrackerNameCellDelegate {
+    func textDidChange(text: String?) {
+        print(text)
     }
 }
 
@@ -148,41 +189,5 @@ private extension TrackerCreationViewController {
             bottomButtonStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             bottomButtonStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -21)
         ])
-    }
-}
-
-// MARK: - Ext CollectionViewDelegate
-extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        switch indexPath.section {
-        case 0:
-            dataSourceManager?.trackerNameCellDelegate = self
-            print("\(indexPath)")
-        case 1:
-            if indexPath.row == 1 {
-                timeTableTapped?()
-            }
-        case 2:
-            print("\(indexPath)")
-        case 3:
-            print("\(indexPath)")
-        default:
-            print("TrackerCreationViewController didSelectItemAt failed")
-            break
-        }
-    }
-}
-
-// MARK: - Ext UIAdaptivePresentationControllerDelegate
-extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegate {
-    func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
-        returnOnCancel?()
-    }
-}
-
-// MARK: - Ext TextFieldDelegate
-extension TrackerCreationViewController: TrackerNameCellDelegate {
-    func textDidChange(text: String?) {
-        print(text)
     }
 }
