@@ -15,6 +15,7 @@ protocol ModulesFactoryProtocol {
     func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol
+    func makeTrackerCategorieScreenView() -> Presentable & TrackerCategoryToCoordinatorProtocol
     func makeTimeTableScreenView() -> Presentable & TrackerTimeTableToCoordinatorProtocol
     func makeStatisticsScreenView() -> Presentable
 }
@@ -34,6 +35,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let vc = TrackerCreationViewController()
+        vc.mainScreenDelegate = TrackersViewController()
         vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
                                          headers: TrackerCollectionSections.getSectionsArray(),
                                          settings: HabitTrackerModel.settings)
@@ -48,6 +50,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let vc = TrackerCreationViewController()
+        vc.mainScreenDelegate = TrackersViewController()
         vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
                                          headers: TrackerCollectionSections.getSectionsArray(),
                                          settings: SingleEventTrackerModel.settings)
@@ -58,6 +61,10 @@ final class ModulesFactory: ModulesFactoryProtocol {
                                                  settings: SingleEventTrackerModel.settings,
                                                  headerLabeltext: SingleEventTrackerModel.title)
         return vc
+    }
+    
+    func makeTrackerCategorieScreenView() -> Presentable & TrackerCategoryToCoordinatorProtocol {
+        return TrackerCategoryScreen()
     }
     
     func makeTimeTableScreenView() -> Presentable & TrackerTimeTableToCoordinatorProtocol {

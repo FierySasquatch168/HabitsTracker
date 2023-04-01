@@ -9,6 +9,8 @@ import UIKit
 
 protocol RouterDelegate: AnyObject {
     func setupRootViewController(_ viewController: Presentable?)
+    func dismissAllPresentedViewControllers(_ rootViewController: Presentable?)
+    func returnRootViewController() -> Presentable?
 }
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -58,5 +60,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 extension SceneDelegate: RouterDelegate {
     func setupRootViewController(_ viewController: Presentable?) {
         window?.rootViewController = viewController?.toPresent()
+    }
+    
+    func dismissAllPresentedViewControllers(_ rootViewController: Presentable?) {
+        window?.rootViewController?.dismiss(animated: true)
+    }
+    
+    func returnRootViewController() -> Presentable? {
+        return window?.rootViewController
     }
 }

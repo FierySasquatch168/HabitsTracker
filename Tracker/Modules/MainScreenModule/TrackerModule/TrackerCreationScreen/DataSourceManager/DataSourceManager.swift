@@ -93,7 +93,7 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
             
         case 3:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerColorsCell.reuseIdentifier, for: indexPath) as? TrackerColorsCell else { return UICollectionViewCell() }
-            cell.colorImage.backgroundColor = colorModel.getColor(for: indexPath.row)
+            cell.colorLabel.backgroundColor = colorModel.getColor(for: indexPath.row)
             return cell
             
         default:

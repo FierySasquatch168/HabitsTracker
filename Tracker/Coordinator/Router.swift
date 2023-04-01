@@ -11,6 +11,7 @@ protocol Routable {
     func setupRootViewController(viewController: Presentable)
     func presentViewController(_ viewController: Presentable, animated: Bool, presentationStyle: UIModalPresentationStyle)
     func dismissViewController(_ viewController: Presentable, animated: Bool, completion: (() -> Void)?)
+    func dismissToRootViewController(animated: Bool, completion: (() -> Void)?)
     func addTabBarItem(_ tab: Presentable)
     
 }
@@ -41,6 +42,12 @@ extension Router: Routable {
     func dismissViewController(_ viewController: Presentable, animated: Bool, completion: (() -> Void)?) {
         self.currentViewController = viewController.toPresent()?.presentingViewController
         viewController.toPresent()?.dismiss(animated: animated, completion: completion)
+    }
+    
+    func dismissToRootViewController(animated: Bool, completion: (() -> Void)?) {
+        let rootViewController = delegate?.returnRootViewController()
+        self.currentViewController = rootViewController
+        delegate?.dismissAllPresentedViewControllers(rootViewController)
     }
     
     func addTabBarItem(_ tab: Presentable) {

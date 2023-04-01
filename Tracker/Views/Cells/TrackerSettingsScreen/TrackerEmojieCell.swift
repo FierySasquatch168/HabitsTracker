@@ -7,20 +7,21 @@
 
 import UIKit
 
-protocol TrackerEmojieCellDelegate: AnyObject {
-    func textDidChange(text: String?)
-}
-
-final class TrackerEmojieCell: UICollectionViewCell {
-    weak var delegate: TrackerEmojieCellDelegate?
-    
+final class TrackerEmojieCell: UICollectionViewCell {    
     lazy var emojieLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
-        label.backgroundColor = .clear
         label.font = UIFont(name: CustomFonts.YPBold.rawValue, size: 32)
+        label.layer.cornerRadius = 16
+        label.layer.masksToBounds = true
         return label
     }()
+    
+    var cellIsSelected: Bool = false {
+        didSet {
+            emojieLabel.backgroundColor = cellIsSelected ? .YPLightGray : .clear
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,6 +31,7 @@ final class TrackerEmojieCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     func setupCellWithValuesOf(item: AnyHashable) {
         emojieLabel.text = item.description

@@ -25,19 +25,9 @@ final class TrackerSettingsCell: UICollectionViewCell {
     
     private lazy var settingsLabel: UILabel = {
         let label = UILabel()
-        // color
-//        label.backgroundColor = .clear
-        // title
         label.textColor = .YPBlack
         label.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
         label.textAlignment = .left
-//        label.titleLabel?.textAlignment = .left
-//        label.titleLabel?.textColor = .YPBlack
-//        label.titleLabel?.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
-        // textAlignment
-//        label.contentVerticalAlignment = .center
-//        label.contentHorizontalAlignment = .leading
-//        label.contentEdgeInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 28)
         
         return label
     }()

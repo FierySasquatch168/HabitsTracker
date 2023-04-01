@@ -46,6 +46,7 @@ final class TrackerNameCell: UICollectionViewCell {
 extension TrackerNameCell: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if let delegate = delegate {
+            // lacks last character of the text
             delegate.textDidChange(text: textField.text)
         }
         return true
