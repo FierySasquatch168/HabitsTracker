@@ -5,7 +5,7 @@
 //  Created by Aleksandr Eliseev on 25.03.2023.
 //
 
-import Foundation
+import UIKit
 
 struct TrackerCategory {
     let name: String // Важное, неважное и т.д.
@@ -15,7 +15,7 @@ struct TrackerCategory {
 struct Tracker: Identifiable {
     let id = UUID()
     let name: String
-    let color: String
+    let color: UIColor
     let emoji: String
     let timetable: String
 }

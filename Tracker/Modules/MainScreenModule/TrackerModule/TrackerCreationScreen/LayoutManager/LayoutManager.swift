@@ -73,9 +73,9 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
     
     private func createColorSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1/7), heightDimension: .fractionalWidth(1/7)))
-        item.contentInsets.bottom = 12
+        item.contentInsets.bottom = 1
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(144)), subitems: [item])
-        group.interItemSpacing = NSCollectionLayoutSpacing.flexible(10)
+        group.interItemSpacing = NSCollectionLayoutSpacing.flexible(1)
         let section = NSCollectionLayoutSection(group: group)
         section.contentInsets.top = 70
         headerCreator.addStandardHeader(to: section)

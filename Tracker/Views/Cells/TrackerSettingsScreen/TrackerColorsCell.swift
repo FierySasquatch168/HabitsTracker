@@ -7,22 +7,32 @@
 
 import UIKit
 
-protocol TrackerColorsCellDelegate: AnyObject {
-    func textDidChange(text: String?)
-}
-
 final class TrackerColorsCell: UICollectionViewCell {
-    weak var delegate: TrackerColorsCellDelegate?
-    
-    lazy var colorImage: UIImageView = {
-        let imageView = UIImageView()
-        imageView.layer.cornerRadius = 8
-        return imageView
+    lazy var colorLabel: UILabel = {
+        let label = UILabel()
+        // color
+        label.backgroundColor = .clear
+        // layer
+        label.layer.cornerRadius = 8
+        label.layer.borderWidth = 3
+        label.layer.borderColor = UIColor.YPBlack?.cgColor
+        label.layer.masksToBounds = true
+        
+        return label
     }()
+    
+    var cellIsSelected: Bool = false {
+        didSet {
+            layer.borderColor = cellIsSelected ? UIColor.YPLightGray?.cgColor : UIColor.clear.cgColor
+            layer.borderWidth = cellIsSelected ? 3 : 0
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        setupUI()
+        setupConstraints()
+        layer.cornerRadius = 8
+        layer.masksToBounds = true
     }
     
     required init?(coder: NSCoder) {
@@ -32,15 +42,19 @@ final class TrackerColorsCell: UICollectionViewCell {
 
 // MARK: - Constraints
 private extension TrackerColorsCell {
-    func setupUI() {
-        contentView.addSubview(colorImage)
-        colorImage.translatesAutoresizingMaskIntoConstraints = false
+    func setupConstraints() {
+        setupColorButton()
+    }
+    
+    func setupColorButton() {
+        contentView.addSubview(colorLabel)
+        colorLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            colorImage.topAnchor.constraint(equalTo: topAnchor),
-            colorImage.bottomAnchor.constraint(equalTo: bottomAnchor),
-            colorImage.leadingAnchor.constraint(equalTo: leadingAnchor),
-            colorImage.trailingAnchor.constraint(equalTo: trailingAnchor)
+            colorLabel.topAnchor.constraint(equalTo: topAnchor, constant: 3),
+            colorLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -3),
+            colorLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 3),
+            colorLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -3)
         ])
     }
 }

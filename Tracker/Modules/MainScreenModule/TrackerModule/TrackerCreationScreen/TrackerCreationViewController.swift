@@ -9,7 +9,7 @@ import UIKit
 
 protocol TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)? { get set }
-    var saveTracker: (() -> Void)? { get set }
+    var saveTrackerTapped: (() -> Void)? { get set }
     var timeTableTapped: (() -> Void)? { get set }
     var categoryTapped: (() -> Void)? { get set }
 }
@@ -17,15 +17,30 @@ protocol TrackerCreationToCoordinatorProtocol {
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
     
     var returnOnCancel: (() -> Void)?
-    var saveTracker: (() -> Void)?
+    var saveTrackerTapped: (() -> Void)?
     var timeTableTapped: (() -> Void)?
     var categoryTapped: (() -> Void)?
     
+    var mainScreenDelegate: TrackerMainScreenDelegate?
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
     
     private var cancelButtonTitle = "Отменить"
     private var createButtonTitle = "Создать"
+    
+    // properties for cell single selection
+    private var emojieSelectedItem: Int?
+    private var colorSelectedItem: Int?
+    private var selectedItem: IndexPath?
+    
+    // tracker properties for model
+    private var templateName: String = ""
+    private var templateColor: UIColor = .clear
+    private var templateEmojie: String = ""
+    private var templateTimeTable: String = ""
+    private var templateCategorie: String = "Test"
+    private var templateTimetable: String = ""
+    
        
     private lazy var headerLabel: CustomHeaderLabel = {
         let label = CustomHeaderLabel(headerText: dataSourceManager?.getTitle() ?? "Error")
@@ -42,6 +57,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     private lazy var createButton: CustomActionButton = {
         let button = CustomActionButton(title: createButtonTitle, backGroundColor: .YPBlack, titleColor: .YPWhite)
+        button.addTarget(self, action: #selector(saveDidTap), for: .touchUpInside)
         return button
     }()
     
@@ -79,6 +95,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         
         // settings
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.allowsMultipleSelection = false
         
         return collectionView
     }()
@@ -95,6 +112,8 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         dataSourceManager?.createDataSource(collectionView: collectionView)
         // delegates
         dataSourceManager?.trackerNameCellDelegate = self
+//        dataSourceManager?.trackerEmojieCellDelegate = self
+//        dataSourceManager?.trackerColorCellDelegate = self
         presentationController?.delegate = self
     }
     
@@ -106,7 +125,13 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     @objc
     private func saveDidTap() {
         // add trackerCreation
-        saveTracker?()
+        var trackers: [Tracker] = []
+        let tracker = Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimeTable)
+        trackers.append(tracker)
+        let trackerCategory = TrackerCategory(name: templateCategorie, trackers: trackers)
+        // delegate - save tracker
+        mainScreenDelegate?.saveTracker(tracker: trackerCategory)
+        saveTrackerTapped?()
     }
 }
 
@@ -117,19 +142,53 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
         case 0:
             print("\(indexPath)")
         case 1:
+            // proceed to category
             if indexPath.row == 0 {
                 categoryTapped?()
             }
-            
+            // proceed to timetable
             if indexPath.row == 1 {
                 timeTableTapped?()
             }
+            
+            print("\(indexPath)")
         case 2:
-            print("\(indexPath)")
+            // select emojie
+            guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerEmojieCell else { return }
+            cell.cellIsSelected = true
+            emojieSelectedItem = indexPath.item
         case 3:
-            print("\(indexPath)")
+            // select color
+            guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerColorsCell else { return }
+            cell.cellIsSelected = true
+            colorSelectedItem = indexPath.item
+            
         default:
             print("TrackerCreationViewController didSelectItemAt failed")
+            break
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        selectedItem = indexPath
+        return true
+    }
+//
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        guard let section = selectedItem?.section else { return }
+        switch section {
+        case 0:
+            print("didDeselectItemAt index path: \(indexPath)")
+        case 1:
+            print("didDeselectItemAt index path: \(indexPath)")
+        case 2:
+            guard let item = emojieSelectedItem, let cell = collectionView.cellForItem(at: IndexPath(item: item, section: section)) as? TrackerEmojieCell else { return }
+            cell.cellIsSelected = false
+            
+        case 3:
+            guard let item = colorSelectedItem, let cell = collectionView.cellForItem(at: IndexPath(item: item, section: section)) as? TrackerColorsCell else { return }
+            cell.cellIsSelected = false
+        default:
             break
         }
     }
@@ -145,9 +204,18 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 // MARK: - Ext TextFieldDelegate
 extension TrackerCreationViewController: TrackerNameCellDelegate {
     func textDidChange(text: String?) {
-        print(text)
+        guard let text = text else { return }
+        templateName = text
     }
 }
+
+// MARK: - Ext EmojieCellDelegate
+//extension TrackerCreationViewController: TrackerColorsCellDelegate {
+//    func didSelectColor(color: UIColor?) {
+//        guard let color = color else { return }
+//        templateColor = color
+//    }
+//}
 
 // MARK: - Ext Constraints
 private extension TrackerCreationViewController {

@@ -11,6 +11,10 @@ protocol TrackerToCoordinatorProtocol {
     var addTrackerButtonPressed: (() -> Void)? { get set }
 }
 
+protocol TrackerMainScreenDelegate: AnyObject {
+    func saveTracker(tracker: TrackerCategory)
+}
+
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
     
     private let titleFontSize: CGFloat = 34
@@ -18,8 +22,21 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     var addTrackerButtonPressed: (() -> Void)?
     
-    //TODO: вынести в отдельный класс
-    var categories: [TrackerCategory] = []
+    //TODO: move to separate class
+    var categories: [TrackerCategory] = [
+        TrackerCategory(name: "Test", trackers: [
+            Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
+            Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
+            Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
+        ])
+    ] {
+        didSet {
+            checkForEmptyState()
+            updateCollectionView()
+            print("categories didSet works")
+            print(categories.count)
+        }
+    }
     var visibleCategories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
     
@@ -38,6 +55,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
         
         collectionView.dataSource = self
+        collectionView.delegate = self
+        
         collectionView.register(TrackersListCollectionViewCell.self, forCellWithReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier)
         
         return collectionView
@@ -100,14 +119,23 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         setupConstraints()
         setupNavigationAttributes()
         checkForEmptyState()
+        
     }
     
-    //TODO: вынести в отдельный класс
+    //TODO: move to separate checker
     private func checkForEmptyState() {
-        if visibleCategories.isEmpty {
+        if categories.isEmpty {
             emptyStateStackView.isHidden = false
         } else {
             emptyStateStackView.isHidden = true
+        }
+    }
+    
+    private func updateCollectionView() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.collectionView.reloadData()
+            print("updateCollectionView")
         }
     }
     
@@ -120,19 +148,45 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
 
 // MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+//        print("numberOfSections is: \(categories.count)")
+        return categories.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 1
+//        print("numberOfItemsInSection is: \(categories[section].trackers.count)")
+        return categories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath)
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
+        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        cell.configCell(with: tracker)
+//        print("cellForItemAt works")
         return cell
+    }
+}
+
+// MARK: - Ext DelegateFlowLayout
+extension TrackersViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let cellWidth = collectionView.frame.width / 2 - 5
+        return CGSize(width: cellWidth,
+                      height: cellWidth * 0.8)
+    }
+}
+
+// MARK: - Ext TrackerMainScreenDelegate
+extension TrackersViewController: TrackerMainScreenDelegate {
+    func saveTracker(tracker: TrackerCategory) {
+        categories.append(tracker)
+//        print("TrackerMainScreenDelegate saveTracker works")
     }
 }
 
 // MARK: - Ext TextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
-    
+    // TODO: apply filtering of the trackers later
 }
 
 // MARK: - Ext NavigationAttributes

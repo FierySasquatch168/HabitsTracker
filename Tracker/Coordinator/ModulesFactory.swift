@@ -35,6 +35,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let vc = TrackerCreationViewController()
+        vc.mainScreenDelegate = TrackersViewController()
         vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
                                          headers: TrackerCollectionSections.getSectionsArray(),
                                          settings: HabitTrackerModel.settings)
@@ -49,6 +50,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let vc = TrackerCreationViewController()
+        vc.mainScreenDelegate = TrackersViewController()
         vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
                                          headers: TrackerCollectionSections.getSectionsArray(),
                                          settings: SingleEventTrackerModel.settings)

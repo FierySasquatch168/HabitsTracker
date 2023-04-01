@@ -24,6 +24,7 @@ final class TrackerCoordinator: MainCoordinator, CoordinatorProtocol {
     }
 }
 
+// MARK: - Ext ScreensCreation
 private extension TrackerCoordinator {
     func createScreen() {
         var trackerMainScreen = factory.makeTrackerScreenView()
@@ -55,21 +56,25 @@ private extension TrackerCoordinator {
     }
     
     func showTrackerHabitScreen() {
-        var trackerHabitScrenn = factory.makeTrackerHabitScreenView()
-        trackerHabitScrenn.returnOnCancel = { [weak self] in
-            self?.router.dismissViewController(trackerHabitScrenn, animated: true, completion: nil)
+        var trackerHabitScreen = factory.makeTrackerHabitScreenView()
+        trackerHabitScreen.returnOnCancel = { [weak self] in
+            self?.router.dismissViewController(trackerHabitScreen, animated: true, completion: nil)
             print("TrackerCoordinator showTrackerHabitScreen returnOnCancel done")
         }
         
-        trackerHabitScrenn.categoryTapped = { [weak self] in
+        trackerHabitScreen.categoryTapped = { [weak self] in
             self?.showCategorySelectionScreen()
         }
         
-        trackerHabitScrenn.timeTableTapped = { [weak self] in
+        trackerHabitScreen.timeTableTapped = { [weak self] in
             self?.showTrackerTimeTableScreen()
         }
         
-        router.presentViewController(trackerHabitScrenn, animated: true, presentationStyle: .pageSheet)
+        trackerHabitScreen.saveTrackerTapped = { [weak self] in
+            self?.router.dismissToRootViewController(animated: true, completion: nil)
+        }
+        
+        router.presentViewController(trackerHabitScreen, animated: true, presentationStyle: .pageSheet)
     }
     
     func showHabitSingleEventScreen() {
