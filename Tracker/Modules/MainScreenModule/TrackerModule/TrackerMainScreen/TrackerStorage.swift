@@ -8,16 +8,21 @@
 import Foundation
 
 protocol TrackerStorageProtocol {
-    var notes: [String] { get set }
-    func saveNote(note: String)
+    var categories: [TrackerCategory] { get set }
+    var trackers: [Tracker] { get set }
+    var visibleCategories: [TrackerCategory] { get set }
+    var completedTrackers: [TrackerRecord] { get set }
+    
+    func saveTracker(tracker: TrackerCategory)
 }
 
 final class TrackerStorage: TrackerStorageProtocol {
-    var notes: [String] = []
+    var categories: [TrackerCategory] = []
+    var trackers: [Tracker] = []
+    var visibleCategories: [TrackerCategory] = []
+    var completedTrackers: [TrackerRecord] = []
     
-    func saveNote(note: String) {
-        print("notes before saving: \(notes)")
-        notes.append(note)
-        print("notes after saving: \(notes)")
+    func saveTracker(tracker: TrackerCategory) {
+        categories.append(tracker)
     }
 }

@@ -13,7 +13,6 @@ protocol TrackerToCoordinatorProtocol {
 
 protocol TrackerMainScreenDelegate: AnyObject {
     func saveTracker(tracker: TrackerCategory)
-    func saveNote(note: String)
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
@@ -22,14 +21,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     private let datePickerCornerRadius: CGFloat = 8
     
     var addTrackerButtonPressed: (() -> Void)?
-    
-    var notes: [String] = [
-        "Test"
-    ] {
-        didSet {
-            checkForEmptyState()
-        }
-    }
     
     //TODO: move to separate class
     var categories: [TrackerCategory] = [
@@ -43,8 +34,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
             checkForEmptyState()
         }
     }
-    var visibleCategories: [TrackerCategory] = []
-    var completedTrackers: [TrackerRecord] = []
+    
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -136,12 +126,12 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     //TODO: move to separate checker
     private func checkForEmptyState() {
-        if notes.isEmpty {
+        if categories.isEmpty {
             emptyStateStackView.isHidden = false
-            print("notes.isEmpty and categories.count is \(notes.count), so the emptyState is not hidden")
+            print("notes.isEmpty and categories.count is \(categories.count), so the emptyState is not hidden")
         } else {
             emptyStateStackView.isHidden = true
-            print("notes.isNotEmpty and categories.count is \(notes.count), so the emptyState is hidden")
+            print("notes.isNotEmpty and categories.count is \(categories.count), so the emptyState is hidden")
         }
     }
     
@@ -187,11 +177,6 @@ extension TrackersViewController: TrackerMainScreenDelegate {
     func saveTracker(tracker: TrackerCategory) {
         categories.append(tracker)
 //        print("TrackerMainScreenDelegate saveTracker works")
-    }
-    
-    func saveNote(note: String) {
-        notes.append(note)
-        print("notes are: \(notes)")
     }
 }
 

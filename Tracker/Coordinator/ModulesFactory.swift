@@ -21,6 +21,23 @@ protocol ModulesFactoryProtocol {
 }
 
 final class ModulesFactory: ModulesFactoryProtocol {
+    
+    // stable properties
+    let mainScreenDelegate = TrackersViewController()
+    let trackerStorage = TrackerStorage()
+    let headerCreator = HeaderCreator()
+    let headers = TrackerCollectionSections.getSectionsArray()
+    let emojieModel = EmojieModel()
+    let colorModel = ColorModel()
+    
+    // properties depending on the user's choise
+    /// habit or singleEvent settings
+    let habitSettings = HabitTrackerModel.settings
+    let singleEventSettings = SingleEventTrackerModel.settings
+    /// habit or singleEvent header
+    let habitLabelText = HabitTrackerModel.title
+    let singleEventLabeltext = SingleEventTrackerModel.title
+    
     func makeSplashScreenView() -> Presentable {
         return SplashViewController()
     }
@@ -34,35 +51,23 @@ final class ModulesFactory: ModulesFactoryProtocol {
     }
     
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
-        let vc = TrackerCreationViewController()
-        vc.mainScreenDelegate = TrackersViewController()
-        vc.trackerStorage = TrackerStorage()
-        vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
-                                         headers: TrackerCollectionSections.getSectionsArray(),
-                                         settings: HabitTrackerModel.settings)
+        let trackerCreationVC = TrackerCreationViewController()
+        trackerCreationVC.mainScreenDelegate = mainScreenDelegate
+        trackerCreationVC.trackerStorage = trackerStorage
+        trackerCreationVC.layoutManager = LayoutManager(headerCreator: headerCreator, headers: headers, settings: habitSettings)
+        trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: emojieModel, colorModel: colorModel, settings: habitSettings, headerLabeltext: habitLabelText)
         
-        vc.dataSourceManager = DataSourceManager(headers: TrackerCollectionSections.getSectionsArray(),
-                                                 emojieModel: EmojieModel(),
-                                                 colorModel: ColorModel(),
-                                                 settings: HabitTrackerModel.settings,
-                                                 headerLabeltext: HabitTrackerModel.title)
-        return vc
+        return trackerCreationVC
     }
     
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
-        let vc = TrackerCreationViewController()
-        vc.mainScreenDelegate = TrackersViewController()
-        vc.trackerStorage = TrackerStorage()
-        vc.layoutManager = LayoutManager(headerCreator: HeaderCreator(),
-                                         headers: TrackerCollectionSections.getSectionsArray(),
-                                         settings: SingleEventTrackerModel.settings)
+        let trackerCreationVC = TrackerCreationViewController()
+        trackerCreationVC.mainScreenDelegate = mainScreenDelegate
+        trackerCreationVC.trackerStorage = trackerStorage
+        trackerCreationVC.layoutManager = LayoutManager(headerCreator: headerCreator, headers: headers, settings: singleEventSettings)
+        trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: emojieModel, colorModel: colorModel, settings: singleEventSettings, headerLabeltext: singleEventLabeltext)
         
-        vc.dataSourceManager = DataSourceManager(headers: TrackerCollectionSections.getSectionsArray(),
-                                                 emojieModel: EmojieModel(),
-                                                 colorModel: ColorModel(),
-                                                 settings: SingleEventTrackerModel.settings,
-                                                 headerLabeltext: SingleEventTrackerModel.title)
-        return vc
+        return trackerCreationVC
     }
     
     func makeTrackerCategorieScreenView() -> Presentable & TrackerCategoryToCoordinatorProtocol {

@@ -131,7 +131,6 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         // delegate - save tracker
 //         mainScreenDelegate?.saveTracker(tracker: <#T##TrackerCategory#>)
 //        mainScreenDelegate?.saveNote(note: templateName)
-        trackerStorage?.saveNote(note: templateName)
         saveTrackerTapped?()
         print("after navigation worked: \(trackerStorage?.notes)")
     }
