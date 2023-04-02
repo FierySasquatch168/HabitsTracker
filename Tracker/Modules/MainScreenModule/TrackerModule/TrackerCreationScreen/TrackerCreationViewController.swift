@@ -125,10 +125,8 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private func saveDidTap() {
         // add trackerCreation
         let tracker = Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
-        // переделать [tracker] во что-то вменямое
-        let trackerCategory = TrackerCategory(name: templateCategory, trackers: [tracker])
         // delegate - save tracker
-        mainScreenDelegate?.saveTracker(category: trackerCategory)
+        mainScreenDelegate?.saveTracker(tracker: tracker)
         saveTrackerTapped?()
     }
 }

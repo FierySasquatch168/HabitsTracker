@@ -12,7 +12,7 @@ protocol TrackerToCoordinatorProtocol {
 }
 
 protocol TrackerMainScreenDelegate: AnyObject {
-    func saveTracker(category: TrackerCategory)
+    func saveTracker(tracker: Tracker)
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
@@ -23,21 +23,17 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     var addTrackerButtonPressed: (() -> Void)?
     
     //TODO: move to separate class
-    var trackers: [Tracker] = []
+    var trackers: [Tracker] = [
+//        Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
+//        Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
+//        Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
+    ]
+    var visibleTrackers: [Tracker] = [
+    
+    ]
     var visibleCategories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
-    var categories: [TrackerCategory] = [
-//        TrackerCategory(name: "Test", trackers: [
-//            Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
-//            Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
-//            Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
-//        ])
-    ] {
-        didSet {
-            checkForEmptyState()
-        }
-    }
-    
+    var categories: [TrackerCategory] = []
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -129,7 +125,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     //TODO: move to separate checker
     private func checkForEmptyState() {
-        emptyStateStackView.isHidden = categories.isEmpty ? false : true
+        emptyStateStackView.isHidden = trackers.isEmpty ? false : true
     }
     
     @objc
@@ -142,17 +138,18 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
 // MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return categories.count
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return categories[section].trackers.count
+        return trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        let tracker = trackers[indexPath.row]
         cell.configCell(with: tracker)
+        print("triggered cellForItemAt ")
         return cell
     }
 }
@@ -168,10 +165,10 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - Ext TrackerMainScreenDelegate
 extension TrackersViewController: TrackerMainScreenDelegate {
-    func saveTracker(category: TrackerCategory) {
-        categories.append(category)
+    func saveTracker(tracker: Tracker) {
+        trackers.append(tracker)
         checkForEmptyState()
-        print(categories)
+        print("emptyStateStackView.isHidden: \(emptyStateStackView.isHidden)")
     }
 }
 
