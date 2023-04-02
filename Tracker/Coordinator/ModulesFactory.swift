@@ -24,7 +24,6 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     // stable properties
     let mainScreenDelegate = TrackersViewController()
-    let trackerStorage = TrackerStorage()
     let headerCreator = HeaderCreator()
     let headers = TrackerCollectionSections.getSectionsArray()
     let emojieModel = EmojieModel()
@@ -53,7 +52,6 @@ final class ModulesFactory: ModulesFactoryProtocol {
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = mainScreenDelegate
-        trackerCreationVC.trackerStorage = trackerStorage
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: headerCreator, headers: headers, settings: habitSettings)
         trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: emojieModel, colorModel: colorModel, settings: habitSettings, headerLabeltext: habitLabelText)
         
@@ -63,7 +61,6 @@ final class ModulesFactory: ModulesFactoryProtocol {
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = mainScreenDelegate
-        trackerCreationVC.trackerStorage = trackerStorage
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: headerCreator, headers: headers, settings: singleEventSettings)
         trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: emojieModel, colorModel: colorModel, settings: singleEventSettings, headerLabeltext: singleEventLabeltext)
         

@@ -24,7 +24,6 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     var mainScreenDelegate: TrackerMainScreenDelegate?
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
-    var trackerStorage: TrackerStorageProtocol?
     
     private var cancelButtonTitle = "Отменить"
     private var createButtonTitle = "Создать"
@@ -125,14 +124,12 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     @objc
     private func saveDidTap() {
         // add trackerCreation
-//        let tracker = Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
+        let tracker = Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
         // переделать [tracker] во что-то вменямое
-//        let trackerCategory = TrackerCategory(name: templateCategory, trackers: [tracker])
+        let trackerCategory = TrackerCategory(name: templateCategory, trackers: [tracker])
         // delegate - save tracker
-//         mainScreenDelegate?.saveTracker(tracker: <#T##TrackerCategory#>)
-//        mainScreenDelegate?.saveNote(note: templateName)
+        mainScreenDelegate?.saveTracker(category: trackerCategory)
         saveTrackerTapped?()
-        print("after navigation worked: \(trackerStorage?.notes)")
     }
 }
 
