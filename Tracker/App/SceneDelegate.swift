@@ -9,7 +9,7 @@ import UIKit
 
 protocol RouterDelegate: AnyObject {
     func setupRootViewController(_ viewController: Presentable?)
-    func dismissAllPresentedViewControllers(_ rootViewController: Presentable?)
+    func dismissAllPresentedViewControllers()
     func returnRootViewController() -> Presentable?
 }
 
@@ -62,7 +62,7 @@ extension SceneDelegate: RouterDelegate {
         window?.rootViewController = viewController?.toPresent()
     }
     
-    func dismissAllPresentedViewControllers(_ rootViewController: Presentable?) {
+    func dismissAllPresentedViewControllers() {
         window?.rootViewController?.dismiss(animated: true)
     }
     

@@ -7,12 +7,12 @@
 
 import UIKit
 
-protocol TrackerSettingsCellDelegate: AnyObject {
+protocol SettingsCellDelegate: AnyObject {
     func textDidChange(text: String?)
 }
 
 final class TrackerSettingsCell: UICollectionViewCell {
-    weak var delegate: TrackerSettingsCellDelegate?
+    weak var delegate: SettingsCellDelegate?
     
     private lazy var chevronImageView: UIImageView = {
         let imageView = UIImageView()

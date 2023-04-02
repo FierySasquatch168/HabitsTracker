@@ -13,6 +13,7 @@ protocol TrackerToCoordinatorProtocol {
 
 protocol TrackerMainScreenDelegate: AnyObject {
     func saveTracker(tracker: TrackerCategory)
+    func saveNote(note: String)
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
@@ -22,19 +23,24 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     var addTrackerButtonPressed: (() -> Void)?
     
-    //TODO: move to separate class
-    var categories: [TrackerCategory] = [
-        TrackerCategory(name: "Test", trackers: [
-            Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
-            Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
-            Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
-        ])
+    var notes: [String] = [
+        "Test"
     ] {
         didSet {
             checkForEmptyState()
-            updateCollectionView()
-            print("categories didSet works")
-            print(categories.count)
+        }
+    }
+    
+    //TODO: move to separate class
+    var categories: [TrackerCategory] = [
+//        TrackerCategory(name: "Test", trackers: [
+//            Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
+//            Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
+//            Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
+//        ])
+    ] {
+        didSet {
+            checkForEmptyState()
         }
     }
     var visibleCategories: [TrackerCategory] = []
@@ -73,10 +79,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         let datePicker = UIDatePicker()
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
-        datePicker.backgroundColor = .YPBlue
+        datePicker.backgroundColor = .YPBackground
         datePicker.tintColor = .YPBlack
         datePicker.layer.cornerRadius = datePickerCornerRadius
         datePicker.layer.masksToBounds = true
+        datePicker.locale = Locale(identifier: "ru_RU")
         return datePicker
     }()
     
@@ -122,20 +129,19 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
     }
     
-    //TODO: move to separate checker
-    private func checkForEmptyState() {
-        if categories.isEmpty {
-            emptyStateStackView.isHidden = false
-        } else {
-            emptyStateStackView.isHidden = true
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("TrackersViewController viewWillAppear")
     }
     
-    private func updateCollectionView() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.collectionView.reloadData()
-            print("updateCollectionView")
+    //TODO: move to separate checker
+    private func checkForEmptyState() {
+        if notes.isEmpty {
+            emptyStateStackView.isHidden = false
+            print("notes.isEmpty and categories.count is \(notes.count), so the emptyState is not hidden")
+        } else {
+            emptyStateStackView.isHidden = true
+            print("notes.isNotEmpty and categories.count is \(notes.count), so the emptyState is hidden")
         }
     }
     
@@ -181,6 +187,11 @@ extension TrackersViewController: TrackerMainScreenDelegate {
     func saveTracker(tracker: TrackerCategory) {
         categories.append(tracker)
 //        print("TrackerMainScreenDelegate saveTracker works")
+    }
+    
+    func saveNote(note: String) {
+        notes.append(note)
+        print("notes are: \(notes)")
     }
 }
 
@@ -248,7 +259,7 @@ private extension TrackersViewController {
     
     func setupDatePicker() {
         NSLayoutConstraint.activate([
-            datePicker.widthAnchor.constraint(equalToConstant: 77)
+            datePicker.widthAnchor.constraint(equalToConstant: 100)
         ])
     }
 }

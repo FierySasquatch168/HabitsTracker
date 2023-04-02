@@ -47,7 +47,7 @@ extension Router: Routable {
     func dismissToRootViewController(animated: Bool, completion: (() -> Void)?) {
         let rootViewController = delegate?.returnRootViewController()
         self.currentViewController = rootViewController
-        delegate?.dismissAllPresentedViewControllers(rootViewController)
+        delegate?.dismissAllPresentedViewControllers()
     }
     
     func addTabBarItem(_ tab: Presentable) {

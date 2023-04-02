@@ -7,7 +7,13 @@
 
 import UIKit
 
-final class TrackerEmojieCell: UICollectionViewCell {    
+protocol EmojieCellDelegate: AnyObject {
+    func didSelectEmojie(emojie: String?)
+}
+
+final class TrackerEmojieCell: UICollectionViewCell {
+    weak var emojieCellDelegate: EmojieCellDelegate?
+    
     lazy var emojieLabel: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
@@ -20,6 +26,7 @@ final class TrackerEmojieCell: UICollectionViewCell {
     var cellIsSelected: Bool = false {
         didSet {
             emojieLabel.backgroundColor = cellIsSelected ? .YPLightGray : .clear
+            sendEmojieIfselected()
         }
     }
     
@@ -35,6 +42,12 @@ final class TrackerEmojieCell: UICollectionViewCell {
     
     func setupCellWithValuesOf(item: AnyHashable) {
         emojieLabel.text = item.description
+    }
+    
+    private func sendEmojieIfselected() {
+        if cellIsSelected {
+            emojieCellDelegate?.didSelectEmojie(emojie: emojieLabel.text)
+        }
     }
 }
 
