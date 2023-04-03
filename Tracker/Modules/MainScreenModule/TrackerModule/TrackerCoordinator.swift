@@ -67,7 +67,8 @@ private extension TrackerCoordinator {
         }
         
         trackerHabitScreen.timeTableTapped = { [weak self] in
-            self?.showTrackerTimeTableScreen()
+            // TODO: think about a better way of setting the delegate
+            self?.showTrackerTimeTableScreen(timetableDelegate: trackerHabitScreen)
         }
         
         trackerHabitScreen.saveTrackerTapped = { [weak self] in
@@ -101,15 +102,17 @@ private extension TrackerCoordinator {
         router.presentViewController(trackerCategorieScreen, animated: true, presentationStyle: .pageSheet)
     }
     
-    func showTrackerTimeTableScreen() {
+    func showTrackerTimeTableScreen(timetableDelegate: TimetableTransferDelegate) {
         var trackerTimetableScreen = factory.makeTimeTableScreenView()
+        trackerTimetableScreen.timetableTransferDelegate = timetableDelegate
         trackerTimetableScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)
             print("TrackerCoordinator showTrackerTimeTableScreen returnOnCancel done")
         }
         
-        trackerTimetableScreen.returnOnReady = { [ weak self] in
+        trackerTimetableScreen.returnOnReady = { [ weak self] days in
             // add some property to transfer
+            trackerTimetableScreen.timetableTransferDelegate?.transferTimeTable(from: days)
             self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)
         }
         

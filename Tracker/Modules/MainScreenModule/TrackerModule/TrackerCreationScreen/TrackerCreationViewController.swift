@@ -12,10 +12,16 @@ protocol TrackerCreationToCoordinatorProtocol {
     var saveTrackerTapped: (() -> Void)? { get set }
     var timeTableTapped: (() -> Void)? { get set }
     var categoryTapped: (() -> Void)? { get set }
+    var selectedCategories: [String]? { get set }
+}
+
+protocol TimetableTransferDelegate {
+    func transferTimeTable(from selected: [Substring])
 }
 
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
     
+    var selectedCategories: [String]?
     var returnOnCancel: (() -> Void)?
     var saveTrackerTapped: (() -> Void)?
     var timeTableTapped: (() -> Void)?
@@ -195,12 +201,19 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
     }
 }
 
+// MARK: - Ext Timetable delegate
+extension TrackerCreationViewController: TimetableTransferDelegate {
+    func transferTimeTable(from selected: [Substring]) {
+        templateTimetable = selected.joined(separator: ", ")
+        print(templateTimetable)
+    }
+}
+
 // MARK: - Ext TextFieldDelegate
 extension TrackerCreationViewController: TrackerNameCellDelegate {
     func textDidChange(text: String?) {
         guard let text = text else { return }
         templateName = text
-//        print(templateName)
     }
 }
 
