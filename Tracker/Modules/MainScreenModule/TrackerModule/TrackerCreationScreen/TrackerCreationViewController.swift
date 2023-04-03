@@ -44,7 +44,12 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var templateColor: UIColor = .clear
     private var templateEmojie: String = ""
     private var templateCategory: String = "Test"
-    private var templateTimetable: String = ""
+    private var templateTimetable: String = "" {
+        didSet {
+            dataSourceManager?.subtitles = templateTimetable
+            dataSourceManager?.createDataSource(collectionView: collectionView)
+        }
+    }
     
        
     private lazy var headerLabel: CustomHeaderLabel = {
@@ -205,7 +210,7 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 extension TrackerCreationViewController: TimetableTransferDelegate {
     func transferTimeTable(from selected: [Substring]) {
         templateTimetable = selected.joined(separator: ", ")
-        print(templateTimetable)
+        print("TrackerCreationViewController templateTimetable is \(templateTimetable)")
     }
 }
 

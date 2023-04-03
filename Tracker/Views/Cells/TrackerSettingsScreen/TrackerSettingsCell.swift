@@ -45,6 +45,7 @@ final class TrackerSettingsCell: UICollectionViewCell {
         stackView.axis = .vertical
         stackView.alignment = .leading
         stackView.distribution = .fill
+        stackView.spacing = 0
         
         stackView.addArrangedSubview(titleLabel)
         stackView.addArrangedSubview(subtitleLabel)
@@ -68,6 +69,12 @@ final class TrackerSettingsCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        cellSeparator.removeFromSuperview()
+        subtitleLabel.text = ""
+    }
+    
     // MARK: Main func
     
     func setupTitle(title: String) {
@@ -78,10 +85,8 @@ final class TrackerSettingsCell: UICollectionViewCell {
         subtitleLabel.text = subtitle
     }
     
-    func setupCellSeparator(for row: Int) {
-        if row > 0 {
-            installSeparator()
-        }
+    func setupCellSeparator() {
+        installSeparator()
     }
 }
 
@@ -117,8 +122,8 @@ private extension TrackerSettingsCell {
         
         NSLayoutConstraint.activate([
             // textView
-            mainStackView.topAnchor.constraint(equalTo: topAnchor),
-            mainStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            mainStackView.topAnchor.constraint(equalTo: topAnchor, constant: 15),
+            mainStackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -14),
             mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 16),
         ])

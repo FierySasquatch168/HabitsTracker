@@ -12,7 +12,7 @@ protocol DataSourceManagerProtocol {
     var settingsCellDelegate: SettingsCellDelegate? { get set }
     var emojieCelldelegate: EmojieCellDelegate? { get set }
     var colorCellDelegate: ColorCellDelegate? { get set }
-    var subtitles: [String] { get set }
+    var subtitles: String { get set }
     func createDataSource(collectionView: UICollectionView)
     func getTitle() -> String
 }
@@ -29,7 +29,7 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     var titles: [String]
     
     // initialized after user picks up timetable
-    var subtitles: [String] = []
+    var subtitles: String = ""
     
     var headerLabeltext: String
     
@@ -78,7 +78,6 @@ private extension DataSourceManager {
         snapshot.appendSections([.trackerName, .trackerSettings, .emojies, .colors])
         snapshot.appendItems([""], toSection: .trackerName)
         snapshot.appendItems(titles, toSection: .trackerSettings)
-        snapshot.appendItems(subtitles, toSection: .trackerSettings)
         
         snapshot.appendItems(emojieModel.emojies, toSection: .emojies)
         snapshot.appendItems(colorModel.colors, toSection: .colors)
@@ -101,9 +100,14 @@ private extension DataSourceManager {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerSettingsCell.reuseIdentifier, for: indexPath) as? TrackerSettingsCell else { return UICollectionViewCell() }
             cell.delegate = settingsCellDelegate
             cell.setupTitle(title: titles[indexPath.row])
-            cell.setupCellSeparator(for: indexPath.row)
-            if !subtitles.isEmpty {
-                cell.setupCellSubtitle(subtitle: subtitles[indexPath.row])
+            
+            if indexPath.row > 0 {
+                cell.setupCellSeparator()
+                print("indexPath.row = \(indexPath.row), cellSeparator is set up")
+            }
+            
+            if indexPath.row == 1 && !subtitles.isEmpty {
+                cell.setupCellSubtitle(subtitle: subtitles)
             }
             return cell
             
