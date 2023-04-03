@@ -30,7 +30,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     ] {
         didSet {
             checkForEmptyState()
-            reloadCollectionView()
         }
     }
     var visibleTrackers: [Tracker] = [
@@ -129,13 +128,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         emptyStateStackView.isHidden = trackers.isEmpty ? false : true
     }
     
-    // collectionView reload
-    private func reloadCollectionView() {
-        DispatchQueue.main.async { [weak self] in
-            self?.collectionView.reloadData()
-        }
-    }
-    
     @objc
     private func addTracker() {
         // сообщить о событии
@@ -173,7 +165,14 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - Ext TrackerMainScreenDelegate
 extension TrackersViewController: TrackerMainScreenDelegate {
     func saveTracker(tracker: Tracker) {
-        trackers.append(tracker)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let nextTrackerIndex = self.trackers.count
+            self.trackers.append(tracker)
+            self.collectionView.performBatchUpdates {
+                self.collectionView.insertItems(at: [IndexPath(item: nextTrackerIndex, section: 0)])
+            }
+        }
     }
 }
 
