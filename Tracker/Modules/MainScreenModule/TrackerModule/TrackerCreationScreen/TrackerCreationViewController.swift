@@ -210,7 +210,6 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 extension TrackerCreationViewController: TimetableTransferDelegate {
     func transferTimeTable(from selected: [Substring]) {
         templateTimetable = selected.joined(separator: ", ")
-        print("TrackerCreationViewController templateTimetable is \(templateTimetable)")
     }
 }
 

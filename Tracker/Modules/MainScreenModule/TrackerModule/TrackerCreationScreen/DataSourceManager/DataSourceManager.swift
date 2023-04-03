@@ -81,7 +81,6 @@ private extension DataSourceManager {
         
         snapshot.appendItems(emojieModel.emojies, toSection: .emojies)
         snapshot.appendItems(colorModel.colors, toSection: .colors)
-        print("createSnapshot finished")
         return snapshot
     }
 }
@@ -103,7 +102,6 @@ private extension DataSourceManager {
             
             if indexPath.row > 0 {
                 cell.setupCellSeparator()
-                print("indexPath.row = \(indexPath.row), cellSeparator is set up")
             }
             
             if indexPath.row == 1 && !subtitles.isEmpty {
