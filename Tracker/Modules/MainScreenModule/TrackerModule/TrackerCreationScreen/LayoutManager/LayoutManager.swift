@@ -28,7 +28,10 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
             return self?.sectionFor(index: sectionIndex, environment: environment, headers: self?.headers ?? [""])
         }
     }
-    
+}
+
+// MARK: - Ext Sections creation
+private extension LayoutManager {
     func sectionFor(index: Int, environment: NSCollectionLayoutEnvironment, headers: [String]) -> NSCollectionLayoutSection {
         let section = headers[index]
         switch section {
@@ -43,7 +46,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         }
     }
     
-    private func createTextFieldSection() -> NSCollectionLayoutSection {
+    func createTextFieldSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(75)), subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
@@ -51,7 +54,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         return section
     }
     
-    private func createCategorieSection() -> NSCollectionLayoutSection {
+    func createCategorieSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/CGFloat(settings.count))))
         let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(75 * CGFloat(settings.count))), subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
@@ -60,7 +63,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         return section
     }
     
-    private func createEmojieSection() -> NSCollectionLayoutSection {
+    func createEmojieSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1/7), heightDimension: .fractionalWidth(1/7)))
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(144)), subitems: [item])
         group.interItemSpacing = NSCollectionLayoutSpacing.flexible(10)
@@ -71,7 +74,7 @@ final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
         return section
     }
     
-    private func createColorSection() -> NSCollectionLayoutSection {
+    func createColorSection() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1/7), heightDimension: .fractionalWidth(1/7)))
         item.contentInsets.bottom = 1
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .estimated(144)), subitems: [item])

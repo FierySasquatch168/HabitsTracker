@@ -23,6 +23,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .center
         // layer
         label.layer.cornerRadius = 12
+        label.layer.masksToBounds = true
         label.backgroundColor = .YPEmojiBackground
         return label
     }()
@@ -33,6 +34,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         label.font = UIFont(name: CustomFonts.YPMedium.rawValue, size: 12)
         label.textColor = .YPBlack
         label.textAlignment = .left
+        label.numberOfLines = 2
         return label
     }()
     
@@ -51,8 +53,11 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         button.setImage(UIImage(systemName: Constants.Icons.plus), for: .normal)
         button.tintColor = .YPWhite
         button.clipsToBounds = true
-        //layer
+        // layer
         button.layer.cornerRadius = 17
+        button.layer.masksToBounds = true
+        // target
+        button.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -87,7 +92,14 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     }
 }
 
-// MARK: - Constraints
+// MARK: - Ext @objc func
+private extension TrackersListCollectionViewCell {
+    @objc func plusButtonTapped() {
+        daysLabel.text = "Tap!"
+    }
+}
+
+// MARK: - Ext Constraints
 private extension TrackersListCollectionViewCell {
     func setupConstraints() {
         setupBackgroundColorImageView()
@@ -137,10 +149,15 @@ private extension TrackersListCollectionViewCell {
         bottomStackView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
+            // stackView
             bottomStackView.topAnchor.constraint(equalTo: cellBackgroundColorImageView.bottomAnchor, constant: 8),
             bottomStackView.heightAnchor.constraint(equalToConstant: 34),
             bottomStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            bottomStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12)
+            bottomStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+            
+            //buttonSize
+            plusButton.widthAnchor.constraint(equalToConstant: 34),
+            plusButton.heightAnchor.constraint(equalToConstant: 34)
         ])
     }
     

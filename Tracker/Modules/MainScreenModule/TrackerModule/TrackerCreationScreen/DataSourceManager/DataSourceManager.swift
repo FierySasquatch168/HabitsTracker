@@ -9,12 +9,18 @@ import UIKit
 
 protocol DataSourceManagerProtocol {
     var trackerNameCellDelegate: TrackerNameCellDelegate? { get set }
+    var settingsCellDelegate: SettingsCellDelegate? { get set }
+    var emojieCelldelegate: EmojieCellDelegate? { get set }
+    var colorCellDelegate: ColorCellDelegate? { get set }
     func createDataSource(collectionView: UICollectionView)
     func getTitle() -> String
 }
 
 final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     weak var trackerNameCellDelegate: TrackerNameCellDelegate?
+    weak var settingsCellDelegate: SettingsCellDelegate?
+    weak var emojieCelldelegate: EmojieCellDelegate?
+    weak var colorCellDelegate: ColorCellDelegate?
     var headers: [String]
     
     // initialized in ModuleFactory
@@ -60,8 +66,11 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
         
         dataSource?.apply(createSnapshot())
     }
-    
-    private func createSnapshot() -> Snapshot {
+}
+
+// MARK: - Ext Snapshot
+private extension DataSourceManager {
+    func createSnapshot() -> Snapshot {
         var snapshot = Snapshot()
         snapshot.appendSections(headers)
         snapshot.appendItems([""], toSection: headers[0])
@@ -72,7 +81,10 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
         
         return snapshot
     }
-    
+}
+
+// MARK: - Ext Cell creation
+private extension DataSourceManager {
     func cell(collectionView: UICollectionView, indexPath: IndexPath, item: AnyHashable) -> UICollectionViewCell {
         switch indexPath.section {
         case 0:
@@ -83,16 +95,19 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
             
         case 1:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerSettingsCell.reuseIdentifier, for: indexPath) as? TrackerSettingsCell else { return UICollectionViewCell() }
+            cell.delegate = settingsCellDelegate
             cell.setupCategory(title: settings[indexPath.row], for: indexPath.row)
             return cell
             
         case 2:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerEmojieCell.reuseIdentifier, for: indexPath) as? TrackerEmojieCell else { return UICollectionViewCell() }
+            cell.emojieCellDelegate = emojieCelldelegate
             cell.setupCellWithValuesOf(item: item)
             return cell
             
         case 3:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerColorsCell.reuseIdentifier, for: indexPath) as? TrackerColorsCell else { return UICollectionViewCell() }
+            cell.colorCellDelegate = colorCellDelegate
             cell.colorLabel.backgroundColor = colorModel.getColor(for: indexPath.row)
             return cell
             

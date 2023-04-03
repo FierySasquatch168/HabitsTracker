@@ -12,33 +12,32 @@ protocol TrackerToCoordinatorProtocol {
 }
 
 protocol TrackerMainScreenDelegate: AnyObject {
-    func saveTracker(tracker: TrackerCategory)
+    func saveTracker(tracker: Tracker)
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
     
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
-    
+        
     var addTrackerButtonPressed: (() -> Void)?
     
     //TODO: move to separate class
-    var categories: [TrackerCategory] = [
-        TrackerCategory(name: "Test", trackers: [
-            Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
-            Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
-            Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
-        ])
+    var trackers: [Tracker] = [
+//        Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
+//        Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
+//        Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
     ] {
         didSet {
             checkForEmptyState()
-            updateCollectionView()
-            print("categories didSet works")
-            print(categories.count)
         }
     }
+    var visibleTrackers: [Tracker] = [
+    
+    ]
     var visibleCategories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
+    var categories: [TrackerCategory] = []
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -73,10 +72,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         let datePicker = UIDatePicker()
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
-        datePicker.backgroundColor = .YPBlue
+        datePicker.backgroundColor = .YPBackground
         datePicker.tintColor = .YPBlack
         datePicker.layer.cornerRadius = datePickerCornerRadius
         datePicker.layer.masksToBounds = true
+        datePicker.locale = Locale(identifier: "ru_RU")
         return datePicker
     }()
     
@@ -107,6 +107,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         stackView.spacing = 8
         stackView.addArrangedSubview(emptyStateImageView)
         stackView.addArrangedSubview(emptyStateTextLabel)
+        
         return stackView
     }()
     
@@ -114,7 +115,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+                
         view.backgroundColor = .systemBackground
         setupConstraints()
         setupNavigationAttributes()
@@ -124,19 +125,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     //TODO: move to separate checker
     private func checkForEmptyState() {
-        if categories.isEmpty {
-            emptyStateStackView.isHidden = false
-        } else {
-            emptyStateStackView.isHidden = true
-        }
-    }
-    
-    private func updateCollectionView() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.collectionView.reloadData()
-            print("updateCollectionView")
-        }
+        emptyStateStackView.isHidden = trackers.isEmpty ? false : true
     }
     
     @objc
@@ -149,20 +138,17 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
 // MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-//        print("numberOfSections is: \(categories.count)")
-        return categories.count
+        return 1
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-//        print("numberOfItemsInSection is: \(categories[section].trackers.count)")
-        return categories[section].trackers.count
+        return trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        let tracker = trackers[indexPath.row]
         cell.configCell(with: tracker)
-//        print("cellForItemAt works")
         return cell
     }
 }
@@ -178,9 +164,15 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - Ext TrackerMainScreenDelegate
 extension TrackersViewController: TrackerMainScreenDelegate {
-    func saveTracker(tracker: TrackerCategory) {
-        categories.append(tracker)
-//        print("TrackerMainScreenDelegate saveTracker works")
+    func saveTracker(tracker: Tracker) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let nextTrackerIndex = self.trackers.count
+            self.trackers.append(tracker)
+            self.collectionView.performBatchUpdates {
+                self.collectionView.insertItems(at: [IndexPath(item: nextTrackerIndex, section: 0)])
+            }
+        }
     }
 }
 
@@ -248,7 +240,7 @@ private extension TrackersViewController {
     
     func setupDatePicker() {
         NSLayoutConstraint.activate([
-            datePicker.widthAnchor.constraint(equalToConstant: 77)
+            datePicker.widthAnchor.constraint(equalToConstant: 100)
         ])
     }
 }
