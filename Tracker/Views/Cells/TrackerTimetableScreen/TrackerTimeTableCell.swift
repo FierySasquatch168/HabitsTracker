@@ -12,11 +12,11 @@ protocol TrackerTimeTableCellDelegate: AnyObject {
 }
 
 final class TrackerTimeTableCell: UICollectionViewCell {
-    weak var delegate: TrackerTimeTableCellDelegate?
+    weak var trackerTimeTableCellDelegate: TrackerTimeTableCellDelegate?
     
     var switchToggled: Bool = false {
         didSet {
-            delegate?.didToggleSwitch(text: weekDayLabel.text)
+            trackerTimeTableCellDelegate?.didToggleSwitch(text: weekDayLabel.text)
         }
     }
     

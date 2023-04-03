@@ -12,10 +12,16 @@ protocol TrackerCreationToCoordinatorProtocol {
     var saveTrackerTapped: (() -> Void)? { get set }
     var timeTableTapped: (() -> Void)? { get set }
     var categoryTapped: (() -> Void)? { get set }
+    var selectedCategories: [String]? { get set }
+}
+
+protocol TimetableTransferDelegate {
+    func transferTimeTable(from selected: [Substring])
 }
 
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
     
+    var selectedCategories: [String]?
     var returnOnCancel: (() -> Void)?
     var saveTrackerTapped: (() -> Void)?
     var timeTableTapped: (() -> Void)?
@@ -38,7 +44,12 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var templateColor: UIColor = .clear
     private var templateEmojie: String = ""
     private var templateCategory: String = "Test"
-    private var templateTimetable: String = ""
+    private var templateTimetable: String = "" {
+        didSet {
+            dataSourceManager?.subtitles = templateTimetable
+            dataSourceManager?.createDataSource(collectionView: collectionView)
+        }
+    }
     
        
     private lazy var headerLabel: CustomHeaderLabel = {
@@ -92,7 +103,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         // delegate
         collectionView.delegate = self
         
-        // settings
+        // titles
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsMultipleSelection = false
         
@@ -195,12 +206,18 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
     }
 }
 
+// MARK: - Ext Timetable delegate
+extension TrackerCreationViewController: TimetableTransferDelegate {
+    func transferTimeTable(from selected: [Substring]) {
+        templateTimetable = selected.joined(separator: ", ")
+    }
+}
+
 // MARK: - Ext TextFieldDelegate
 extension TrackerCreationViewController: TrackerNameCellDelegate {
     func textDidChange(text: String?) {
         guard let text = text else { return }
         templateName = text
-//        print(templateName)
     }
 }
 
@@ -210,7 +227,6 @@ extension TrackerCreationViewController: EmojieCellDelegate {
     func didSelectEmojie(emojie: String?) {
         guard let emojie = emojie else { return }
         templateEmojie = emojie
-        print(templateEmojie)
     }
 }
 
@@ -219,7 +235,6 @@ extension TrackerCreationViewController: ColorCellDelegate {
     func didSelectColor(color: UIColor?) {
         guard let color = color else { return }
         templateColor = color
-        print(color)
     }
 }
 

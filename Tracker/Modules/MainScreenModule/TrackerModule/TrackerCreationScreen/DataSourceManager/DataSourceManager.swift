@@ -12,6 +12,7 @@ protocol DataSourceManagerProtocol {
     var settingsCellDelegate: SettingsCellDelegate? { get set }
     var emojieCelldelegate: EmojieCellDelegate? { get set }
     var colorCellDelegate: ColorCellDelegate? { get set }
+    var subtitles: String { get set }
     func createDataSource(collectionView: UICollectionView)
     func getTitle() -> String
 }
@@ -21,24 +22,26 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     weak var settingsCellDelegate: SettingsCellDelegate?
     weak var emojieCelldelegate: EmojieCellDelegate?
     weak var colorCellDelegate: ColorCellDelegate?
-    var headers: [String]
     
     // initialized in ModuleFactory
     var emojieModel: EmojieModel
     var colorModel: ColorModel
-    var settings: [String]
+    var titles: [String]
+    
+    // initialized after user picks up timetable
+    var subtitles: String = ""
+    
     var headerLabeltext: String
     
-    typealias DataSource = UICollectionViewDiffableDataSource<String, AnyHashable>
-    typealias Snapshot = NSDiffableDataSourceSnapshot<String, AnyHashable>
+    typealias DataSource = UICollectionViewDiffableDataSource<Sections, AnyHashable>
+    typealias Snapshot = NSDiffableDataSourceSnapshot<Sections, AnyHashable>
     
     var dataSource: DataSource?
     
-    init(headers: [String], emojieModel: EmojieModel, colorModel: ColorModel, settings: [String], headerLabeltext: String) {
-        self.headers = headers
+    init(emojieModel: EmojieModel, colorModel: ColorModel, settings: [String], headerLabeltext: String) {
         self.emojieModel = emojieModel
         self.colorModel = colorModel
-        self.settings = settings
+        self.titles = settings
         self.headerLabeltext = headerLabeltext
     }
     
@@ -51,14 +54,14 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
             return self?.cell(collectionView: collectionView, indexPath: indexPath, item: itemIdentifier)
         })
         
-        dataSource?.supplementaryViewProvider = { [weak self] (collectionView, kind, indexPath) in
-            guard let self = self, let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.reuseIdentifier, for: indexPath) as? HeaderView else { fatalError() }
+        dataSource?.supplementaryViewProvider = { (collectionView, kind, indexPath) in
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.reuseIdentifier, for: indexPath) as? HeaderView else { fatalError() }
             if indexPath.section == 2 {
-                header.configure(with: self.headers[2])
+                header.configure(with: Sections.emojies.name)
             }
             
             if indexPath.section == 3 {
-                header.configure(with: self.headers[3])
+                header.configure(with: Sections.colors.name)
             }
             
             return header
@@ -72,13 +75,12 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
 private extension DataSourceManager {
     func createSnapshot() -> Snapshot {
         var snapshot = Snapshot()
-        snapshot.appendSections(headers)
-        snapshot.appendItems([""], toSection: headers[0])
-        snapshot.appendItems(settings, toSection: headers[1])
+        snapshot.appendSections([.trackerName, .trackerSettings, .emojies, .colors])
+        snapshot.appendItems([""], toSection: .trackerName)
+        snapshot.appendItems(titles, toSection: .trackerSettings)
         
-        snapshot.appendItems(emojieModel.emojies, toSection: headers[2])
-        snapshot.appendItems(colorModel.colors, toSection: headers[3])
-        
+        snapshot.appendItems(emojieModel.emojies, toSection: .emojies)
+        snapshot.appendItems(colorModel.colors, toSection: .colors)
         return snapshot
     }
 }
@@ -96,7 +98,15 @@ private extension DataSourceManager {
         case 1:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerSettingsCell.reuseIdentifier, for: indexPath) as? TrackerSettingsCell else { return UICollectionViewCell() }
             cell.delegate = settingsCellDelegate
-            cell.setupCategory(title: settings[indexPath.row], for: indexPath.row)
+            cell.setupTitle(title: titles[indexPath.row])
+            
+            if indexPath.row > 0 {
+                cell.setupCellSeparator()
+            }
+            
+            if indexPath.row == 1 && !subtitles.isEmpty {
+                cell.setupCellSubtitle(subtitle: subtitles)
+            }
             return cell
             
         case 2:

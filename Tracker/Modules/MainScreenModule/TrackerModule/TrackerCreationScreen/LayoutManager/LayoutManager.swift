@@ -14,34 +14,32 @@ protocol LayoutManagerProtocol {
 
 final class LayoutManager: LayoutManagerProtocol, LayoutDataProtocol {
     var headerCreator: HeaderCreatorProtocol
-    var headers: [String]
-    var settings: [String]
+    var titles: [String]
     
-    init(headerCreator: HeaderCreatorProtocol, headers: [String], settings: [String]) {
+    init(headerCreator: HeaderCreatorProtocol, settings: [String]) {
         self.headerCreator = headerCreator
-        self.headers = headers
-        self.settings = settings
+        self.titles = settings
     }
     
     func createCompositionalLayout() -> UICollectionViewLayout {
         return UICollectionViewCompositionalLayout { [weak self] sectionIndex, environment in
-            return self?.sectionFor(index: sectionIndex, environment: environment, headers: self?.headers ?? [""])
+            return self?.sectionFor(index: sectionIndex, environment: environment, headers: Sections.allCases)
         }
     }
 }
 
 // MARK: - Ext Sections creation
 private extension LayoutManager {
-    func sectionFor(index: Int, environment: NSCollectionLayoutEnvironment, headers: [String]) -> NSCollectionLayoutSection {
-        let section = headers[index]
+    func sectionFor(index: Int, environment: NSCollectionLayoutEnvironment, headers: [Sections]) -> NSCollectionLayoutSection {
+        let section = Sections.allCases[index]
         switch section {
-        case headers[0]:
+        case .trackerName:
             return createTextFieldSection()
-        case headers[1]:
+        case .trackerSettings:
             return createCategorieSection()
-        case headers[2]:
+        case .emojies:
             return createEmojieSection()
-        default:
+        case .colors:
             return createColorSection()
         }
     }
@@ -55,8 +53,8 @@ private extension LayoutManager {
     }
     
     func createCategorieSection() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/CGFloat(settings.count))))
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(75 * CGFloat(settings.count))), subitems: [item])
+        let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1/CGFloat(titles.count))))
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(75 * CGFloat(titles.count))), subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
         let decorationItem = NSCollectionLayoutDecorationItem.background(elementKind: RoundedBackgroundView.reuseIdentifier)
         section.decorationItems = [decorationItem]
