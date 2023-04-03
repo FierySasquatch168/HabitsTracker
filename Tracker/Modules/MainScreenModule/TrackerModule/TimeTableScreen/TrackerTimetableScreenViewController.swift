@@ -77,6 +77,14 @@ final class TrackerTimetableScreenViewController: UIViewController, TrackerTimeT
         return WeekDays(rawValue: day)?.shortName ?? "Error"
     }
     
+    private func addTimetableIfNeeded(shortName: Substring) {
+        if !selectedWeekDays.contains(shortName) {
+            selectedWeekDays.append(shortName)
+        } else {
+            selectedWeekDays.removeAll(where: { $0 == shortName })
+        }
+    }
+    
     @objc
     private func dismissDidTapped() {
         returnOnCancel?()
@@ -84,6 +92,7 @@ final class TrackerTimetableScreenViewController: UIViewController, TrackerTimeT
     
     @objc
     private func readyDidTap() {
+        // 
         returnOnReady?(selectedWeekDays)
     }
 
@@ -115,11 +124,7 @@ extension TrackerTimetableScreenViewController: TrackerTimeTableCellDelegate {
     func didToggleSwitch(text: String?) {
         guard let text = text else { return }
         let shortName = convertStringToShortWeekDay(day: text)
-        if !selectedWeekDays.contains(shortName) {
-            selectedWeekDays.append(shortName)
-        } else {
-            selectedWeekDays.removeAll(where: { $0 == shortName })
-        }
+        addTimetableIfNeeded(shortName: shortName)
     }
 }
 

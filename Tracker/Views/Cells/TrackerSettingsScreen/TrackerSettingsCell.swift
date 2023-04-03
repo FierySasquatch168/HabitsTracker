@@ -23,13 +23,32 @@ final class TrackerSettingsCell: UICollectionViewCell {
         return imageView
     }()
     
-    private lazy var settingsLabel: UILabel = {
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .YPBlack
         label.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
         label.textAlignment = .left
         
         return label
+    }()
+    
+    private lazy var subtitleLabel: UILabel =  {
+        let label = UILabel()
+        label.textAlignment =  .left
+        label.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
+        label.textColor = .YPGray
+        return label
+    }()
+    
+    private lazy var mainStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.distribution = .fill
+        
+        stackView.addArrangedSubview(titleLabel)
+        stackView.addArrangedSubview(subtitleLabel)
+        return stackView
     }()
     
     private lazy var cellSeparator: UIImageView = {
@@ -51,9 +70,15 @@ final class TrackerSettingsCell: UICollectionViewCell {
     
     // MARK: Main func
     
-    func setupCategory(title: String, for row: Int) {
-        settingsLabel.text = title
-        
+    func setupTitle(title: String) {
+        titleLabel.text = title
+    }
+    
+    func setupCellSubtitle(subtitle: String) {
+        subtitleLabel.text = subtitle
+    }
+    
+    func setupCellSeparator(for row: Int) {
         if row > 0 {
             installSeparator()
         }
@@ -81,21 +106,21 @@ private extension TrackerSettingsCell {
     
     func setupConstraints() {
         // wrap main label into stackview with secondary label hidden
-        // show secondary label when settings are set
-        setupTextView()
+        // show secondary label when titles are set
+        setupTitleAndSubtitleStackView()
         setupImageView()
     }
     
-    func setupTextView() {
-        contentView.addSubview(settingsLabel)
-        settingsLabel.translatesAutoresizingMaskIntoConstraints = false
+    func setupTitleAndSubtitleStackView() {
+        contentView.addSubview(mainStackView)
+        mainStackView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             // textView
-            settingsLabel.topAnchor.constraint(equalTo: topAnchor),
-            settingsLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
-            settingsLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            settingsLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 16),
+            mainStackView.topAnchor.constraint(equalTo: topAnchor),
+            mainStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            mainStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            mainStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 16),
         ])
     }
     

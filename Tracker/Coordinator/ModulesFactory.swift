@@ -24,7 +24,6 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     // stable properties
     let trackersViewController = TrackersViewController()
-    let headers = TrackerCollectionSections.getSectionsArray()
     
     // properties depending on the user's choise
     /// habit or singleEvent settings
@@ -49,8 +48,8 @@ final class ModulesFactory: ModulesFactoryProtocol {
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol & TimetableTransferDelegate {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = trackersViewController
-        trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), headers: headers, settings: habitSettings)
-        trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: EmojieModel(), colorModel: ColorModel(), settings: habitSettings, headerLabeltext: habitLabelText)
+        trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), settings: habitSettings)
+        trackerCreationVC.dataSourceManager = DataSourceManager(emojieModel: EmojieModel(), colorModel: ColorModel(), settings: habitSettings, headerLabeltext: habitLabelText)
         
         return trackerCreationVC
     }
@@ -58,8 +57,8 @@ final class ModulesFactory: ModulesFactoryProtocol {
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = trackersViewController
-        trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), headers: headers, settings: singleEventSettings)
-        trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: EmojieModel(), colorModel: ColorModel(), settings: singleEventSettings, headerLabeltext: singleEventLabeltext)
+        trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), settings: singleEventSettings)
+        trackerCreationVC.dataSourceManager = DataSourceManager(emojieModel: EmojieModel(), colorModel: ColorModel(), settings: singleEventSettings, headerLabeltext: singleEventLabeltext)
         
         return trackerCreationVC
     }

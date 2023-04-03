@@ -98,7 +98,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         // delegate
         collectionView.delegate = self
         
-        // settings
+        // titles
         collectionView.showsVerticalScrollIndicator = false
         collectionView.allowsMultipleSelection = false
         
@@ -223,7 +223,6 @@ extension TrackerCreationViewController: EmojieCellDelegate {
     func didSelectEmojie(emojie: String?) {
         guard let emojie = emojie else { return }
         templateEmojie = emojie
-        print(templateEmojie)
     }
 }
 
@@ -232,7 +231,6 @@ extension TrackerCreationViewController: ColorCellDelegate {
     func didSelectColor(color: UIColor?) {
         guard let color = color else { return }
         templateColor = color
-        print(color)
     }
 }
 

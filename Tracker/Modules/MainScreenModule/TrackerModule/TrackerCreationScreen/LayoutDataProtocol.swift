@@ -8,6 +8,5 @@
 import Foundation
 
 protocol LayoutDataProtocol {
-    var settings: [String] { get set }
-    var headers: [String] { get set }
+    var titles: [String] { get set }
 }
