@@ -27,7 +27,12 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
 //        Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
 //        Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
 //        Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
-    ]
+    ] {
+        didSet {
+            checkForEmptyState()
+            reloadCollectionView()
+        }
+    }
     var visibleTrackers: [Tracker] = [
     
     ]
@@ -124,6 +129,13 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         emptyStateStackView.isHidden = trackers.isEmpty ? false : true
     }
     
+    // collectionView reload
+    private func reloadCollectionView() {
+        DispatchQueue.main.async { [weak self] in
+            self?.collectionView.reloadData()
+        }
+    }
+    
     @objc
     private func addTracker() {
         // сообщить о событии
@@ -145,7 +157,6 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
         let tracker = trackers[indexPath.row]
         cell.configCell(with: tracker)
-        print("triggered cellForItemAt ")
         return cell
     }
 }
@@ -163,8 +174,6 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: TrackerMainScreenDelegate {
     func saveTracker(tracker: Tracker) {
         trackers.append(tracker)
-        checkForEmptyState()
-        print("emptyStateStackView.isHidden: \(emptyStateStackView.isHidden)")
     }
 }
 
