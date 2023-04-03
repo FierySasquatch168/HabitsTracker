@@ -23,7 +23,7 @@ protocol ModulesFactoryProtocol {
 final class ModulesFactory: ModulesFactoryProtocol {
     
     // stable properties
-    let mainScreenDelegate = TrackersViewController()
+    let trackersViewController = TrackersViewController()
     let headerCreator = HeaderCreator()
     let headers = TrackerCollectionSections.getSectionsArray()
     let emojieModel = EmojieModel()
@@ -42,7 +42,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     }
     
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
-        return TrackersViewController()
+        return trackersViewController
     }
     
     func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol {
@@ -51,7 +51,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTrackerHabitScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let trackerCreationVC = TrackerCreationViewController()
-        trackerCreationVC.mainScreenDelegate = mainScreenDelegate
+        trackerCreationVC.mainScreenDelegate = trackersViewController
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: headerCreator, headers: headers, settings: habitSettings)
         trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: emojieModel, colorModel: colorModel, settings: habitSettings, headerLabeltext: habitLabelText)
         
@@ -60,7 +60,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol {
         let trackerCreationVC = TrackerCreationViewController()
-        trackerCreationVC.mainScreenDelegate = mainScreenDelegate
+        trackerCreationVC.mainScreenDelegate = trackersViewController
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: headerCreator, headers: headers, settings: singleEventSettings)
         trackerCreationVC.dataSourceManager = DataSourceManager(headers: headers, emojieModel: emojieModel, colorModel: colorModel, settings: singleEventSettings, headerLabeltext: singleEventLabeltext)
         

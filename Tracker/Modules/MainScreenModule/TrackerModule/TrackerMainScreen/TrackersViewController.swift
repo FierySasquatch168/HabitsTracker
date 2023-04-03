@@ -103,6 +103,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         stackView.spacing = 8
         stackView.addArrangedSubview(emptyStateImageView)
         stackView.addArrangedSubview(emptyStateTextLabel)
+        
         return stackView
     }()
     
@@ -116,11 +117,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         setupNavigationAttributes()
         checkForEmptyState()
         
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        print("TrackersViewController viewWillAppear")
     }
     
     //TODO: move to separate checker
