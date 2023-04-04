@@ -21,6 +21,6 @@ struct Tracker: Identifiable {
 }
 
 struct TrackerRecord: Identifiable {
-    let id = UUID()
-    let date: Date
+    let id: UUID
+    let date: String
 }

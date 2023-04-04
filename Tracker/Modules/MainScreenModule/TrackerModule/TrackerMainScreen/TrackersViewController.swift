@@ -12,7 +12,7 @@ protocol TrackerToCoordinatorProtocol {
 }
 
 protocol TrackerMainScreenDelegate: AnyObject {
-    func saveTracker(tracker: Tracker)
+    func saveTracker(category: TrackerCategory)
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
@@ -23,21 +23,13 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     var addTrackerButtonPressed: (() -> Void)?
     
     //TODO: move to separate class
-    var trackers: [Tracker] = [
-//        Tracker(name: "Test", color: .blue, emoji: "🙂", timetable: ""),
-//        Tracker(name: "Test 2", color: .orange, emoji: "🌺", timetable: ""),
-//        Tracker(name: "Test 3", color: .red, emoji: "🥶", timetable: "")
-    ] {
+    var visibleCategories: [TrackerCategory] = []
+    var completedTrackers: [TrackerRecord] = []
+    var categories: [TrackerCategory] = [] {
         didSet {
             checkForEmptyState()
         }
     }
-    var visibleTrackers: [Tracker] = [
-    
-    ]
-    var visibleCategories: [TrackerCategory] = []
-    var completedTrackers: [TrackerRecord] = []
-    var categories: [TrackerCategory] = []
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -55,8 +47,10 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
         collectionView.dataSource = self
         collectionView.delegate = self
-        
+        // cell
         collectionView.register(TrackersListCollectionViewCell.self, forCellWithReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier)
+        // header
+        collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.reuseIdentifier)
         
         return collectionView
     }()
@@ -125,7 +119,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     //TODO: move to separate checker
     private func checkForEmptyState() {
-        emptyStateStackView.isHidden = trackers.isEmpty ? false : true
+        emptyStateStackView.isHidden = categories.isEmpty ? false : true
     }
     
     @objc
@@ -138,18 +132,24 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
 // MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return categories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return trackers.count
+        return categories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
-        let tracker = trackers[indexPath.row]
+        let tracker = categories[indexPath.section].trackers[indexPath.row]
         cell.configCell(with: tracker)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.reuseIdentifier, for: indexPath) as? HeaderView else { return UICollectionReusableView() }
+        view.configure(with: categories[indexPath.section].name)
+        return view
     }
 }
 
@@ -160,19 +160,44 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: cellWidth,
                       height: cellWidth * 0.8)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: collectionView.frame.width, height: 36)
+        // TODO: check the code below and try applying it for fitting the height
+//        let indexPath = IndexPath(row: 0, section: section)
+//        let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
+//        let layoutSize = CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height)
+//        let size = headerView.systemLayoutSizeFitting(layoutSize,
+//                                                  withHorizontalFittingPriority: .required,
+//                                                  verticalFittingPriority: .fittingSizeLevel)
+//
+//        return size
+    }
 }
 
 // MARK: - Ext TrackerMainScreenDelegate
 extension TrackersViewController: TrackerMainScreenDelegate {
-    func saveTracker(tracker: Tracker) {
+    func saveTracker(category: TrackerCategory) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            let nextTrackerIndex = self.trackers.count
-            self.trackers.append(tracker)
-            self.collectionView.performBatchUpdates {
-                self.collectionView.insertItems(at: [IndexPath(item: nextTrackerIndex, section: 0)])
-            }
+            let nextCategoryIndex = self.categories.count
+            self.categories.append(category)
+            // TODO: Make it work with batch updates, now it doesn't
+//            self.collectionView.performBatchUpdates {
+//                self.collectionView.insertItems(at: [IndexPath(item: nextCategoryIndex, section: self.categories.count)])
+//            }
+            self.collectionView.reloadData()
         }
+    }
+}
+
+// MARK: - Ext TrackersListCellDelegate
+extension TrackersViewController: TrackersListCollectionViewCellDelegate {
+    func plusTapped(trackerID: UUID?) {
+        guard let trackerID = trackerID else { return }
+        let dateOfCompletion = Date().toString()
+        let completedTracker = TrackerRecord(id: trackerID, date: dateOfCompletion)
+        completedTrackers.append(completedTracker)
     }
 }
 

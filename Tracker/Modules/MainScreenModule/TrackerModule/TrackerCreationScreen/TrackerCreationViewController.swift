@@ -40,14 +40,19 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var selectedItem: IndexPath?
     
     // tracker properties for model
-    private var templateName: String = ""
+    private var templateName: String = "" 
     private var templateColor: UIColor = .clear
     private var templateEmojie: String = ""
-    private var templateCategory: String = "Test"
+    private var templateTrackers: [Tracker] = []
+    
+    private var templateCategory: String = "Test" {
+        didSet {
+            updateCollectionView()
+        }
+    }
     private var templateTimetable: String = "" {
         didSet {
-            dataSourceManager?.subtitles = templateTimetable
-            dataSourceManager?.createDataSource(collectionView: collectionView)
+            updateCollectionView()
         }
     }
     
@@ -114,17 +119,50 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         view.backgroundColor = .YPWhite
         setupConstraints()
         
         // dataSource
-        dataSourceManager?.createDataSource(collectionView: collectionView)
+        createDataSource()
         // delegates
+        setDataSourceDelegates()
+        // swipe down delegate
+        presentationController?.delegate = self
+    }
+    
+    private func updateCollectionView() {
+        dataSourceManager?.subtitles = templateTimetable
+        dataSourceManager?.createDataSource(collectionView: collectionView)
+    }
+    
+    private func saveTracker() {
+        // add trackerCreation
+        let tracker = createTracker()
+        templateTrackers.append(tracker)
+        
+        let category = createCategoryWithTrackers(for: templateCategory, with: templateTrackers)
+        // delegate - save tracker
+        mainScreenDelegate?.saveTracker(category: category)
+    }
+    
+    private func createTracker() -> Tracker {
+        return Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
+    }
+    
+    private func createCategoryWithTrackers(for category: String, with trackers: [Tracker]) -> TrackerCategory {
+        return TrackerCategory(name: category, trackers: trackers)
+        
+    }
+    
+    private func createDataSource() {
+        dataSourceManager?.createDataSource(collectionView: collectionView)
+    }
+    
+    private func setDataSourceDelegates() {
         dataSourceManager?.trackerNameCellDelegate = self
         dataSourceManager?.emojieCelldelegate = self
         dataSourceManager?.colorCellDelegate = self
-        presentationController?.delegate = self
     }
     
     @objc
@@ -134,10 +172,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     @objc
     private func saveDidTap() {
-        // add trackerCreation
-        let tracker = Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
-        // delegate - save tracker
-        mainScreenDelegate?.saveTracker(tracker: tracker)
+        saveTracker()
         saveTrackerTapped?()
     }
 }
@@ -179,7 +214,7 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
         selectedItem = indexPath
         return true
     }
-//
+
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         guard let section = selectedItem?.section else { return }
         switch section {

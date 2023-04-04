@@ -66,8 +66,11 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
             
             return header
         }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.dataSource?.apply(createSnapshot())
+        }
         
-        dataSource?.apply(createSnapshot())
     }
 }
 
