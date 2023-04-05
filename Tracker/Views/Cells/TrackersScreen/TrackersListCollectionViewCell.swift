@@ -89,16 +89,6 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        trackerID = nil
-        emojieLabel.removeFromSuperview()
-        trackerNameLabel.removeFromSuperview()
-        daysLabel.removeFromSuperview()
-        plusButton.removeFromSuperview()
-        bottomStackView.removeFromSuperview()
-    }
-    
     func configCell(with tracker: Tracker) {
         // category should be configured as Header
         trackerID = tracker.id

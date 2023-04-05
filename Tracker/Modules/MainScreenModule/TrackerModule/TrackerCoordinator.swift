@@ -41,7 +41,6 @@ private extension TrackerCoordinator {
         var trackerSelectionScreen = factory.makeTrackerSelectionScreenView()
         trackerSelectionScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerSelectionScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showTrackerSelectionScreen returnOnCancel done")
         }
         
         trackerSelectionScreen.headToHabit = { [weak self] in
@@ -59,7 +58,6 @@ private extension TrackerCoordinator {
         var trackerHabitScreen = factory.makeTrackerHabitScreenView()
         trackerHabitScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerHabitScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showTrackerHabitScreen returnOnCancel done")
         }
         
         trackerHabitScreen.categoryTapped = { [weak self] in
@@ -82,7 +80,6 @@ private extension TrackerCoordinator {
         var trackerSingleEventScreen = factory.makeTrackerSingleEventScreenView()
         trackerSingleEventScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerSingleEventScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showHabitSingleEventScreen returnOnCancel done")
         }
         
         trackerSingleEventScreen.categoryTapped = { [weak self] in
@@ -105,7 +102,6 @@ private extension TrackerCoordinator {
         
         trackerCategoryScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerCategoryScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showCategorySelectionScreen returnOnCancel done")
         }
         
         trackerCategoryScreen.returnOnCategoryReady = { [weak self] category in
@@ -125,7 +121,6 @@ private extension TrackerCoordinator {
         
         trackerTimetableScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showTrackerTimeTableScreen returnOnCancel done")
         }
         
         trackerTimetableScreen.returnOnTimetableReady = { [ weak self] days in

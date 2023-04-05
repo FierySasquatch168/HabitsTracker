@@ -154,6 +154,7 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDelegateFlowLayo
         guard let timetableSelected = timetableSelected else { return }
         if !timetableSelected {
             selectedCategory = Categories.allCases.map({ $0.rawValue })[indexPath.row]
+            print("didSelectItemAt")
         }
 
     }

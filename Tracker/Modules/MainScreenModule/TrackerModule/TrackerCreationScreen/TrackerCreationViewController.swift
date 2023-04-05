@@ -44,11 +44,10 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var templateName: String = "" 
     private var templateColor: UIColor = .clear
     private var templateEmojie: String = ""
-    private var templateTrackers: [Tracker] = []
     
     private var templateCategory: String = "" {
         didSet {
-            updateCollectionView()
+//            updateCollectionView()
         }
     }
     private var templateTimetable: String = "" {
@@ -126,7 +125,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         
         // dataSource
         createDataSource()
-        // delegates
+        // dataSource delegates
         setDataSourceDelegates()
         // swipe down delegate
         presentationController?.delegate = self
@@ -139,22 +138,14 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }
     
     private func saveTracker() {
-        // add trackerCreation
-        let tracker = createTracker()
-        templateTrackers.append(tracker)
-        
-        let category = createCategoryWithTrackers(for: templateCategory, with: templateTrackers)
+        // create tracker
+        let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
         // delegate - save tracker
-        mainScreenDelegate?.saveTracker(category: category)
+        mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
     }
     
-    private func createTracker() -> Tracker {
-        return Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
-    }
-    
-    private func createCategoryWithTrackers(for category: String, with trackers: [Tracker]) -> TrackerCategory {
-        return TrackerCategory(name: category, trackers: trackers)
-        
+    private func createTracker(name: String, color: UIColor, emoji: String, timetable: String) -> Tracker {
+        return Tracker(name: name, color: color, emoji: emoji, timetable: timetable)
     }
     
     private func createDataSource() {

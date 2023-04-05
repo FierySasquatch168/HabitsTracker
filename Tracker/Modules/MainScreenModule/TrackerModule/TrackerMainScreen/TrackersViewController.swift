@@ -12,7 +12,7 @@ protocol TrackerToCoordinatorProtocol {
 }
 
 protocol TrackerMainScreenDelegate: AnyObject {
-    func saveTracker(category: TrackerCategory)
+    func saveTracker(tracker: Tracker, to category: String)
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
@@ -23,6 +23,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     var addTrackerButtonPressed: (() -> Void)?
     
     //TODO: move to separate class
+    
     var visibleCategories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
     var categories: [TrackerCategory] = [] {
@@ -51,7 +52,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         collectionView.register(TrackersListCollectionViewCell.self, forCellWithReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier)
         // header
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.reuseIdentifier)
-        
+                
         return collectionView
     }()
     
@@ -141,8 +142,11 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
+//        print("categories count is \(categories.count) (sections count)")
+//        print("categories[section].trackers.count is \(categories[indexPath.section].trackers.count) (rows in section count)")
         let tracker = categories[indexPath.section].trackers[indexPath.row]
         cell.configCell(with: tracker)
+//        print("cell configured with tracker: \(tracker)")
         return cell
     }
     
@@ -163,30 +167,28 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 36)
-        // TODO: check the code below and try applying it for fitting the height
-//        let indexPath = IndexPath(row: 0, section: section)
-//        let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
-//        let layoutSize = CGSize(width: collectionView.frame.width, height: UIView.layoutFittingExpandedSize.height)
-//        let size = headerView.systemLayoutSizeFitting(layoutSize,
-//                                                  withHorizontalFittingPriority: .required,
-//                                                  verticalFittingPriority: .fittingSizeLevel)
-//
-//        return size
     }
 }
 
 // MARK: - Ext TrackerMainScreenDelegate
 extension TrackersViewController: TrackerMainScreenDelegate {
-    func saveTracker(category: TrackerCategory) {
+    func saveTracker(tracker: Tracker, to category: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            let nextCategoryIndex = self.categories.count
-            self.categories.append(category)
-            // TODO: Make it work with batch updates, now it doesn't
-//            self.collectionView.performBatchUpdates {
-//                self.collectionView.insertItems(at: [IndexPath(item: nextCategoryIndex, section: self.categories.count)])
-//            }
-            self.collectionView.reloadData()
+            
+            if !categories.contains(where: { $0.name == category }) {
+                let newCategory = TrackerCategory(name: category, trackers: [tracker])
+                var temporaryCategories = categories
+                temporaryCategories.append(newCategory)
+                categories = temporaryCategories
+            }
+            else {
+                var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
+                var newCategoryIndex = categories.firstIndex(where: { $0.name == category })
+                newCategoryTrackers?.append(tracker)
+                categories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
+            }
+            collectionView.reloadData()
         }
     }
 }
