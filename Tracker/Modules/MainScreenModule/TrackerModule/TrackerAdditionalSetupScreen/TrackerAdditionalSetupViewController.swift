@@ -1,5 +1,5 @@
 //
-//  TrackerTimetableScreenViewController.swift
+//  TrackerAdditionalSetupViewController.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 30.03.2023.
@@ -7,22 +7,27 @@
 
 import UIKit
 
-protocol TrackerTimeTableToCoordinatorProtocol {
-    var timetableTransferDelegate: TimetableTransferDelegate? { get set }
+protocol TrackerAdditionalSetupToCoordinatorProtocol {
+    var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol? { get set }
+    var timetableSelected: Bool? { get set }
     var returnOnCancel: (() -> Void)? { get set }
-    var returnOnReady: (([Substring]) -> Void)? { get set }
+    var returnOnTimetableReady: (([Substring]) -> Void)? { get set }
+    var returnOnCategoryReady: ((String) -> Void)? { get set }
 }
 
-final class TrackerTimetableScreenViewController: UIViewController, TrackerTimeTableToCoordinatorProtocol {
-    var timetableTransferDelegate: TimetableTransferDelegate?
-    
+final class TrackerAdditionalSetupViewController: UIViewController, TrackerAdditionalSetupToCoordinatorProtocol {
+    var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol?
+    var timetableSelected: Bool?
     var returnOnCancel: (() -> Void)?
-    var returnOnReady: (([Substring]) -> Void)?
+    var returnOnTimetableReady: (([Substring]) -> Void)?
+    var returnOnCategoryReady: ((String) -> Void)?
     
-    private var headerTitle: String = "Расписание"
-    private var readyButtonTitle: String = "Готово"
+    private var headerTitle: String?
+    private var readyButtonTitle: String?
     
+    // data for transfering between the screens
     private var selectedWeekDays: [Substring] = []
+    private var selectedCategory: String = ""
         
     private lazy var backgroundView: UIImageView = {
         let imageView = UIImageView()
@@ -33,7 +38,7 @@ final class TrackerTimetableScreenViewController: UIViewController, TrackerTimeT
     }()
     
     private lazy var headerLabel: CustomHeaderLabel = {
-        let label = CustomHeaderLabel(headerText: headerTitle)
+        let label = CustomHeaderLabel(headerText: headerTitle ?? "Header transferringError")
         return label
     }()
     
@@ -47,18 +52,20 @@ final class TrackerTimetableScreenViewController: UIViewController, TrackerTimeT
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        
-        collectionView.register(TrackerTimeTableCell.self, forCellWithReuseIdentifier: TrackerTimeTableCell.reuseIdentifier)
+        // cell
+        collectionView.register(TrackerAdditionalSetupCell.self, forCellWithReuseIdentifier: TrackerAdditionalSetupCell.reuseIdentifier)
+        // delegate + dataSource
         collectionView.dataSource = self
         collectionView.delegate = self
-        
+                
         collectionView.backgroundView = backgroundView
+        collectionView.allowsMultipleSelection = false
         
         return collectionView
     }()
     
     private lazy var readyButton: CustomActionButton = {
-        let button = CustomActionButton(title: readyButtonTitle, backGroundColor: .YPBlack, titleColor: .YPWhite)
+        let button = CustomActionButton(title: readyButtonTitle ?? "ButtonTitleTransferError", backGroundColor: .YPBlack, titleColor: .YPWhite)
         button.addTarget(self, action: #selector(readyDidTap), for: .touchUpInside)
         return button
     }()
@@ -69,8 +76,25 @@ final class TrackerTimetableScreenViewController: UIViewController, TrackerTimeT
         super.viewDidLoad()
         
         view.backgroundColor = .YPWhite
+        chooseHeader()
+        chooseReadyButtonTitle()
         setupConstraints()
         presentationController?.delegate = self
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        timetableSelected = nil
+    }
+    
+    private func chooseHeader() {
+        guard let timetableSelected = timetableSelected else { return }
+        headerTitle = timetableSelected ? "Расписание" : "Категория"
+    }
+    
+    private func chooseReadyButtonTitle() {
+        guard let timetableSelected = timetableSelected else { return }
+        readyButtonTitle = timetableSelected ? "Готово" : "Добавить категорию"
     }
     
     private func convertStringToShortWeekDay(day: String) -> Substring {
@@ -92,35 +116,51 @@ final class TrackerTimetableScreenViewController: UIViewController, TrackerTimeT
     
     @objc
     private func readyDidTap() {
-        // 
-        returnOnReady?(selectedWeekDays)
+        guard let timetableSelected = timetableSelected else { return }
+        timetableSelected ? returnOnTimetableReady?(selectedWeekDays) : returnOnCategoryReady?(selectedCategory)
+        
     }
 
 }
 
 // MARK: - Ext DataSource
-extension TrackerTimetableScreenViewController: UICollectionViewDataSource {
+extension TrackerAdditionalSetupViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return WeekDays.allCases.count
+        guard let timetableSelected = timetableSelected else { return 0 }
+        return timetableSelected ? WeekDays.allCases.count : Categories.allCases.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerTimeTableCell.reuseIdentifier, for: indexPath) as? TrackerTimeTableCell else { return UICollectionViewCell() }
+        guard let timetableSelected = timetableSelected, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerAdditionalSetupCell.reuseIdentifier, for: indexPath) as? TrackerAdditionalSetupCell else { return UICollectionViewCell() }
         cell.trackerTimeTableCellDelegate = self
-        cell.configCellWith(title: WeekDays.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row)
+        
+        if timetableSelected {
+            cell.configTimeTableCell(title: WeekDays.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row, timetableSelected: timetableSelected)
+        } else {
+            cell.configTimeTableCell(title: Categories.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row, timetableSelected: timetableSelected)
+        }
+        
         return cell
     }
 }
 
 // MARK: - Ext CV Delegate
-extension TrackerTimetableScreenViewController: UICollectionViewDelegateFlowLayout {
+extension TrackerAdditionalSetupViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height / Double(WeekDays.allCases.count + 1))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let timetableSelected = timetableSelected else { return }
+        if !timetableSelected {
+            selectedCategory = Categories.allCases.map({ $0.rawValue })[indexPath.row]
+        }
+
     }
 }
 
 // MARK: - Ext Cell delegate
-extension TrackerTimetableScreenViewController: TrackerTimeTableCellDelegate {
+extension TrackerAdditionalSetupViewController: TrackerTimeTableCellDelegate {
     func didToggleSwitch(text: String?) {
         guard let text = text else { return }
         let shortName = convertStringToShortWeekDay(day: text)
@@ -129,14 +169,14 @@ extension TrackerTimetableScreenViewController: TrackerTimeTableCellDelegate {
 }
 
 // MARK: - Ext UIAdaptivePresentationControllerDelegate
-extension TrackerTimetableScreenViewController: UIAdaptivePresentationControllerDelegate {
+extension TrackerAdditionalSetupViewController: UIAdaptivePresentationControllerDelegate {
     func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
         returnOnCancel?()
     }
 }
 
 // MARK: - Constraints
-private extension TrackerTimetableScreenViewController {
+private extension TrackerAdditionalSetupViewController {
     func setupConstraints() {
         setupDismissButton()
         setupHeaderLabel()
@@ -186,7 +226,8 @@ private extension TrackerTimetableScreenViewController {
             collectionView.topAnchor.constraint(equalTo: headerLabel.bottomAnchor, constant: 30),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            collectionView.bottomAnchor.constraint(equalTo: readyButton.topAnchor, constant: -47)
+            collectionView.bottomAnchor.constraint(greaterThanOrEqualTo: readyButton.topAnchor, constant: -47)
+//            collectionView.bottomAnchor.constraint(equalTo: readyButton.topAnchor, constant: -47)
         ])
     }
 }

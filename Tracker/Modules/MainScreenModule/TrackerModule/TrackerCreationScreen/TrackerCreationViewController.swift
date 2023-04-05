@@ -15,8 +15,9 @@ protocol TrackerCreationToCoordinatorProtocol {
     var selectedCategories: [String]? { get set }
 }
 
-protocol TimetableTransferDelegate {
+protocol AdditionalTrackerSetupProtocol {
     func transferTimeTable(from selected: [Substring])
+    func transferCategory(from selectedCategory: String)
 }
 
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
@@ -45,7 +46,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var templateEmojie: String = ""
     private var templateTrackers: [Tracker] = []
     
-    private var templateCategory: String = "Test" {
+    private var templateCategory: String = "" {
         didSet {
             updateCollectionView()
         }
@@ -132,7 +133,8 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }
     
     private func updateCollectionView() {
-        dataSourceManager?.subtitles = templateTimetable
+        dataSourceManager?.timetableSubtitles = templateTimetable
+        dataSourceManager?.categorySubtitles = templateCategory
         dataSourceManager?.createDataSource(collectionView: collectionView)
     }
     
@@ -242,9 +244,13 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 }
 
 // MARK: - Ext Timetable delegate
-extension TrackerCreationViewController: TimetableTransferDelegate {
+extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
     func transferTimeTable(from selected: [Substring]) {
         templateTimetable = selected.joined(separator: ", ")
+    }
+    
+    func transferCategory(from selectedCategory: String) {
+        templateCategory = selectedCategory
     }
 }
 
