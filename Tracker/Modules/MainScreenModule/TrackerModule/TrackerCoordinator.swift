@@ -41,7 +41,6 @@ private extension TrackerCoordinator {
         var trackerSelectionScreen = factory.makeTrackerSelectionScreenView()
         trackerSelectionScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerSelectionScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showTrackerSelectionScreen returnOnCancel done")
         }
         
         trackerSelectionScreen.headToHabit = { [weak self] in
@@ -59,11 +58,10 @@ private extension TrackerCoordinator {
         var trackerHabitScreen = factory.makeTrackerHabitScreenView()
         trackerHabitScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerHabitScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showTrackerHabitScreen returnOnCancel done")
         }
         
         trackerHabitScreen.categoryTapped = { [weak self] in
-            self?.showCategorySelectionScreen()
+            self?.showCategorySelectionScreen(timetableDelegate: trackerHabitScreen)
         }
         
         trackerHabitScreen.timeTableTapped = { [weak self] in
@@ -82,37 +80,52 @@ private extension TrackerCoordinator {
         var trackerSingleEventScreen = factory.makeTrackerSingleEventScreenView()
         trackerSingleEventScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerSingleEventScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showHabitSingleEventScreen returnOnCancel done")
         }
         
         trackerSingleEventScreen.categoryTapped = { [weak self] in
-            self?.showCategorySelectionScreen()
+            self?.showCategorySelectionScreen(timetableDelegate: trackerSingleEventScreen)
+        }
+        
+        trackerSingleEventScreen.saveTrackerTapped = { [weak self] in
+            self?.router.dismissToRootViewController(animated: true, completion: nil)
         }
         
         router.presentViewController(trackerSingleEventScreen, animated: true, presentationStyle: .pageSheet)
     }
     
-    func showCategorySelectionScreen() {
-        var trackerCategorieScreen = factory.makeTrackerCategorieScreenView()
-        trackerCategorieScreen.returnOnCancel = { [weak self] in
-            self?.router.dismissViewController(trackerCategorieScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showCategorySelectionScreen returnOnCancel done")
+    func showCategorySelectionScreen(timetableDelegate: AdditionalTrackerSetupProtocol) {
+        var trackerCategoryScreen = factory.makeTrackerCategorieScreenView()
+        
+        trackerCategoryScreen.timetableSelected = false
+        
+        trackerCategoryScreen.additionalTrackerSetupDelegate = timetableDelegate
+        
+        trackerCategoryScreen.returnOnCancel = { [weak self] in
+            self?.router.dismissViewController(trackerCategoryScreen, animated: true, completion: nil)
         }
         
-        router.presentViewController(trackerCategorieScreen, animated: true, presentationStyle: .pageSheet)
+        trackerCategoryScreen.returnOnCategoryReady = { [weak self] category in
+            trackerCategoryScreen.additionalTrackerSetupDelegate?.transferCategory(from: category)
+            self?.router.dismissViewController(trackerCategoryScreen, animated: true, completion: nil)
+        }
+        
+        router.presentViewController(trackerCategoryScreen, animated: true, presentationStyle: .pageSheet)
     }
     
-    func showTrackerTimeTableScreen(timetableDelegate: TimetableTransferDelegate) {
+    func showTrackerTimeTableScreen(timetableDelegate: AdditionalTrackerSetupProtocol) {
         var trackerTimetableScreen = factory.makeTimeTableScreenView()
-        trackerTimetableScreen.timetableTransferDelegate = timetableDelegate
+        
+        trackerTimetableScreen.timetableSelected = true
+        
+        trackerTimetableScreen.additionalTrackerSetupDelegate = timetableDelegate
+        
         trackerTimetableScreen.returnOnCancel = { [weak self] in
             self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)
-            print("TrackerCoordinator showTrackerTimeTableScreen returnOnCancel done")
         }
         
-        trackerTimetableScreen.returnOnReady = { [ weak self] days in
+        trackerTimetableScreen.returnOnTimetableReady = { [ weak self] days in
             // add some property to transfer
-            trackerTimetableScreen.timetableTransferDelegate?.transferTimeTable(from: days)
+            trackerTimetableScreen.additionalTrackerSetupDelegate?.transferTimeTable(from: days)
             self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)
         }
         

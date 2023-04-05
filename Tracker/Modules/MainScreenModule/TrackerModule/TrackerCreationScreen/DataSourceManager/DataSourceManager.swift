@@ -12,7 +12,8 @@ protocol DataSourceManagerProtocol {
     var settingsCellDelegate: SettingsCellDelegate? { get set }
     var emojieCelldelegate: EmojieCellDelegate? { get set }
     var colorCellDelegate: ColorCellDelegate? { get set }
-    var subtitles: String { get set }
+    var categorySubtitles: String { get set }
+    var timetableSubtitles: String { get set }
     func createDataSource(collectionView: UICollectionView)
     func getTitle() -> String
 }
@@ -28,8 +29,11 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     var colorModel: ColorModel
     var titles: [String]
     
+    // initialized after user picks up category
+    var categorySubtitles: String = ""
+    
     // initialized after user picks up timetable
-    var subtitles: String = ""
+    var timetableSubtitles: String = ""
     
     var headerLabeltext: String
     
@@ -66,8 +70,11 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
             
             return header
         }
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.dataSource?.apply(createSnapshot())
+        }
         
-        dataSource?.apply(createSnapshot())
     }
 }
 
@@ -104,9 +111,14 @@ private extension DataSourceManager {
                 cell.setupCellSeparator()
             }
             
-            if indexPath.row == 1 && !subtitles.isEmpty {
-                cell.setupCellSubtitle(subtitle: subtitles)
+            if indexPath.row == 0 && !categorySubtitles.isEmpty {
+                cell.setupCellSubtitle(subtitle: categorySubtitles)
             }
+            
+            if indexPath.row == 1 && !timetableSubtitles.isEmpty {
+                cell.setupCellSubtitle(subtitle: timetableSubtitles)
+            }
+            
             return cell
             
         case 2:

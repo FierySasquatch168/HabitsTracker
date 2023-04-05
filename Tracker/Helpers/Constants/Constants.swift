@@ -15,5 +15,6 @@ struct Constants {
         static let emptyState = "EmptyState"
         static let trackersTabIcon = "record.circle.fill"
         static let statisticsTabIcon = "hare.fill"
+        static let checkmark = "checkmark"
     }
 }

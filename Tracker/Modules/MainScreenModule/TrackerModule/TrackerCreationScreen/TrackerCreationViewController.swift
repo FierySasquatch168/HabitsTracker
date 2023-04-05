@@ -15,8 +15,9 @@ protocol TrackerCreationToCoordinatorProtocol {
     var selectedCategories: [String]? { get set }
 }
 
-protocol TimetableTransferDelegate {
+protocol AdditionalTrackerSetupProtocol {
     func transferTimeTable(from selected: [Substring])
+    func transferCategory(from selectedCategory: String)
 }
 
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
@@ -40,14 +41,18 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var selectedItem: IndexPath?
     
     // tracker properties for model
-    private var templateName: String = ""
+    private var templateName: String = "" 
     private var templateColor: UIColor = .clear
     private var templateEmojie: String = ""
-    private var templateCategory: String = "Test"
+    
+    private var templateCategory: String = "" {
+        didSet {
+//            updateCollectionView()
+        }
+    }
     private var templateTimetable: String = "" {
         didSet {
-            dataSourceManager?.subtitles = templateTimetable
-            dataSourceManager?.createDataSource(collectionView: collectionView)
+            updateCollectionView()
         }
     }
     
@@ -114,17 +119,43 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         view.backgroundColor = .YPWhite
         setupConstraints()
         
         // dataSource
+        createDataSource()
+        // dataSource delegates
+        setDataSourceDelegates()
+        // swipe down delegate
+        presentationController?.delegate = self
+    }
+    
+    private func updateCollectionView() {
+        dataSourceManager?.timetableSubtitles = templateTimetable
+        dataSourceManager?.categorySubtitles = templateCategory
         dataSourceManager?.createDataSource(collectionView: collectionView)
-        // delegates
+    }
+    
+    private func saveTracker() {
+        // create tracker
+        let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
+        // delegate - save tracker
+        mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
+    }
+    
+    private func createTracker(name: String, color: UIColor, emoji: String, timetable: String) -> Tracker {
+        return Tracker(name: name, color: color, emoji: emoji, timetable: timetable)
+    }
+    
+    private func createDataSource() {
+        dataSourceManager?.createDataSource(collectionView: collectionView)
+    }
+    
+    private func setDataSourceDelegates() {
         dataSourceManager?.trackerNameCellDelegate = self
         dataSourceManager?.emojieCelldelegate = self
         dataSourceManager?.colorCellDelegate = self
-        presentationController?.delegate = self
     }
     
     @objc
@@ -134,10 +165,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     @objc
     private func saveDidTap() {
-        // add trackerCreation
-        let tracker = Tracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
-        // delegate - save tracker
-        mainScreenDelegate?.saveTracker(tracker: tracker)
+        saveTracker()
         saveTrackerTapped?()
     }
 }
@@ -179,7 +207,7 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
         selectedItem = indexPath
         return true
     }
-//
+
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         guard let section = selectedItem?.section else { return }
         switch section {
@@ -207,9 +235,13 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 }
 
 // MARK: - Ext Timetable delegate
-extension TrackerCreationViewController: TimetableTransferDelegate {
+extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
     func transferTimeTable(from selected: [Substring]) {
         templateTimetable = selected.joined(separator: ", ")
+    }
+    
+    func transferCategory(from selectedCategory: String) {
+        templateCategory = selectedCategory
     }
 }
 

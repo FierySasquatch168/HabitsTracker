@@ -7,7 +7,14 @@
 
 import UIKit
 
+protocol TrackersListCollectionViewCellDelegate: AnyObject {
+    func plusTapped(trackerID: UUID?)
+}
+
 final class TrackersListCollectionViewCell: UICollectionViewCell {
+    weak var trackersListCellDelegate: TrackersListCollectionViewCellDelegate?
+    
+    var trackerID: UUID?
     
     lazy var cellBackgroundColorImageView: UIImageView = {
         let imageView = UIImageView()
@@ -51,6 +58,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         let button = UIButton()
         // image
         button.setImage(UIImage(systemName: Constants.Icons.plus), for: .normal)
+        button.setImage(UIImage(systemName: Constants.Icons.checkmark), for: .selected)
         button.tintColor = .YPWhite
         button.clipsToBounds = true
         // layer
@@ -83,19 +91,18 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     
     func configCell(with tracker: Tracker) {
         // category should be configured as Header
+        trackerID = tracker.id
         emojieLabel.text = tracker.emoji
         cellBackgroundColorImageView.backgroundColor = tracker.color
         trackerNameLabel.text = tracker.name
         plusButton.backgroundColor = tracker.color
-        
-        
     }
 }
 
 // MARK: - Ext @objc func
 private extension TrackersListCollectionViewCell {
     @objc func plusButtonTapped() {
-        daysLabel.text = "Tap!"
+        trackersListCellDelegate?.plusTapped(trackerID: trackerID)
     }
 }
 
