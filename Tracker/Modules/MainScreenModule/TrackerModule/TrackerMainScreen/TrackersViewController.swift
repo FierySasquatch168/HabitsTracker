@@ -22,8 +22,9 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
     var addTrackerButtonPressed: (() -> Void)?
     
-    //TODO: move to separate class
+    var currentDate: Date?
     
+    //TODO: move to separate class
     var visibleCategories: [TrackerCategory] = []
     var completedTrackers: [TrackerRecord] = []
     var categories: [TrackerCategory] = [] {
@@ -142,11 +143,9 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
-//        print("categories count is \(categories.count) (sections count)")
-//        print("categories[section].trackers.count is \(categories[indexPath.section].trackers.count) (rows in section count)")
+        cell.trackersListCellDelegate = self
         let tracker = categories[indexPath.section].trackers[indexPath.row]
         cell.configCell(with: tracker)
-//        print("cell configured with tracker: \(tracker)")
         return cell
     }
     
@@ -184,9 +183,11 @@ extension TrackersViewController: TrackerMainScreenDelegate {
             }
             else {
                 var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
-                var newCategoryIndex = categories.firstIndex(where: { $0.name == category })
+                let newCategoryIndex = categories.firstIndex(where: { $0.name == category })
                 newCategoryTrackers?.append(tracker)
-                categories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
+                var temporaryCategories = categories
+                temporaryCategories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
+                categories = temporaryCategories
             }
             collectionView.reloadData()
         }
@@ -200,6 +201,7 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
         let dateOfCompletion = Date().toString()
         let completedTracker = TrackerRecord(id: trackerID, date: dateOfCompletion)
         completedTrackers.append(completedTracker)
+        print(completedTrackers)
     }
 }
 
