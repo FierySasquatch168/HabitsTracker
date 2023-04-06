@@ -22,16 +22,31 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
     var addTrackerButtonPressed: (() -> Void)?
     
-    var currentDate: Date?
-    
-    //TODO: move to separate class
-    var visibleCategories: [TrackerCategory] = []
-    var completedTrackers: [TrackerRecord] = []
-    var categories: [TrackerCategory] = [] {
+    var currentDate: Date? {
         didSet {
-            checkForEmptyState()
+            
         }
     }
+    
+    //TODO: move to separate class
+    var completedTrackerIDsSet: Set<UUID> = []
+    var visibleCategories: [TrackerCategory] = [] {
+        didSet {
+            checkForEmptyState()
+            collectionView.reloadData()
+        }
+    }
+    var completedTrackers: [TrackerRecord] = []
+    var categories: [TrackerCategory] = [
+        TrackerCategory(name: "Color", trackers: [
+            Tracker(name: "Andrew", color: .red, emoji: "0", timetable: ""),
+            Tracker(name: "Oleg", color: .blue, emoji: "1", timetable: "")
+        ]),
+        TrackerCategory(name: "Paggy", trackers: [
+            Tracker(name: "Barry", color: .green, emoji: "2", timetable: ""),
+            Tracker(name: "Malcolm", color: .gray, emoji: "3", timetable: "")
+        ])
+    ]
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
@@ -73,6 +88,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         datePicker.layer.cornerRadius = datePickerCornerRadius
         datePicker.layer.masksToBounds = true
         datePicker.locale = Locale(identifier: "ru_RU")
+        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         return datePicker
     }()
     
@@ -117,11 +133,13 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         setupNavigationAttributes()
         checkForEmptyState()
         
+        visibleCategories = categories
+        
     }
     
     //TODO: move to separate checker
     private func checkForEmptyState() {
-        emptyStateStackView.isHidden = categories.isEmpty ? false : true
+        emptyStateStackView.isHidden = visibleCategories.isEmpty ? false : true
     }
     
     @objc
@@ -129,29 +147,35 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         // сообщить о событии
         addTrackerButtonPressed?()
     }
+    
+    
+    @objc
+    private func dateChanged(_ sender: UIDatePicker) {
+        currentDate = sender.date
+    }
 }
 
 // MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return categories.count
+        return visibleCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return categories[section].trackers.count
+        return visibleCategories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
         cell.trackersListCellDelegate = self
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
         cell.configCell(with: tracker)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.reuseIdentifier, for: indexPath) as? HeaderView else { return UICollectionReusableView() }
-        view.configure(with: categories[indexPath.section].name)
+        view.configure(with: visibleCategories[indexPath.section].name)
         return view
     }
 }
@@ -180,6 +204,7 @@ extension TrackersViewController: TrackerMainScreenDelegate {
                 var temporaryCategories = categories
                 temporaryCategories.append(newCategory)
                 categories = temporaryCategories
+                visibleCategories = categories
             }
             else {
                 var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
@@ -188,6 +213,7 @@ extension TrackersViewController: TrackerMainScreenDelegate {
                 var temporaryCategories = categories
                 temporaryCategories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
                 categories = temporaryCategories
+                visibleCategories = categories
             }
             collectionView.reloadData()
         }
@@ -200,15 +226,40 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
         guard let trackerID = trackerID else { return }
         let dateOfCompletion = Date().toString()
         let completedTracker = TrackerRecord(id: trackerID, date: dateOfCompletion)
-        completedTrackers.append(completedTracker)
-        print(completedTrackers)
+        
+        if !completedTrackers.contains(where: { $0.id == trackerID }) {
+            completedTrackers.append(completedTracker)
+            completedTrackerIDsSet.insert(completedTracker.id)
+        } else {
+            completedTrackers.removeAll(where: { $0.id == trackerID })
+            completedTrackerIDsSet.remove(trackerID)
+        }
     }
 }
 
 // MARK: - Ext TextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
-    // TODO: apply filtering of the trackers later
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if string.isEmpty {
+            visibleCategories = categories
+            return true
+        } else {
+            var temporaryCategories: [TrackerCategory] = []
+            
+            for category in categories {
+                let filteredTrackers = category.trackers.filter({ $0.name.contains(string) })
+                if !filteredTrackers.isEmpty {
+                    let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
+                    temporaryCategories.append(filteredCategory)
+                    visibleCategories = temporaryCategories
+                }
+            }
+        }
+        
+        return true
+    }
 }
+
 
 // MARK: - Ext NavigationAttributes
 private extension TrackersViewController {
