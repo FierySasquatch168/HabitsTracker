@@ -30,6 +30,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     //TODO: move to separate class
     var completedTrackerIDsSet: Set<UUID> = []
+
     var visibleCategories: [TrackerCategory] = [] {
         didSet {
             checkForEmptyState()
@@ -76,6 +77,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         let textField = UISearchTextField()
         textField.placeholder = "Search"
         textField.delegate = self
+        textField.addTarget(self, action: #selector(editingChanged), for: .valueChanged)
         return textField
     }()
     
@@ -132,6 +134,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         setupConstraints()
         setupNavigationAttributes()
         checkForEmptyState()
+        visibleCategories = categories
         
         visibleCategories = categories
         
@@ -142,13 +145,16 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         emptyStateStackView.isHidden = visibleCategories.isEmpty ? false : true
     }
     
+    private func filterTheTrackers() {
+        
+    }
+    
     @objc
     private func addTracker() {
         // сообщить о событии
         addTrackerButtonPressed?()
     }
-    
-    
+
     @objc
     private func dateChanged(_ sender: UIDatePicker) {
         currentDate = sender.date
