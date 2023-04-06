@@ -47,7 +47,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     private var templateCategory: String = "" {
         didSet {
-//            updateCollectionView()
+            updateCollectionView()
         }
     }
     private var templateTimetable: String = "" {
