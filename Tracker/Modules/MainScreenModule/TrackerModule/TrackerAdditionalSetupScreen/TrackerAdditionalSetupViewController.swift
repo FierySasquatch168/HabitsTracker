@@ -57,7 +57,8 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
         // delegate + dataSource
         collectionView.dataSource = self
         collectionView.delegate = self
-                
+        
+        
         collectionView.backgroundView = backgroundView
         collectionView.allowsMultipleSelection = false
         

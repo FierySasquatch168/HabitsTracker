@@ -23,13 +23,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     var addTrackerButtonPressed: (() -> Void)?
     
     var currentDate: Date? {
-        didSet {
-            
-        }
+        datePicker.date.customlyFormatted()
     }
     
     //TODO: move to separate class
-    var completedTrackerIDsSet: Set<UUID> = []
+    var cmopletedTrackers: Set<TrackerRecord> = []
 
     var visibleCategories: [TrackerCategory] = [] {
         didSet {
@@ -37,15 +35,16 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
             collectionView.reloadData()
         }
     }
-    var completedTrackers: [TrackerRecord] = []
+
+    
     var categories: [TrackerCategory] = [
-        TrackerCategory(name: "Color", trackers: [
-            Tracker(name: "Andrew", color: .red, emoji: "0", timetable: ""),
-            Tracker(name: "Oleg", color: .blue, emoji: "1", timetable: "")
+        TrackerCategory(name: "Важное", trackers: [
+            Tracker(name: "Play", color: .red, emoji: "🙂", timetable: "Вт"),
+            Tracker(name: "Run", color: .blue, emoji: "😻", timetable: "Чт")
         ]),
-        TrackerCategory(name: "Paggy", trackers: [
-            Tracker(name: "Barry", color: .green, emoji: "2", timetable: ""),
-            Tracker(name: "Malcolm", color: .gray, emoji: "3", timetable: "")
+        TrackerCategory(name: "Самочувствие", trackers: [
+            Tracker(name: "Jump", color: .green, emoji: "🌺", timetable: "Ср"),
+            Tracker(name: "Fly", color: .gray, emoji: "🐶", timetable: "Чт")
         ])
     ]
     
@@ -77,7 +76,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         let textField = UISearchTextField()
         textField.placeholder = "Search"
         textField.delegate = self
-        textField.addTarget(self, action: #selector(editingChanged), for: .valueChanged)
         return textField
     }()
     
@@ -90,7 +88,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         datePicker.layer.cornerRadius = datePickerCornerRadius
         datePicker.layer.masksToBounds = true
         datePicker.locale = Locale(identifier: "ru_RU")
-        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+        datePicker.addTarget(self, action: #selector(reloadTheDate), for: .valueChanged)
         return datePicker
     }()
     
@@ -136,17 +134,29 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         checkForEmptyState()
         visibleCategories = categories
         
-        visibleCategories = categories
-        
+        checkForSceduledTrackers()
     }
     
-    //TODO: move to separate checker
+    //MARK: Methods
     private func checkForEmptyState() {
         emptyStateStackView.isHidden = visibleCategories.isEmpty ? false : true
     }
     
-    private func filterTheTrackers() {
+    private func checkForSceduledTrackers() {
+        guard let dayOfWeek = currentDate?.weekdayNameStandalone else { return }
         
+        var temporaryCategories: [TrackerCategory] = []
+        
+        for category in categories {
+            let filteredTrackers = category.trackers.filter { $0.timetable.contains(dayOfWeek) }
+            if !filteredTrackers.isEmpty {
+                let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
+                temporaryCategories.append(filteredCategory)
+                visibleCategories = temporaryCategories
+            } else {
+                visibleCategories = temporaryCategories
+            }
+        }
     }
     
     @objc
@@ -154,11 +164,12 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         // сообщить о событии
         addTrackerButtonPressed?()
     }
-
+    
     @objc
-    private func dateChanged(_ sender: UIDatePicker) {
-        currentDate = sender.date
+    private func reloadTheDate() {
+        checkForSceduledTrackers()
     }
+
 }
 
 // MARK: - Ext Data Source
@@ -229,16 +240,15 @@ extension TrackersViewController: TrackerMainScreenDelegate {
 // MARK: - Ext TrackersListCellDelegate
 extension TrackersViewController: TrackersListCollectionViewCellDelegate {
     func plusTapped(trackerID: UUID?) {
-        guard let trackerID = trackerID else { return }
-        let dateOfCompletion = Date().toString()
+        guard let trackerID = trackerID, let currentDate = currentDate else { return }
+        let dateOfCompletion = currentDate
         let completedTracker = TrackerRecord(id: trackerID, date: dateOfCompletion)
         
-        if !completedTrackers.contains(where: { $0.id == trackerID }) {
-            completedTrackers.append(completedTracker)
-            completedTrackerIDsSet.insert(completedTracker.id)
+        if !cmopletedTrackers.contains(where: { $0.id == trackerID }) {
+            cmopletedTrackers.insert(completedTracker)
+            print(cmopletedTrackers)
         } else {
-            completedTrackers.removeAll(where: { $0.id == trackerID })
-            completedTrackerIDsSet.remove(trackerID)
+            cmopletedTrackers.remove(completedTracker)
         }
     }
 }
@@ -247,16 +257,18 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
 extension TrackersViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if string.isEmpty {
-            visibleCategories = categories
+            checkForSceduledTrackers()
             return true
         } else {
             var temporaryCategories: [TrackerCategory] = []
             
-            for category in categories {
+            for category in visibleCategories {
                 let filteredTrackers = category.trackers.filter({ $0.name.contains(string) })
                 if !filteredTrackers.isEmpty {
                     let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
                     temporaryCategories.append(filteredCategory)
+                    visibleCategories = temporaryCategories
+                } else {
                     visibleCategories = temporaryCategories
                 }
             }

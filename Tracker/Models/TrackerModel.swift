@@ -20,7 +20,7 @@ struct Tracker: Identifiable {
     let timetable: String
 }
 
-struct TrackerRecord: Identifiable {
+struct TrackerRecord: Identifiable, Hashable {
     let id: UUID
-    let date: String
+    let date: Date
 }
