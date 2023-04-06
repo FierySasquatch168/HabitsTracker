@@ -58,7 +58,6 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         let button = UIButton()
         // image
         button.setImage(UIImage(systemName: Constants.Icons.plus), for: .normal)
-        button.setImage(UIImage(systemName: Constants.Icons.checkmark), for: .selected)
         button.tintColor = .YPWhite
         button.clipsToBounds = true
         // layer
@@ -97,12 +96,23 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         trackerNameLabel.text = tracker.name
         plusButton.backgroundColor = tracker.color
     }
+    
+    private func toggleCompletionInfo(_ sender: UIButton) {
+        if sender.currentImage == UIImage(systemName: Constants.Icons.plus) {
+            sender.setImage(UIImage(systemName: Constants.Icons.checkmark), for: .normal)
+            daysLabel.text = "1 день"
+        } else {
+            sender.setImage(UIImage(systemName: Constants.Icons.plus), for: .normal)
+            daysLabel.text = "0 дней"
+        }
+    }
 }
 
 // MARK: - Ext @objc func
 private extension TrackersListCollectionViewCell {
-    @objc func plusButtonTapped() {
+    @objc func plusButtonTapped(_ sender: UIButton) {
         trackersListCellDelegate?.plusTapped(trackerID: trackerID)
+        toggleCompletionInfo(sender)
     }
 }
 

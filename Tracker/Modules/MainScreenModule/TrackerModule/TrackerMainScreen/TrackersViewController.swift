@@ -21,15 +21,28 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     private let datePickerCornerRadius: CGFloat = 8
         
     var addTrackerButtonPressed: (() -> Void)?
-    
-    var currentDate: Date?
+        
+    var currentDate: Date? {
+        didSet {
+            
+        }
+    }
     
     //TODO: move to separate class
-    var visibleCategories: [TrackerCategory] = []
-    var completedTrackers: [TrackerRecord] = []
-    var categories: [TrackerCategory] = [] {
+    var completedTrackerIDsSet: Set<UUID> = []
+    
+    var visibleCategories: [TrackerCategory] = [] {
         didSet {
             checkForEmptyState()
+            collectionView.reloadData()
+        }
+    }
+    
+    var completedTrackers: [TrackerRecord] = []
+    
+    var categories: [TrackerCategory] = [] {
+        didSet {
+            visibleCategories = categories
         }
     }
     
@@ -61,6 +74,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         let textField = UISearchTextField()
         textField.placeholder = "Search"
         textField.delegate = self
+        textField.addTarget(self, action: #selector(editingChanged), for: .valueChanged)
         return textField
     }()
     
@@ -73,6 +87,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         datePicker.layer.cornerRadius = datePickerCornerRadius
         datePicker.layer.masksToBounds = true
         datePicker.locale = Locale(identifier: "ru_RU")
+        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         return datePicker
     }()
     
@@ -116,6 +131,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         setupConstraints()
         setupNavigationAttributes()
         checkForEmptyState()
+        visibleCategories = categories
         
     }
     
@@ -124,34 +140,62 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         emptyStateStackView.isHidden = categories.isEmpty ? false : true
     }
     
+    private func filterTheTrackers() {
+        
+    }
+    
     @objc
     private func addTracker() {
         // сообщить о событии
         addTrackerButtonPressed?()
+    }
+    
+    @objc
+    private func dateChanged(_ sender: UIDatePicker) {
+        currentDate = sender.date
+    }
+    
+    @objc
+    private func editingChanged(_ sender: UITextField) {
+        guard let text = sender.text else { return }
+        if text.isEmpty {
+            visibleCategories = categories
+            collectionView.reloadData()
+        } else {
+            visibleCategories = categories.filter({ $0.name.localizedCaseInsensitiveContains(text) }).sorted(by: {
+                if let range0 = $0.name.range(of: text, options: [.caseInsensitive], range: $0.name.startIndex..<$0.name.endIndex, locale: nil),
+                   let range1 = $0.name.range(of: text, options: [.caseInsensitive], range: $1.name.startIndex..<$1.name.endIndex, locale: nil) {
+                    return range0.lowerBound < range1.lowerBound
+                } else {
+                    return false
+                }
+            })
+            collectionView.reloadData()
+        }
     }
 }
 
 // MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return categories.count
+        return visibleCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return categories[section].trackers.count
+        return visibleCategories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
         cell.trackersListCellDelegate = self
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
         cell.configCell(with: tracker)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.reuseIdentifier, for: indexPath) as? HeaderView else { return UICollectionReusableView() }
-        view.configure(with: categories[indexPath.section].name)
+        view.configure(with: visibleCategories[indexPath.section].name)
         return view
     }
 }
@@ -200,14 +244,21 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
         guard let trackerID = trackerID else { return }
         let dateOfCompletion = Date().toString()
         let completedTracker = TrackerRecord(id: trackerID, date: dateOfCompletion)
-        completedTrackers.append(completedTracker)
-        print(completedTrackers)
+        
+        if !completedTrackers.contains(where: { $0.id == trackerID }) {
+            completedTrackers.append(completedTracker)
+            completedTrackerIDsSet.insert(completedTracker.id)
+        } else {
+            completedTrackers.removeAll(where: { $0.id == trackerID })
+            completedTrackerIDsSet.remove(trackerID)
+        }
     }
 }
 
 // MARK: - Ext TextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
     // TODO: apply filtering of the trackers later
+    
 }
 
 // MARK: - Ext NavigationAttributes

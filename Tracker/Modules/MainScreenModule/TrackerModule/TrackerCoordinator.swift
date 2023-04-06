@@ -37,6 +37,7 @@ private extension TrackerCoordinator {
         router.addTabBarItem(navController)
     }
     
+    // MARK: Tracker Selection
     func showTrackerSelectionScreen() {
         var trackerSelectionScreen = factory.makeTrackerSelectionScreenView()
         trackerSelectionScreen.returnOnCancel = { [weak self] in
@@ -53,6 +54,8 @@ private extension TrackerCoordinator {
         
         router.presentViewController(trackerSelectionScreen, animated: true, presentationStyle: .pageSheet)
     }
+    
+    // MARK: Habit
     
     func showTrackerHabitScreen() {
         var trackerHabitScreen = factory.makeTrackerHabitScreenView()
@@ -76,6 +79,8 @@ private extension TrackerCoordinator {
         router.presentViewController(trackerHabitScreen, animated: true, presentationStyle: .pageSheet)
     }
     
+    // MARK: SingleEvent
+    
     func showHabitSingleEventScreen() {
         var trackerSingleEventScreen = factory.makeTrackerSingleEventScreenView()
         trackerSingleEventScreen.returnOnCancel = { [weak self] in
@@ -92,6 +97,8 @@ private extension TrackerCoordinator {
         
         router.presentViewController(trackerSingleEventScreen, animated: true, presentationStyle: .pageSheet)
     }
+    
+    // MARK: Category selection
     
     func showCategorySelectionScreen(timetableDelegate: AdditionalTrackerSetupProtocol) {
         var trackerCategoryScreen = factory.makeTrackerCategorieScreenView()
@@ -111,6 +118,8 @@ private extension TrackerCoordinator {
         
         router.presentViewController(trackerCategoryScreen, animated: true, presentationStyle: .pageSheet)
     }
+    
+    // MARK: TimeTable
     
     func showTrackerTimeTableScreen(timetableDelegate: AdditionalTrackerSetupProtocol) {
         var trackerTimetableScreen = factory.makeTimeTableScreenView()
