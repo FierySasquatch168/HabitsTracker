@@ -27,7 +27,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     }
     
     //TODO: move to separate class
-    var cmopletedTrackers: Set<TrackerRecord> = []
+    var completedTrackers: Set<TrackerRecord> = [] {
+        didSet {
+            collectionView.reloadData()
+        }
+    }
 
     var visibleCategories: [TrackerCategory] = [] {
         didSet {
@@ -39,11 +43,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     var categories: [TrackerCategory] = [
         TrackerCategory(name: "Важное", trackers: [
-            Tracker(name: "Play", color: .red, emoji: "🙂", timetable: "Вт"),
+            Tracker(name: "Play", color: .red, emoji: "🙂", timetable: "Вт, Чт"),
             Tracker(name: "Run", color: .blue, emoji: "😻", timetable: "Чт")
         ]),
         TrackerCategory(name: "Самочувствие", trackers: [
-            Tracker(name: "Jump", color: .green, emoji: "🌺", timetable: "Ср"),
+            Tracker(name: "Jump", color: .green, emoji: "🌺", timetable: "Вт, Ср"),
             Tracker(name: "Fly", color: .gray, emoji: "🐶", timetable: "Чт")
         ])
     ]
@@ -131,9 +135,9 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         view.backgroundColor = .systemBackground
         setupConstraints()
         setupNavigationAttributes()
-        checkForEmptyState()
         visibleCategories = categories
         
+        checkForEmptyState()
         checkForSceduledTrackers()
     }
     
@@ -157,6 +161,27 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
                 visibleCategories = temporaryCategories
             }
         }
+    }
+    
+    private func chooseTrackerImage(for tracker: Tracker) -> UIImage {
+        for completedTracker in completedTrackers {
+            if completedTracker.id == tracker.id && completedTracker.date == currentDate {
+                return UIImage(systemName: Constants.Icons.checkmark) ?? UIImage()
+            }
+        }
+        
+        return UIImage(systemName: Constants.Icons.plus) ?? UIImage()
+    }
+    
+    private func updateCellCounter(for trackerID: UUID) -> String {
+        var count = 0
+        for completedTracker in completedTrackers {
+            if completedTracker.id == trackerID {
+                count += 1
+            }
+        }
+        
+        return "\(count) дней"
     }
     
     @objc
@@ -184,9 +209,14 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier, for: indexPath) as? TrackersListCollectionViewCell else { return UICollectionViewCell() }
+        // cell delegate
         cell.trackersListCellDelegate = self
+        // properties for the cell
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
-        cell.configCell(with: tracker)
+        let image = chooseTrackerImage(for: tracker)
+        let label = updateCellCounter(for: tracker.id)
+        // cell configuration
+        cell.configCell(with: tracker, image: image, label: label)
         return cell
     }
     
@@ -240,15 +270,14 @@ extension TrackersViewController: TrackerMainScreenDelegate {
 // MARK: - Ext TrackersListCellDelegate
 extension TrackersViewController: TrackersListCollectionViewCellDelegate {
     func plusTapped(trackerID: UUID?) {
-        guard let trackerID = trackerID, let currentDate = currentDate else { return }
-        let dateOfCompletion = currentDate
+        guard let trackerID = trackerID, let currentDate = currentDate, currentDate <= Date() else { return }
+        let dateOfCompletion = currentDate.customlyFormatted()
         let completedTracker = TrackerRecord(id: trackerID, date: dateOfCompletion)
         
-        if !cmopletedTrackers.contains(where: { $0.id == trackerID }) {
-            cmopletedTrackers.insert(completedTracker)
-            print(cmopletedTrackers)
+        if !completedTrackers.contains(where: { $0.id == trackerID && $0.date == currentDate }) {
+            completedTrackers.insert(completedTracker)
         } else {
-            cmopletedTrackers.remove(completedTracker)
+            completedTrackers.remove(completedTracker)
         }
     }
 }

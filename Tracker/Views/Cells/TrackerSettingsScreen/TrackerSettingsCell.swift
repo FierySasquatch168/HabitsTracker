@@ -76,7 +76,7 @@ final class TrackerSettingsCell: UICollectionViewCell {
     }
     
     // MARK: Main func
-    
+    // set from collectionView
     func setupTitle(title: String) {
         titleLabel.text = title
     }
@@ -110,8 +110,6 @@ private extension TrackerSettingsCell {
 private extension TrackerSettingsCell {
     
     func setupConstraints() {
-        // wrap main label into stackview with secondary label hidden
-        // show secondary label when titles are set
         setupTitleAndSubtitleStackView()
         setupImageView()
     }

@@ -25,6 +25,11 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     private var headerTitle: String?
     private var readyButtonTitle: String?
     
+    private var timetableScreenTitle = "Расписание"
+    private var categoryScreenTitle = "Категория"
+    private var timetableDoneButtonTitle = "Готово"
+    private var categoryDoneButtonTitle = "Добавить категорию"
+    
     // data for transfering between the screens
     private var selectedWeekDays: [Substring] = []
     private var selectedCategory: String = ""
@@ -51,6 +56,8 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     private lazy var collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 0
+        
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         // cell
         collectionView.register(TrackerAdditionalSetupCell.self, forCellWithReuseIdentifier: TrackerAdditionalSetupCell.reuseIdentifier)
@@ -58,8 +65,6 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
         collectionView.dataSource = self
         collectionView.delegate = self
         
-        
-        collectionView.backgroundView = backgroundView
         collectionView.allowsMultipleSelection = false
         
         return collectionView
@@ -90,12 +95,12 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     
     private func chooseHeader() {
         guard let timetableSelected = timetableSelected else { return }
-        headerTitle = timetableSelected ? "Расписание" : "Категория"
+        headerTitle = timetableSelected ? timetableScreenTitle : categoryScreenTitle
     }
     
     private func chooseReadyButtonTitle() {
         guard let timetableSelected = timetableSelected else { return }
-        readyButtonTitle = timetableSelected ? "Готово" : "Добавить категорию"
+        readyButtonTitle = timetableSelected ? timetableDoneButtonTitle : categoryDoneButtonTitle
     }
     
     private func convertStringToShortWeekDay(day: String) -> Substring {
@@ -137,8 +142,18 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDataSource {
         
         if timetableSelected {
             cell.configTimeTableCell(title: WeekDays.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row, timetableSelected: timetableSelected)
+            if indexPath.row == WeekDays.allCases.count - 1 {
+                cell.roundBottomCorners()
+            }
         } else {
             cell.configTimeTableCell(title: Categories.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row, timetableSelected: timetableSelected)
+            if indexPath.row == Categories.allCases.count - 1 {
+                cell.roundBottomCorners()
+            }
+        }
+        
+        if indexPath.row == 0 {
+            cell.roundTopCorners()
         }
         
         return cell
@@ -148,16 +163,14 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDataSource {
 // MARK: - Ext CV Delegate
 extension TrackerAdditionalSetupViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.frame.width, height: collectionView.frame.height / Double(WeekDays.allCases.count + 1))
+        return CGSize(width: collectionView.frame.width, height: 75)
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let timetableSelected = timetableSelected else { return }
         if !timetableSelected {
             selectedCategory = Categories.allCases.map({ $0.rawValue })[indexPath.row]
-            print("didSelectItemAt")
         }
-
     }
 }
 
@@ -229,7 +242,6 @@ private extension TrackerAdditionalSetupViewController {
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             collectionView.bottomAnchor.constraint(greaterThanOrEqualTo: readyButton.topAnchor, constant: -47)
-//            collectionView.bottomAnchor.constraint(equalTo: readyButton.topAnchor, constant: -47)
         ])
     }
 }
