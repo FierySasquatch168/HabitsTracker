@@ -88,23 +88,16 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configCell(with tracker: Tracker) {
+    func configCell(with tracker: Tracker, image: UIImage, label: String) {
         // category should be configured as Header
         trackerID = tracker.id
         emojieLabel.text = tracker.emoji
         cellBackgroundColorImageView.backgroundColor = tracker.color
         trackerNameLabel.text = tracker.name
         plusButton.backgroundColor = tracker.color
-    }
-    
-    private func toggleCompletionInfo(_ sender: UIButton) {
-        if sender.currentImage == UIImage(systemName: Constants.Icons.plus) {
-            sender.setImage(UIImage(systemName: Constants.Icons.checkmark), for: .normal)
-            daysLabel.text = "1 день"
-        } else {
-            sender.setImage(UIImage(systemName: Constants.Icons.plus), for: .normal)
-            daysLabel.text = "0 дней"
-        }
+        
+        plusButton.setImage(image, for: .normal)
+        daysLabel.text = label
     }
 }
 
@@ -112,7 +105,6 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
 private extension TrackersListCollectionViewCell {
     @objc func plusButtonTapped(_ sender: UIButton) {
         trackersListCellDelegate?.plusTapped(trackerID: trackerID)
-        toggleCompletionInfo(sender)
     }
 }
 
