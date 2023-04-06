@@ -175,7 +175,7 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         switch indexPath.section {
         case 0:
-            print("\(indexPath)")
+            break
         case 1:
             // proceed to category
             if indexPath.row == 0 {
@@ -212,9 +212,9 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
         guard let section = selectedItem?.section else { return }
         switch section {
         case 0:
-            print("didDeselectItemAt index path: \(indexPath)")
+            break
         case 1:
-            print("didDeselectItemAt index path: \(indexPath)")
+            break
         case 2:
             guard let item = emojieSelectedItem, let cell = collectionView.cellForItem(at: IndexPath(item: item, section: section)) as? TrackerEmojieCell else { return }
             cell.cellIsSelected = false

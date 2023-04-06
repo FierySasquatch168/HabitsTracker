@@ -172,16 +172,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
         return UIImage(systemName: Constants.Icons.plus) ?? UIImage()
     }
-    // TODO: remove if solution found
-//    private func chooseTrackerLabel(for tracker: Tracker) -> String {
-//        for completedTracker in completedTrackers {
-//            if completedTracker.id == tracker.id && completedTracker.date == currentDate {
-//                return "1 день"
-//            }
-//        }
-//
-//        return "0 дней"
-//    }
     
     private func updateCellCounter(for trackerID: UUID) -> String {
         var count = 0
@@ -286,12 +276,8 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
         
         if !completedTrackers.contains(where: { $0.id == trackerID && $0.date == currentDate }) {
             completedTrackers.insert(completedTracker)
-            print("completedTrackers doesn't contain \(completedTracker)")
-            print("completedTrackers are: \(completedTrackers)")
         } else {
             completedTrackers.remove(completedTracker)
-            print("completedTrackers contains \(completedTracker)")
-            print("completedTrackers are: \(completedTrackers)")
         }
     }
 }

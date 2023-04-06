@@ -78,6 +78,15 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
         }
     }
     
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .YPBackground
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     func configTimeTableCell(title: String, for row: Int, timetableSelected: Bool) {
         cellTextLabel.text = title
         
@@ -87,6 +96,18 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
         
         timetableSelected ? setupTimeTableConstraints() : setupCategoryConstraints()
         
+    }
+    
+    func roundTopCorners() {
+        layer.masksToBounds = true
+        layer.cornerRadius = 10
+        layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+    }
+    
+    func roundBottomCorners() {
+        layer.masksToBounds = true
+        layer.cornerRadius = 10
+        layer.maskedCorners = [.layerMaxXMaxYCorner, .layerMinXMaxYCorner]
     }
     
     @objc
@@ -99,7 +120,7 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
 private extension TrackerAdditionalSetupCell {
     // is set up from collectionView when separator is needed
     func installSeparator() {
-        contentView.addSubview(cellSeparator)
+        addSubview(cellSeparator)
         cellSeparator.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
