@@ -8,10 +8,21 @@
 import Foundation
 
 extension Date {
-    func toString(format: String = "dd MMMM yyyy") -> String {
-           let formatter = DateFormatter()
-           formatter.dateStyle = .short
-           formatter.dateFormat = format
-           return formatter.string(from: self)
+    func customlyFormatted() -> Date {
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: self)
+        return Calendar.current.date(from: components) ?? Date()
        }
+    
+    var weekdayNameStandalone: String {
+            Formatter.weekdayNameStandalone.string(from: self)
+        }
+}
+
+extension Formatter {
+    static let weekdayNameStandalone: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.locale = .autoupdatingCurrent
+            formatter.dateFormat = "EEEEEE"
+            return formatter
+        }()
 }
