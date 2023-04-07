@@ -175,15 +175,9 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         return UIImage(systemName: Constants.Icons.plus) ?? UIImage()
     }
     
-    private func updateCellCounter(for trackerID: UUID) -> String {
-        var count = 0
-        for completedTracker in completedTrackers {
-            if completedTracker.id == trackerID {
-                count += 1
-            }
-        }
-        
-        return "\(count) дней"
+    private func updateCellCounter(at indexPath: IndexPath) -> Int {
+        let id = visibleCategories[indexPath.section].trackers[indexPath.row].id
+        return completedTrackers.filter({ $0.id == id }).count
     }
     
     private func closeTheDatePicker() {
@@ -221,9 +215,9 @@ extension TrackersViewController: UICollectionViewDataSource {
         // properties for the cell
         let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
         let image = chooseTrackerImage(for: tracker)
-        let label = updateCellCounter(for: tracker.id)
+        let count = updateCellCounter(at: indexPath)
         // cell configuration
-        cell.configCell(with: tracker, image: image, label: label)
+        cell.configCell(with: tracker, image: image, count: count)
         return cell
     }
     

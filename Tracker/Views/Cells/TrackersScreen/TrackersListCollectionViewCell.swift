@@ -48,7 +48,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     lazy var daysLabel: UILabel = {
         let label = UILabel()
         // text
-        label.text = "0 дней"
+//        label.text = "0 дней"
         label.font = UIFont(name: CustomFonts.YPMedium.rawValue, size: 12)
         label.textColor = .YPBlack
         return label
@@ -79,6 +79,23 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
+    var daysAmount: Int? {
+        didSet {
+            if let daysAmount {
+                var suffix: String
+                let lastDigit = daysAmount % 10
+                
+                switch lastDigit {
+                case 1: suffix = "день"
+                case 2, 3, 4: suffix = "дня"
+                case 5, 6, 7, 8, 9 , 0: suffix = "дней"
+                default: suffix = ""
+                }
+                daysLabel.text = "\(daysAmount) " + suffix
+            }
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupConstraints()
@@ -88,7 +105,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configCell(with tracker: Tracker, image: UIImage, label: String) {
+    func configCell(with tracker: Tracker, image: UIImage, count: Int) {
         // category should be configured as Header
         trackerID = tracker.id
         emojieLabel.text = tracker.emoji
@@ -97,7 +114,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         plusButton.backgroundColor = tracker.color
         
         plusButton.setImage(image, for: .normal)
-        daysLabel.text = label
+        daysAmount = count
     }
 }
 
