@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol TrackerAdditionalSetupToCoordinatorProtocol {
+protocol TrackerAdditionalSetupToCoordinatorProtocol: AnyObject {
     var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol? { get set }
     var timetableSelected: Bool? { get set }
     var returnOnCancel: (() -> Void)? { get set }
@@ -71,7 +71,7 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     }()
     
     private lazy var readyButton: CustomActionButton = {
-        let button = CustomActionButton(title: readyButtonTitle ?? "ButtonTitleTransferError", backGroundColor: .YPBlack, titleColor: .YPWhite)
+        let button = CustomActionButton(title: readyButtonTitle ?? "ButtonTitleTransferError", appearance: .confirm)
         button.addTarget(self, action: #selector(readyDidTap), for: .touchUpInside)
         return button
     }()

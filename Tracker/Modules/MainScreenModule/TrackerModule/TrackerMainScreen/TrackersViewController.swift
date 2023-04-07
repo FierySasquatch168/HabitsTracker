@@ -36,7 +36,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     var visibleCategories: [TrackerCategory] = [] {
         didSet {
             checkForEmptyState()
-            collectionView.reloadData()
         }
     }
 
@@ -44,11 +43,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     var categories: [TrackerCategory] = [
         TrackerCategory(name: "Важное", trackers: [
             Tracker(name: "Play", color: .red, emoji: "🙂", timetable: "Вт, Чт"),
-            Tracker(name: "Run", color: .blue, emoji: "😻", timetable: "Чт")
+            Tracker(name: "Run", color: .blue, emoji: "😻", timetable: "Чт, Пт")
         ]),
         TrackerCategory(name: "Самочувствие", trackers: [
             Tracker(name: "Jump", color: .green, emoji: "🌺", timetable: "Вт, Ср"),
-            Tracker(name: "Fly", color: .gray, emoji: "🐶", timetable: "Чт")
+            Tracker(name: "Fly", color: .gray, emoji: "🐶", timetable: "Чт, Пт")
         ])
     ]
     
@@ -72,6 +71,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         collectionView.register(TrackersListCollectionViewCell.self, forCellWithReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier)
         // header
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.reuseIdentifier)
+        
+        collectionView.showsVerticalScrollIndicator = false
                 
         return collectionView
     }()
@@ -88,7 +89,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
         datePicker.backgroundColor = .YPBackground
-        datePicker.tintColor = .YPBlack
+        datePicker.tintColor = .YPBlue
         datePicker.layer.cornerRadius = datePickerCornerRadius
         datePicker.layer.masksToBounds = true
         datePicker.locale = Locale(identifier: "ru_RU")
@@ -262,6 +263,7 @@ extension TrackersViewController: TrackerMainScreenDelegate {
                 categories = temporaryCategories
                 visibleCategories = categories
             }
+            checkForSceduledTrackers()
             collectionView.reloadData()
         }
     }

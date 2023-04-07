@@ -15,7 +15,7 @@ protocol TrackerCreationToCoordinatorProtocol {
     var selectedCategories: [String]? { get set }
 }
 
-protocol AdditionalTrackerSetupProtocol {
+protocol AdditionalTrackerSetupProtocol: AnyObject {
     func transferTimeTable(from selected: [Substring])
     func transferCategory(from selectedCategory: String)
 }
@@ -28,7 +28,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     var timeTableTapped: (() -> Void)?
     var categoryTapped: (() -> Void)?
     
-    var mainScreenDelegate: TrackerMainScreenDelegate?
+    weak var mainScreenDelegate: TrackerViceMainScreenDelegate?
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
     
@@ -41,17 +41,31 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var selectedItem: IndexPath?
     
     // tracker properties for model
-    private var templateName: String = "" 
-    private var templateColor: UIColor = .clear
-    private var templateEmojie: String = ""
+    private var templateName: String = "" {
+        didSet {
+            checkForCorrectTrackerInfo()
+        }
+    }
+    private var templateColor: UIColor = .clear {
+        didSet {
+            checkForCorrectTrackerInfo()
+        }
+    }
+    private var templateEmojie: String = "" {
+        didSet {
+            checkForCorrectTrackerInfo()
+        }
+    }
     
     private var templateCategory: String = "" {
         didSet {
+            checkForCorrectTrackerInfo()
             updateCollectionView()
         }
     }
     private var templateTimetable: String = "" {
         didSet {
+            checkForCorrectTrackerInfo()
             updateCollectionView()
         }
     }
@@ -63,15 +77,13 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }()
     
     private lazy var cancelButton: CustomActionButton = {
-        let button = CustomActionButton(title: cancelButtonTitle, backGroundColor: .clear, titleColor: .YPRed)
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.YPRed?.cgColor
+        let button = CustomActionButton(title: cancelButtonTitle, appearance: .cancel)
         button.addTarget(self, action: #selector(cancelDidTap), for: .touchUpInside)
         return button
     }()
     
     private lazy var createButton: CustomActionButton = {
-        let button = CustomActionButton(title: createButtonTitle, backGroundColor: .YPBlack, titleColor: .YPWhite)
+        let button = CustomActionButton(title: createButtonTitle, appearance: .disabled)
         button.addTarget(self, action: #selector(saveDidTap), for: .touchUpInside)
         return button
     }()
@@ -131,10 +143,23 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         presentationController?.delegate = self
     }
     
+    // MARK: Methods
+    
     private func updateCollectionView() {
         dataSourceManager?.timetableSubtitles = templateTimetable
         dataSourceManager?.categorySubtitles = templateCategory
         dataSourceManager?.createDataSource(collectionView: collectionView)
+    }
+    
+    private func checkForCorrectTrackerInfo() {
+        if !templateName.isEmpty
+        && templateColor != .clear
+        && !templateEmojie.isEmpty
+        && !templateCategory.isEmpty {
+            createButton.setAppearance(for: .confirm)
+        } else {
+            createButton.setAppearance(for: .disabled)
+        }
     }
     
     private func saveTracker() {
@@ -157,6 +182,8 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         dataSourceManager?.emojieCelldelegate = self
         dataSourceManager?.colorCellDelegate = self
     }
+    
+    // MARK: objc
     
     @objc
     private func cancelDidTap() {

@@ -13,11 +13,17 @@ protocol TrackerSelectionCoordinatorProtocol {
     var returnOnCancel: (() -> Void)? { get set }
 }
 
-final class TrackerSelectionViewController: UIViewController & TrackerSelectionCoordinatorProtocol {
+protocol TrackerViceMainScreenDelegate: AnyObject {
+    func saveTracker(tracker: Tracker, to category: String)
+}
+
+final class TrackerSelectionViewController: UIViewController & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate {
     
     var headToHabit: (() -> Void)?
     var headToSingleEvent: (() -> Void)?
     var returnOnCancel: (() -> Void)?
+    
+    weak var mainScreenDelegate: TrackerMainScreenDelegate?
     
     private var headerLabeltext = "Создание трекера"
     private var habitsButtonHeader = "Привычка"
@@ -29,13 +35,13 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
     }()
     
     private lazy var habitsButton: CustomActionButton = {
-        let button = CustomActionButton(title: habitsButtonHeader, backGroundColor: .YPBlack, titleColor: .YPWhite)
+        let button = CustomActionButton(title: habitsButtonHeader, appearance: .confirm)
         button.addTarget(self, action: #selector(didSelectTracker), for: .touchUpInside)
         return button
     }()
     
     private lazy var singleEventButton: CustomActionButton = {
-        let button = CustomActionButton(title: singleEventButtonHeader, backGroundColor: .YPBlack, titleColor: .YPWhite)
+        let button = CustomActionButton(title: singleEventButtonHeader, appearance: .confirm)
         button.addTarget(self, action: #selector(didSelectTracker), for: .touchUpInside)
         return button
     }()
@@ -71,6 +77,10 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         presentationController?.delegate = self
+    }
+    
+    func saveTracker(tracker: Tracker, to category: String) {
+        mainScreenDelegate?.saveTracker(tracker: tracker, to: category)
     }
     
     @objc
