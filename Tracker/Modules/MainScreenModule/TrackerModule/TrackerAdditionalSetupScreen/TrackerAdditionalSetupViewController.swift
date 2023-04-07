@@ -11,7 +11,7 @@ protocol TrackerAdditionalSetupToCoordinatorProtocol: AnyObject {
     var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol? { get set }
     var timetableSelected: Bool? { get set }
     var returnOnCancel: (() -> Void)? { get set }
-    var returnOnTimetableReady: (([Substring]) -> Void)? { get set }
+    var returnOnTimetableReady: (([WeekDays]) -> Void)? { get set }
     var returnOnCategoryReady: ((String) -> Void)? { get set }
 }
 
@@ -19,7 +19,7 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol?
     var timetableSelected: Bool?
     var returnOnCancel: (() -> Void)?
-    var returnOnTimetableReady: (([Substring]) -> Void)?
+    var returnOnTimetableReady: (([WeekDays]) -> Void)?
     var returnOnCategoryReady: ((String) -> Void)?
     
     private var headerTitle: String?
@@ -31,7 +31,7 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     private var categoryDoneButtonTitle = "Добавить категорию"
     
     // data for transfering between the screens
-    private var selectedWeekDays: [Substring] = []
+    private var selectedWeekDays: [WeekDays] = []
     private var selectedCategory: String = ""
         
     private lazy var backgroundView: UIImageView = {
@@ -103,15 +103,17 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
         readyButtonTitle = timetableSelected ? timetableDoneButtonTitle : categoryDoneButtonTitle
     }
     
-    private func convertStringToShortWeekDay(day: String) -> Substring {
-        return WeekDays(rawValue: day)?.shortName ?? "Error"
-    }
+//    private func convertStringToShortWeekDay(day: WeekDays) -> String {
+//        return day.shortName
+//        return WeekDays(rawValue: day)?.shortName ?? "Error"
+//    }
     
-    private func addTimetableIfNeeded(shortName: Substring) {
-        if !selectedWeekDays.contains(shortName) {
-            selectedWeekDays.append(shortName)
+    private func addTimetableIfNeeded(day: WeekDays) {
+        // works, appends and removes .tuesday or etc
+        if !selectedWeekDays.contains(day) {
+            selectedWeekDays.append(day)
         } else {
-            selectedWeekDays.removeAll(where: { $0 == shortName })
+            selectedWeekDays.removeAll(where: { $0 == day })
         }
     }
     
@@ -177,9 +179,8 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDelegateFlowLayo
 // MARK: - Ext Cell delegate
 extension TrackerAdditionalSetupViewController: TrackerTimeTableCellDelegate {
     func didToggleSwitch(text: String?) {
-        guard let text = text else { return }
-        let shortName = convertStringToShortWeekDay(day: text)
-        addTimetableIfNeeded(shortName: shortName)
+        guard let text = text, let weekDay = WeekDays(rawValue: text) else { return }
+        addTimetableIfNeeded(day: weekDay)
     }
 }
 

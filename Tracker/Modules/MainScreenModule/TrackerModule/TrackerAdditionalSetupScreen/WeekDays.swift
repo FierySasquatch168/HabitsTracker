@@ -16,7 +16,7 @@ enum WeekDays: String, CaseIterable {
     case saturday = "Суббота"
     case sunday = "Воскресенье"
     
-    var shortName: Substring {
+    var shortName: String {
         switch self {
         case .monday:
             return "Пн"

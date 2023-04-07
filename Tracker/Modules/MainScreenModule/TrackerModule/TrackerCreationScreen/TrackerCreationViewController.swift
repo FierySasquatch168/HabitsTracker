@@ -16,7 +16,7 @@ protocol TrackerCreationToCoordinatorProtocol {
 }
 
 protocol AdditionalTrackerSetupProtocol: AnyObject {
-    func transferTimeTable(from selected: [Substring])
+    func transferTimeTable(from selectedWeekdays: [WeekDays])
     func transferCategory(from selectedCategory: String)
 }
 
@@ -63,7 +63,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
             updateCollectionView()
         }
     }
-    private var templateTimetable: String = "" {
+    private var templateTimetable: [WeekDays] = [] {
         didSet {
             checkForCorrectTrackerInfo()
             updateCollectionView()
@@ -146,7 +146,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     // MARK: Methods
     
     private func updateCollectionView() {
-        dataSourceManager?.timetableSubtitles = templateTimetable
+        dataSourceManager?.timetableSubtitles = convertWeekDayToString(from: templateTimetable)
         dataSourceManager?.categorySubtitles = templateCategory
         dataSourceManager?.createDataSource(collectionView: collectionView)
     }
@@ -162,6 +162,19 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         }
     }
     
+    private func convertWeekDayToString(from weekDay: [WeekDays]) -> String {
+        var convertedString = ""
+        for i in 0..<weekDay.count {
+            if i < weekDay.count - 1 {
+                convertedString.append("\(weekDay[i].shortName), ")
+            } else {
+                convertedString.append("\(weekDay[i].shortName)")
+            }
+        }
+        
+        return convertedString
+    }
+    
     private func saveTracker() {
         // create tracker
         let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
@@ -169,7 +182,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
     }
     
-    private func createTracker(name: String, color: UIColor, emoji: String, timetable: String) -> Tracker {
+    private func createTracker(name: String, color: UIColor, emoji: String, timetable: [WeekDays]) -> Tracker {
         return Tracker(name: name, color: color, emoji: emoji, timetable: timetable)
     }
     
@@ -263,8 +276,8 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 
 // MARK: - Ext Timetable delegate
 extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
-    func transferTimeTable(from selected: [Substring]) {
-        templateTimetable = selected.joined(separator: ", ")
+    func transferTimeTable(from selectedWeekdays: [WeekDays]) {
+        templateTimetable = selectedWeekdays
     }
     
     func transferCategory(from selectedCategory: String) {

@@ -36,18 +36,19 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     var visibleCategories: [TrackerCategory] = [] {
         didSet {
             checkForEmptyState()
+            collectionView.reloadData()
         }
     }
 
     
     var categories: [TrackerCategory] = [
         TrackerCategory(name: "Важное", trackers: [
-            Tracker(name: "Play", color: .red, emoji: "🙂", timetable: "Вт, Чт"),
-            Tracker(name: "Run", color: .blue, emoji: "😻", timetable: "Чт, Пт")
+            Tracker(name: "Play", color: .red, emoji: "🙂", timetable: [.tuesday, .thursday]),
+            Tracker(name: "Run", color: .blue, emoji: "😻", timetable: [.thursday, .friday])
         ]),
         TrackerCategory(name: "Самочувствие", trackers: [
-            Tracker(name: "Jump", color: .green, emoji: "🌺", timetable: "Вт, Ср"),
-            Tracker(name: "Fly", color: .gray, emoji: "🐶", timetable: "Чт, Пт")
+            Tracker(name: "Jump", color: .green, emoji: "🌺", timetable: [.tuesday, .wednesday]),
+            Tracker(name: "Fly", color: .gray, emoji: "🐶", timetable: [.thursday, .friday])
         ])
     ]
     
@@ -79,7 +80,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private lazy var searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
-        textField.placeholder = "Search"
+        textField.placeholder = "Поиск"
         textField.delegate = self
         return textField
     }()
@@ -94,6 +95,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         datePicker.layer.masksToBounds = true
         datePicker.locale = Locale(identifier: "ru_RU")
         datePicker.addTarget(self, action: #selector(reloadTheDate), for: .valueChanged)
+        
         return datePicker
     }()
     
@@ -148,12 +150,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     }
     
     private func checkForSceduledTrackers() {
-        guard let dayOfWeek = currentDate?.weekdayNameStandalone else { return }
-        
+        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone, let weekDay = WeekDays(rawValue: stringDayOfWeek) else { return }
         var temporaryCategories: [TrackerCategory] = []
         
         for category in categories {
-            let filteredTrackers = category.trackers.filter { $0.timetable.contains(dayOfWeek) }
+            let filteredTrackers = category.trackers.filter({ $0.timetable.contains(weekDay) })
             if !filteredTrackers.isEmpty {
                 let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
                 temporaryCategories.append(filteredCategory)
@@ -185,6 +186,10 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         return "\(count) дней"
     }
     
+    private func closeTheDatePicker() {
+        presentedViewController?.dismiss(animated: false)
+    }
+    
     @objc
     private func addTracker() {
         // сообщить о событии
@@ -194,6 +199,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     @objc
     private func reloadTheDate() {
         checkForSceduledTrackers()
+        closeTheDatePicker()
     }
 
 }
@@ -294,7 +300,7 @@ extension TrackersViewController: UITextFieldDelegate {
             var temporaryCategories: [TrackerCategory] = []
             
             for category in visibleCategories {
-                let filteredTrackers = category.trackers.filter({ $0.name.contains(string) })
+                let filteredTrackers = category.trackers.filter({ $0.name.lowercased().contains(string.lowercased()) })
                 if !filteredTrackers.isEmpty {
                     let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
                     temporaryCategories.append(filteredCategory)
