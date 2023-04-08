@@ -7,21 +7,23 @@
 
 import UIKit
 
+protocol RouterDelegate: AnyObject {
+    func setupRootViewController(_ viewController: Presentable?)
+    func dismissAllPresentedViewControllers()
+    func returnRootViewController() -> Presentable?
+}
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-
     var window: UIWindow?
-
+    private let factory = CoordinatorFactory()
+    lazy private var router: Routable = Router(routerDelegate: self)
+    lazy private var coordinator = factory.makeSplashCoordinator(with: router)
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(frame: windowScene.coordinateSpace.bounds)
-        window?.windowScene = windowScene
-        
-        window?.rootViewController = ViewController()
+        window = UIWindow(windowScene: windowScene)
         window?.makeKeyAndVisible()
+        coordinator.start()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -55,3 +57,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 }
 
+extension SceneDelegate: RouterDelegate {
+    func setupRootViewController(_ viewController: Presentable?) {
+        window?.rootViewController = viewController?.toPresent()
+    }
+    
+    func dismissAllPresentedViewControllers() {
+        window?.rootViewController?.dismiss(animated: true)
+    }
+    
+    func returnRootViewController() -> Presentable? {
+        return window?.rootViewController
+    }
+}
