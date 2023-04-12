@@ -104,7 +104,7 @@ private extension TrackerCoordinator {
     // MARK: Category selection
     
     func showCategorySelectionScreen(timetableDelegate: AdditionalTrackerSetupProtocol?) {
-        var trackerCategoryScreen = factory.makeTrackerCategorieScreenView()
+        let trackerCategoryScreen = factory.makeTrackerCategorieScreenView()
         
         trackerCategoryScreen.timetableSelected = false
         
@@ -125,7 +125,7 @@ private extension TrackerCoordinator {
     // MARK: TimeTable
     
     func showTrackerTimeTableScreen(timetableDelegate: AdditionalTrackerSetupProtocol?) {
-        var trackerTimetableScreen = factory.makeTimeTableScreenView()
+        let trackerTimetableScreen = factory.makeTimeTableScreenView()
         
         trackerTimetableScreen.timetableSelected = true
         

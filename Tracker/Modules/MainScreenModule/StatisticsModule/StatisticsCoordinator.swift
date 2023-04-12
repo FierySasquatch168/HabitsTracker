@@ -27,7 +27,7 @@ final class StatisticsCoordinator: MainCoordinator, CoordinatorProtocol {
 private extension StatisticsCoordinator {
     func createScreen() {
         let statisticsMainScreen = factory.makeStatisticsScreenView()
-        var navController = navigationControllerFactory.createNavigationController(.statistics, largeTitle: true, rootViewController: statisticsMainScreen)
+        let navController = navigationControllerFactory.createNavigationController(.statistics, largeTitle: true, rootViewController: statisticsMainScreen)
         
         router.addTabBarItem(navController)
     }
