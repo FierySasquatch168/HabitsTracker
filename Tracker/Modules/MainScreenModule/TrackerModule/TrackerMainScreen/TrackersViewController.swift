@@ -150,7 +150,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     }
     
     private func checkForSceduledTrackers() {
-        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone, let weekDay = WeekDays(rawValue: stringDayOfWeek) else { return }
+        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone, let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek) else { return }
         var temporaryCategories: [TrackerCategory] = []
         
         for category in categories {

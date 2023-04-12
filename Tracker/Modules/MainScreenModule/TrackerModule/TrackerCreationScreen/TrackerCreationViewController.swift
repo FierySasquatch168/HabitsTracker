@@ -163,16 +163,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }
     
     private func convertWeekDayToString(from weekDay: [WeekDays]) -> String {
-        var convertedString = ""
-        for i in 0..<weekDay.count {
-            if i < weekDay.count - 1 {
-                convertedString.append("\(weekDay[i].shortName), ")
-            } else {
-                convertedString.append("\(weekDay[i].shortName)")
-            }
-        }
-        
-        return convertedString
+        return weekDay.map({ $0.shortName }).joined(separator: ", ")
     }
     
     private func saveTracker() {

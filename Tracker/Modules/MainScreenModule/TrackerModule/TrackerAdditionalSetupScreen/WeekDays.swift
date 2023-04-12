@@ -7,14 +7,8 @@
 
 import Foundation
 
-enum WeekDays: String, CaseIterable {
-    case monday = "Понедельник"
-    case tuesday = "Вторник"
-    case wednesday = "Среда"
-    case thursday = "Четверг"
-    case friday = "Пятница"
-    case saturday = "Суббота"
-    case sunday = "Воскресенье"
+enum WeekDays: Int, CustomStringConvertible, CaseIterable {
+    case monday, tuesday, wednesday, thursday, friday, saturday, sunday
     
     var shortName: String {
         switch self {
@@ -33,5 +27,28 @@ enum WeekDays: String, CaseIterable {
         case .sunday:
             return "Вс"
         }
+    }
+    
+    var description: String {
+        switch self {
+        case .monday:
+            return "Понедельник"
+        case .tuesday:
+            return "Вторник"
+        case .wednesday:
+            return "Среда"
+        case .thursday:
+            return "Четверг"
+        case .friday:
+            return "Пятница"
+        case .saturday:
+             return "Суббота"
+        case .sunday:
+            return "Воскресенье"
+        }
+    }
+    
+    static func getWeekDay(from text: String) -> WeekDays? {
+        return WeekDays.allCases.filter({ $0.description == text }).first
     }
 }

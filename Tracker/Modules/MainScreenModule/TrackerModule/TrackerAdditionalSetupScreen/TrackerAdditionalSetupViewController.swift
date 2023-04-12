@@ -16,7 +16,7 @@ protocol TrackerAdditionalSetupToCoordinatorProtocol: AnyObject {
 }
 
 final class TrackerAdditionalSetupViewController: UIViewController, TrackerAdditionalSetupToCoordinatorProtocol {
-    var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol?
+    weak var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol?
     var timetableSelected: Bool?
     var returnOnCancel: (() -> Void)?
     var returnOnTimetableReady: (([WeekDays]) -> Void)?
@@ -103,18 +103,9 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
         readyButtonTitle = timetableSelected ? timetableDoneButtonTitle : categoryDoneButtonTitle
     }
     
-//    private func convertStringToShortWeekDay(day: WeekDays) -> String {
-//        return day.shortName
-//        return WeekDays(rawValue: day)?.shortName ?? "Error"
-//    }
-    
     private func addTimetableIfNeeded(day: WeekDays) {
         // works, appends and removes .tuesday or etc
-        if !selectedWeekDays.contains(day) {
-            selectedWeekDays.append(day)
-        } else {
-            selectedWeekDays.removeAll(where: { $0 == day })
-        }
+        selectedWeekDays.contains(day) ? selectedWeekDays.removeAll(where: { $0 == day }) : selectedWeekDays.append(day)
     }
     
     @objc
@@ -143,12 +134,12 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDataSource {
         cell.trackerTimeTableCellDelegate = self
         
         if timetableSelected {
-            cell.configTimeTableCell(title: WeekDays.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row, timetableSelected: timetableSelected)
+            cell.configTimeTableCell(title: WeekDays.allCases[indexPath.row].description, for: indexPath.row, timetableSelected: timetableSelected)
             if indexPath.row == WeekDays.allCases.count - 1 {
                 cell.roundBottomCorners()
             }
         } else {
-            cell.configTimeTableCell(title: Categories.allCases.map({ $0.rawValue })[indexPath.row], for: indexPath.row, timetableSelected: timetableSelected)
+            cell.configTimeTableCell(title: Categories.allCases[indexPath.row].description, for: indexPath.row, timetableSelected: timetableSelected)
             if indexPath.row == Categories.allCases.count - 1 {
                 cell.roundBottomCorners()
             }
@@ -171,7 +162,7 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDelegateFlowLayo
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let timetableSelected = timetableSelected else { return }
         if !timetableSelected {
-            selectedCategory = Categories.allCases.map({ $0.rawValue })[indexPath.row]
+            selectedCategory = Categories.allCases[indexPath.row].description
         }
     }
 }
@@ -179,7 +170,7 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDelegateFlowLayo
 // MARK: - Ext Cell delegate
 extension TrackerAdditionalSetupViewController: TrackerTimeTableCellDelegate {
     func didToggleSwitch(text: String?) {
-        guard let text = text, let weekDay = WeekDays(rawValue: text) else { return }
+        guard let text = text, let weekDay = WeekDays.getWeekDay(from: text) else { return }
         addTimetableIfNeeded(day: weekDay)
     }
 }
