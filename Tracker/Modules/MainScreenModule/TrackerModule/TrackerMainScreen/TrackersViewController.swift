@@ -15,7 +15,23 @@ protocol TrackerMainScreenDelegate: AnyObject {
     func saveTracker(tracker: Tracker, to category: String)
 }
 
+protocol TrackerCategoryDelegate: AnyObject {
+    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates)
+}
+
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
+    
+    private lazy var trackerCategoryStore: TrackerCategoryStoreProtocol? = {
+        do {
+            try trackerCategoryStore = TrackerCategoryStore(coreDataManager: CoreDataManager(), delegate: self)
+            return trackerCategoryStore
+        } catch {
+            print("trackerCategoryStore error")
+            return nil
+        }
+    }()
+    
+    var trackerRecordStore: TrackerRecordStoreProtocol?
     
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
@@ -42,14 +58,14 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
 
     
     var categories: [TrackerCategory] = [
-        TrackerCategory(name: "Важное", trackers: [
-            Tracker(name: "Play", color: .red, emoji: "🙂", timetable: [.tuesday, .thursday]),
-            Tracker(name: "Run", color: .blue, emoji: "😻", timetable: [.thursday, .friday])
-        ]),
-        TrackerCategory(name: "Самочувствие", trackers: [
-            Tracker(name: "Jump", color: .green, emoji: "🌺", timetable: [.tuesday, .wednesday]),
-            Tracker(name: "Fly", color: .gray, emoji: "🐶", timetable: [.thursday, .friday])
-        ])
+//        TrackerCategory(name: "Важное", trackers: [
+//            Tracker(name: "Play", color: .red, emoji: "🙂", schedule: [.tuesday, .thursday]),
+//            Tracker(name: "Run", color: .blue, emoji: "😻", schedule: [.thursday, .friday])
+//        ]),
+//        TrackerCategory(name: "Самочувствие", trackers: [
+//            Tracker(name: "Jump", color: .green, emoji: "🌺", schedule: [.tuesday, .wednesday, .thursday]),
+//            Tracker(name: "Fly", color: .gray, emoji: "🐶", schedule: [.thursday, .friday])
+//        ])
     ]
     
     private lazy var mainStackView: UIStackView = {
@@ -138,23 +154,49 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         view.backgroundColor = .systemBackground
         setupConstraints()
         setupNavigationAttributes()
-        visibleCategories = categories
+        
+        // загрузка трекеров и записей
+        fetchTrackers()
+//        visibleCategories = categories
         
         checkForEmptyState()
-        checkForSceduledTrackers()
+        checkForScheduledTrackers()
+        
+        
     }
     
     //MARK: Methods
+    
+    private func fetchTrackers() {
+        if let savedCategories = try? trackerCategoryStore?.fetchTrackerCategories() {
+            visibleCategories = savedCategories
+            categories = savedCategories
+            print("TrackersViewController fetchTrackers worked")
+        } else {
+            print("TrackersViewController No saved categories")
+        }
+    }
+    
+    private func saveTrackers(_ category: TrackerCategory) {
+        do {
+            try trackerCategoryStore?.saveTrackerCategories(category)
+        } catch {
+            print("Saving of categories failed")
+        }
+    }
+    
     private func checkForEmptyState() {
         emptyStateStackView.isHidden = visibleCategories.isEmpty ? false : true
     }
     
-    private func checkForSceduledTrackers() {
+    // TODO: move to coreDataCategories
+    private func checkForScheduledTrackers() {
+        // TODO: rewrite to do everything through CoreData
         guard let stringDayOfWeek = currentDate?.weekdayNameStandalone, let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek) else { return }
         var temporaryCategories: [TrackerCategory] = []
         
         for category in categories {
-            let filteredTrackers = category.trackers.filter({ $0.timetable.contains(weekDay) })
+            let filteredTrackers = category.trackers.filter({ $0.schedule.contains(weekDay) })
             if !filteredTrackers.isEmpty {
                 let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
                 temporaryCategories.append(filteredCategory)
@@ -192,7 +234,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     @objc
     private func reloadTheDate() {
-        checkForSceduledTrackers()
+        checkForScheduledTrackers()
         closeTheDatePicker()
     }
 
@@ -247,24 +289,42 @@ extension TrackersViewController: TrackerMainScreenDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             
-            if !categories.contains(where: { $0.name == category }) {
-                let newCategory = TrackerCategory(name: category, trackers: [tracker])
-                var temporaryCategories = categories
-                temporaryCategories.append(newCategory)
-                categories = temporaryCategories
-                visibleCategories = categories
+            if categories.contains(where: { $0.name == category }) {
+                // get category with the same name
+                guard var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
+                else {
+                    return
+                }
+                // append new tracker to the category with the same name
+                newCategoryTrackers.append(tracker)
+                // save updated category
+                saveTrackers(TrackerCategory(name: category, trackers: newCategoryTrackers))
+            } else {
+                // save new category
+                saveTrackers(TrackerCategory(name: category, trackers: [tracker]))
             }
-            else {
-                var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
-                let newCategoryIndex = categories.firstIndex(where: { $0.name == category })
-                newCategoryTrackers?.append(tracker)
-                var temporaryCategories = categories
-                temporaryCategories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
-                categories = temporaryCategories
-                visibleCategories = categories
-            }
-            checkForSceduledTrackers()
-            collectionView.reloadData()
+            
+            
+            
+            // сохраняем категории
+//            if !categories.contains(where: { $0.name == category }) {
+//                let newCategory = TrackerCategory(name: category, trackers: [tracker])
+//                var temporaryCategories = categories
+//                temporaryCategories.append(newCategory)
+//                categories = temporaryCategories
+//                visibleCategories = categories
+//            }
+//            else {
+//                var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
+//                let newCategoryIndex = categories.firstIndex(where: { $0.name == category })
+//                newCategoryTrackers?.append(tracker)
+//                var temporaryCategories = categories
+//                temporaryCategories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
+//                categories = temporaryCategories
+//                visibleCategories = categories
+//            }
+            checkForScheduledTrackers()
+//            collectionView.reloadData()
         }
     }
 }
@@ -288,9 +348,9 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
 extension TrackersViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if string.isEmpty {
-            checkForSceduledTrackers()
-            return true
-        } else {
+            checkForScheduledTrackers()
+        }
+        else {
             var temporaryCategories: [TrackerCategory] = []
             
             for category in visibleCategories {
@@ -306,6 +366,16 @@ extension TrackersViewController: UITextFieldDelegate {
         }
         
         return true
+    }
+}
+
+// MARK: - Ext TrackerCategoryDelegate
+extension TrackersViewController: TrackerCategoryDelegate {
+    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates) {
+        self.fetchTrackers()
+//        collectionView.reloadSections(updates.insertedIndexes)
+        collectionView.reloadData()
+        print("TrackersViewController TrackerCategoryDelegate didUpdateCategory")
     }
 }
 

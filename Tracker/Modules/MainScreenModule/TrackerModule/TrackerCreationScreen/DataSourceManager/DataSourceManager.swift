@@ -32,7 +32,7 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     // initialized after user picks up category
     var categorySubtitles: String = ""
     
-    // initialized after user picks up timetable
+    // initialized after user picks up schedule
     var timetableSubtitles: String = ""
     
     var headerLabeltext: String

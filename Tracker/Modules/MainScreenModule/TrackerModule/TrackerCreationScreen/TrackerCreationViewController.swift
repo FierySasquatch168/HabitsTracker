@@ -174,7 +174,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }
     
     private func createTracker(name: String, color: UIColor, emoji: String, timetable: [WeekDays]) -> Tracker {
-        return Tracker(name: name, color: color, emoji: emoji, timetable: timetable)
+        return Tracker(name: name, color: color, emoji: emoji, schedule: timetable)
     }
     
     private func createDataSource() {
@@ -212,7 +212,7 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
             if indexPath.row == 0 {
                 categoryTapped?()
             }
-            // proceed to timetable
+            // proceed to schedule
             if indexPath.row == 1 {
                 timeTableTapped?()
             }

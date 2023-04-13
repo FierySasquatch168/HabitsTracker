@@ -44,11 +44,9 @@ final class TrackerNameCell: UICollectionViewCell {
 
 // MARK: - TextFieldDelegate
 extension TrackerNameCell: UITextFieldDelegate {
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        // TODO: fix the lack of last button
-        if let delegate = delegate {
-            // lacks last character of the text
-            delegate.textDidChange(text: textField.text)
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+        if let delegate = delegate, let text = textField.text {
+            delegate.textDidChange(text: text)
         }
         return true
     }

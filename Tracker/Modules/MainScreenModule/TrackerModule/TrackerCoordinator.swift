@@ -27,11 +27,11 @@ final class TrackerCoordinator: MainCoordinator, CoordinatorProtocol {
 // MARK: - Ext ScreensCreation
 private extension TrackerCoordinator {
     func createScreen() {
-        // var someClassA = SomeClassA()
-        weak var trackerMainScreen = factory.makeTrackerScreenView()
-        let navController = navigationControllerFactory.createNavigationController(.trackers, largeTitle: true, rootViewController: trackerMainScreen!)
-        //someClassA.closure1 =
-        trackerMainScreen?.addTrackerButtonPressed = { [weak self] in
+        var trackerMainScreen = factory.makeTrackerScreenView()
+        
+        let navController = navigationControllerFactory.createNavigationController(.trackers, largeTitle: true, rootViewController: trackerMainScreen)
+        
+        trackerMainScreen.addTrackerButtonPressed = { [weak self] in
             self?.showTrackerSelectionScreen(with: trackerMainScreen)
         }
         

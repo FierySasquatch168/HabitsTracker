@@ -51,4 +51,23 @@ enum WeekDays: Int, CustomStringConvertible, CaseIterable {
     static func getWeekDay(from text: String) -> WeekDays? {
         return WeekDays.allCases.filter({ $0.description == text }).first
     }
+    
+    static func getString(from weekDays: [WeekDays]) -> String {
+        var result: [String] = []
+        for i in 0..<WeekDays.allCases.count{
+            weekDays.contains(WeekDays.allCases[i]) ? result.append("1") : result.append("0")
+        }
+        
+        return result.joined()
+
+    }
+    
+    static func getWeekDaysArray(from code: String) -> [WeekDays] {
+        var weekDays: [WeekDays] = []
+        for i in 0..<Array(code).count {
+            Array(code)[i] == "1" ? weekDays.append(WeekDays.allCases[i]) : ()
+        }
+        
+        return weekDays
+    }
 }
