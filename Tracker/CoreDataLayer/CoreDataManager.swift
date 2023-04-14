@@ -60,19 +60,19 @@ final class CoreDataManager {
         }
     }
     
-//    private func fetchCategory(from request: NSFetchRequest<TrackerCategoryCoreData>, with name: String) throws -> TrackerCategoryCoreData? {
-//        request.predicate = NSPredicate(format: "%K == %@",
-//                                         argumentArray: ["name", name])
-//        request.sortDescriptors = [
-//            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name, ascending: false)
-//        ]
-//        do {
-//            let category = try context.fetch(request).first
-//            return category
-//        } catch {
-//            throw StoreError.decodingErrorInvalidCategoryData
-//        }
-//    }
+    private func fetchCategory(from request: NSFetchRequest<TrackerCategoryCoreData>, with name: String) throws -> TrackerCategoryCoreData? {
+        request.predicate = NSPredicate(format: "%K == %@",
+                                         argumentArray: ["name", name])
+        request.sortDescriptors = [
+            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name, ascending: false)
+        ]
+        do {
+            let category = try context.fetch(request).first
+            return category
+        } catch {
+            throw StoreError.decodingErrorInvalidCategoryData
+        }
+    }
 }
 
 // MARK: - Ext CoreDataManagerProtocol
@@ -95,49 +95,40 @@ extension CoreDataManager: CoreDataManagerProtocol {
         
         return trackerCategories
     }
-    // MARK: Добавляет только один трекер, дальше если в ту же категорию - то фейл, если в другую - то краш
-    func saveTracker(tracker: Tracker, to categoryName: String) throws {
-        let trackerViewCategory = TrackerCategory(name: categoryName, trackers: [tracker])
-        let result = makeCategory(from: trackerViewCategory)
+   
+    func saveTracker(tracker: Tracker, to category: String) throws {
+        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker),
+              let request = trackerCategoryStore?.trackerFetchedResultsController.fetchRequest,
+              var fetchedObjects = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects
+        else {
+            return
+        }
         
+        
+        // загрузить действующую категорию с таким именем
+        if let existingCategory = try? fetchCategory(from: request, with: category),
+           var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
+            // если она есть, поменять у нее свойство трэкерс и загрузить обратно
+            newCoreDataTrackers.append(trackerCoreData)
+            existingCategory.trackers = NSSet(array: newCoreDataTrackers)
+            // TODO: Работает до сюда
+        } else {
+            // если ее нет, создать новую
+            // TODO: Работает только для первой категории
+            let newCategory = TrackerCategoryCoreData(context: context)
+            var newCoreDataTrackers: [TrackerCoreData] = []
+            newCoreDataTrackers.append(trackerCoreData)
+            newCategory.name = category
+            newCategory.trackers = NSSet(array: [trackerCoreData])
+            fetchedObjects.append(newCategory)
+        }
         
         do {
-            try addCategory(result)
+            try context.save()
         } catch {
             throw StoreError.failedToSaveContext
         }
-        
     }
-//    func saveTracker(tracker: Tracker, to category: String) throws {
-//        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker),
-//              var fetchedObjects = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects
-//        else {
-//            return
-//        }
-        
-        
-//        // загрузить действующую категорию с таким именем
-//        if let existingCategories = try? fetchCategory(from: request, with: category),
-//           var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
-//            // если она есть, поменять у нее свойство трэкерс и загрузить обратно
-//            newCoreDataTrackers.append(trackerCoreData)
-//            existingCategory.trackers = NSSet(array: newCoreDataTrackers)
-//        } else {
-//            // если ее нет, создать новую
-//            let newCategory = TrackerCategoryCoreData(context: context)
-//            var newCoreDataTrackers: [TrackerCoreData] = []
-//            newCoreDataTrackers.append(trackerCoreData)
-//            newCategory.name = category
-//            newCategory.trackers = NSSet(array: [trackerCoreData])
-//            fetchedObjects.append(newCategory)
-//        }
-        
-//        do {
-//            try context.save()
-//        } catch {
-//            throw StoreError.failedToSaveContext
-//        }
-//    }
     
     private func makeCategory(from category: TrackerCategory) -> TrackerCategoryCoreData {
         let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
