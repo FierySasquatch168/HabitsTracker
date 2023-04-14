@@ -10,7 +10,7 @@ import CoreData
 
 protocol CoreDataManagerProtocol {
     func fetchTrackerCategories() throws -> [TrackerCategory]
-    func saveTracker(tracker: Tracker, to category: String) throws
+    func saveTracker(tracker: Tracker, to categoryName: String) throws
 }
 
 protocol CoreDataManagerDelegate: AnyObject {
@@ -90,7 +90,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
         return trackerCategories
     }
    
-    func saveTracker(tracker: Tracker, to category: String) throws {
+    func saveTracker(tracker: Tracker, to categoryName: String) throws {
         guard let trackerCoreData = trackerStore?.makeTracker(from: tracker),
               let request = trackerCategoryStore?.trackerFetchedResultsController.fetchRequest
         else {
@@ -99,7 +99,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
         
         
         // загрузить действующую категорию с таким именем
-        if let existingCategory = try? trackerCategoryStore?.fetchCategory(from: request, with: category),
+        if let existingCategory = try? trackerCategoryStore?.fetchCategory(from: request, with: categoryName),
            var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
             // если она есть, поменять у нее свойство трэкерс и загрузить обратно
             newCoreDataTrackers.append(trackerCoreData)
@@ -109,7 +109,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
             // если ее нет, создать новую
             // TODO: Работает только для первой категории
             let newCategory = TrackerCategoryCoreData(context: context)
-            newCategory.name = category
+            newCategory.name = categoryName
             newCategory.trackers = NSSet(array: [trackerCoreData])
         }
         
