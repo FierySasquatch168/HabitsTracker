@@ -10,7 +10,7 @@ import CoreData
 
 protocol TrackerCategoryStoreProtocol {
     var trackerFetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> { get set }
-    func fetchCategory(from request: NSFetchRequest<TrackerCategoryCoreData>, with name: String) throws -> TrackerCategoryCoreData?
+    func fetchCategory(with nameToShow: String) throws -> TrackerCategoryCoreData?
 }
 
 struct CategoryUpdates {
@@ -68,9 +68,10 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
 
 // MARK: - Ext TrackerCategoryStoreProtocol
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
-    func fetchCategory(from request: NSFetchRequest<TrackerCategoryCoreData>, with name: String) throws -> TrackerCategoryCoreData? {
+    func fetchCategory(with nameToShow: String) throws -> TrackerCategoryCoreData? {
+        let request = trackerFetchedResultsController.fetchRequest
         request.predicate = NSPredicate(format: "%K == %@",
-                                        argumentArray: ["name", name])
+                                        argumentArray: ["name", nameToShow])
         request.sortDescriptors = [
             NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name,
                              ascending: false)

@@ -82,8 +82,8 @@ extension CoreDataManager: CoreDataManagerProtocol {
         
         categoriesCoreData.forEach { trackerCategoryCoreData in
             let filteredCoreDataTrackers = trackersCoreData.filter({ $0.category?.name == trackerCategoryCoreData.name })
-            let finalTrackers = try? filteredCoreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
-            let category = TrackerCategory(name: trackerCategoryCoreData.name ?? "", trackers: finalTrackers ?? [])
+            let trackerToView = try? filteredCoreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
+            let category = TrackerCategory(name: trackerCategoryCoreData.name ?? "", trackers: trackerToView ?? [])
             trackerCategories.append(category)
         }
         
@@ -91,15 +91,13 @@ extension CoreDataManager: CoreDataManagerProtocol {
     }
    
     func saveTracker(tracker: Tracker, to categoryName: String) throws {
-        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker),
-              let request = trackerCategoryStore?.trackerFetchedResultsController.fetchRequest
+        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker)
         else {
             return
         }
         
-        
         // загрузить действующую категорию с таким именем
-        if let existingCategory = try? trackerCategoryStore?.fetchCategory(from: request, with: categoryName),
+        if let existingCategory = try? trackerCategoryStore?.fetchCategory(with: categoryName),
            var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
             // если она есть, поменять у нее свойство трэкерс и загрузить обратно
             newCoreDataTrackers.append(trackerCoreData)
@@ -122,7 +120,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
     }
 }
 
-// MARK: - Ext
+// MARK: - Ext TrackerStorageCoreDataDelegate
 extension CoreDataManager: TrackerStorageCoreDataDelegate {
     var managedObjectContext: NSManagedObjectContext {
         return context
