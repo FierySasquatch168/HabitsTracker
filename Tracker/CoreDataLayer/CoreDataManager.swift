@@ -49,29 +49,23 @@ final class CoreDataManager {
         self.trackerRecordStore = TrackerRecordStore(delegate: self)
     }
     
-    private func addCategory(_ category: TrackerCategoryCoreData) throws {
-        let trackerCategory = TrackerCategoryCoreData(context: context)
-        trackerCategory.name = category.name
-        trackerCategory.trackers = category.trackers
-        do {
-            try context.save()
-        } catch {
-            throw StoreError.failedToSaveContext
-        }
+    // TODO: move to trackerCategoryStore
+    private func makeCategory(from category: TrackerCategory) -> TrackerCategoryCoreData {
+        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
+        trackerCategoryCoreData.name = category.name
+        trackerCategoryCoreData.trackers = NSSet(array: category.trackers.compactMap({ trackerStore?.makeTracker(from: $0) }))
+        return trackerCategoryCoreData
     }
-    
-    private func fetchCategory(from request: NSFetchRequest<TrackerCategoryCoreData>, with name: String) throws -> TrackerCategoryCoreData? {
-        request.predicate = NSPredicate(format: "%K == %@",
-                                         argumentArray: ["name", name])
-        request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name, ascending: false)
-        ]
-        do {
-            let category = try context.fetch(request).first
-            return category
-        } catch {
+    // TODO: move to trackerCategoryStore
+    private func getCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
+        guard let name = categoryCoreData.name,
+              let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
+              let trackers = try? coreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
+        else {
             throw StoreError.decodingErrorInvalidCategoryData
         }
+        
+        return TrackerCategory(name: name, trackers: trackers)
     }
 }
 
@@ -106,7 +100,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
         
         
         // загрузить действующую категорию с таким именем
-        if let existingCategory = try? fetchCategory(from: request, with: category),
+        if let existingCategory = try? trackerCategoryStore?.fetchCategory(from: request, with: category),
            var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
             // если она есть, поменять у нее свойство трэкерс и загрузить обратно
             newCoreDataTrackers.append(trackerCoreData)
@@ -128,24 +122,6 @@ extension CoreDataManager: CoreDataManagerProtocol {
         } catch {
             throw StoreError.failedToSaveContext
         }
-    }
-    
-    private func makeCategory(from category: TrackerCategory) -> TrackerCategoryCoreData {
-        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
-        trackerCategoryCoreData.name = category.name
-        trackerCategoryCoreData.trackers = NSSet(array: category.trackers.compactMap({ trackerStore?.makeTracker(from: $0) }))
-        return trackerCategoryCoreData
-    }
-    
-    private func getCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-        guard let name = categoryCoreData.name,
-              let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
-              let trackers = try? coreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
-        else {
-            throw StoreError.decodingErrorInvalidCategoryData
-        }
-        
-        return TrackerCategory(name: name, trackers: trackers)
     }
 }
 

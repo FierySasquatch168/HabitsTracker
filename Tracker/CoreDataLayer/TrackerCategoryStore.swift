@@ -10,7 +10,7 @@ import CoreData
 
 protocol TrackerCategoryStoreProtocol {
     var trackerFetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> { get set }
-//    func fetchTrackerCategories() throws -> [TrackerCategory]
+    func fetchCategory(from request: NSFetchRequest<TrackerCategoryCoreData>, with name: String) throws -> TrackerCategoryCoreData?
 }
 
 struct CategoryUpdates {
@@ -45,30 +45,11 @@ final class TrackerCategoryStore: NSObject {
         self.context = delegate.managedObjectContext
         self.delegate = delegate
     }
-    
-//    private func getCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-//        guard let name = categoryCoreData.name,
-//              let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
-//              let trackers = try? coreDataTrackers.map({ try trackerStore.getTracker(from: $0) })
-//        else {
-//            throw StoreError.decodingErrorInvalidCategoryData
-//        }
-//
-//        return TrackerCategory(name: name, trackers: trackers)
-//    }
-    
-//    private func makeCategory(from category: TrackerCategory) -> TrackerCategoryCoreData {
-//        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
-//        trackerCategoryCoreData.name = category.name
-//        trackerCategoryCoreData.trackers = NSSet(array: category.trackers.map({ trackerStore.makeTracker(from: $0) }))
-//        return trackerCategoryCoreData
-//    }
 }
 
 // MARK: - Ext NSFetchedResultsControllerDelegate
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        print("TrackerCategoryStore controllerWillChangeContent works")
         insertedIndexes = IndexSet()
     }
     
@@ -79,7 +60,6 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        print("TrackerCategoryStore didChange anObject insert index")
         if let indexPath = newIndexPath {
             insertedIndexes?.insert(indexPath.item)
         }
@@ -88,17 +68,18 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
 
 // MARK: - Ext TrackerCategoryStoreProtocol
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
-//    func fetchTrackerCategories() throws -> [TrackerCategory] {
-//        guard let objects = self.trackerFetchedResultsController.fetchedObjects,
-//              let trackerCategory = try? objects.map({ try self.getCategory(from: $0) })
-//        else {
-//            throw StoreError.decodingErrorInvalidTrackerData
-//        }
-//        return trackerCategory
-//    }
-//
-//    func createCoreDataCategories() throws -> [TrackerCategoryCoreData] {
-//        guard let objects = self.trackerFetchedResultsController.fetchedObjects else { return [] }
-//        return objects
-//    }
+    func fetchCategory(from request: NSFetchRequest<TrackerCategoryCoreData>, with name: String) throws -> TrackerCategoryCoreData? {
+        request.predicate = NSPredicate(format: "%K == %@",
+                                        argumentArray: ["name", name])
+        request.sortDescriptors = [
+            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name,
+                             ascending: false)
+        ]
+        do {
+            let category = try context.fetch(request).first
+            return category
+        } catch {
+            throw StoreError.decodingErrorInvalidCategoryData
+        }
+    }
 }

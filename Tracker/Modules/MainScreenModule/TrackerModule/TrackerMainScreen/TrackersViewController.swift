@@ -146,7 +146,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
         // загрузка трекеров и записей
         fetchTrackers()
-//        visibleCategories = categories
         
         checkForEmptyState()
         checkForScheduledTrackers()
@@ -160,8 +159,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         if let savedCategories = try? coreDataManager.fetchTrackerCategories() {
             visibleCategories = savedCategories
             categories = savedCategories
-            print("TrackersViewController fetchTrackers worked")
-            print("visibleCategories are: \(visibleCategories)")
         } else {
             print("No saved categories")
         }
@@ -276,43 +273,7 @@ extension TrackersViewController: TrackerMainScreenDelegate {
                 print("saveTracker failed")
             }
             
-            
-//            if categories.contains(where: { $0.name == category }) {
-//                // get category with the same name
-//                guard var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
-//                else {
-//                    return
-//                }
-//                // append new tracker to the category with the same name
-//                newCategoryTrackers.append(tracker)
-//                // save updated category
-//                saveTrackers(TrackerCategory(name: category, trackers: newCategoryTrackers))
-//            } else {
-//                // save new category
-//                saveTrackers(TrackerCategory(name: category, trackers: [tracker]))
-//            }
-            
-            
-            
-            // сохраняем категории
-//            if !categories.contains(where: { $0.name == category }) {
-//                let newCategory = TrackerCategory(name: category, trackers: [tracker])
-//                var temporaryCategories = categories
-//                temporaryCategories.append(newCategory)
-//                categories = temporaryCategories
-//                visibleCategories = categories
-//            }
-//            else {
-//                var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
-//                let newCategoryIndex = categories.firstIndex(where: { $0.name == category })
-//                newCategoryTrackers?.append(tracker)
-//                var temporaryCategories = categories
-//                temporaryCategories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
-//                categories = temporaryCategories
-//                visibleCategories = categories
-//            }
             checkForScheduledTrackers()
-//            collectionView.reloadData()
         }
     }
 }
