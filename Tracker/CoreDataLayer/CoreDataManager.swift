@@ -102,17 +102,14 @@ extension CoreDataManager: CoreDataManagerProtocol {
             // если она есть, поменять у нее свойство трэкерс и загрузить обратно
             newCoreDataTrackers.append(trackerCoreData)
             existingCategory.trackers = NSSet(array: newCoreDataTrackers)
-            // TODO: Работает ок до этой строки
         } else {
             // если ее нет, создать новую
-            // TODO: Работает только для первой категории
             let newCategory = TrackerCategoryCoreData(context: context)
             newCategory.name = categoryName
             newCategory.trackers = NSSet(array: [trackerCoreData])
         }
         
         do {
-            // TODO: если добавлена вторая категория, то краш
             try context.save()
         } catch {
             throw StoreError.failedToSaveContext
