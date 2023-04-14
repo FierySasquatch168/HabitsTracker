@@ -14,4 +14,11 @@ protocol TrackerRecordStoreProtocol {
 
 final class TrackerRecordStore: TrackerRecordStoreProtocol {
     
+    private let context: NSManagedObjectContext
+    weak var delegate: TrackerStorageCoreDataDelegate?
+    
+    init(delegate: TrackerStorageCoreDataDelegate) {
+        self.context = delegate.managedObjectContext
+        self.delegate = delegate
+    }
 }
