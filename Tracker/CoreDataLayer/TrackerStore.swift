@@ -9,15 +9,18 @@ import Foundation
 import CoreData
 
 protocol TrackerStoreProtocol {
-    
+    var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> { get set }
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
+    func makeTracker(from tracker: Tracker) -> TrackerCoreData
 }
 
 final class TrackerStore: NSObject {
     
     private let context: NSManagedObjectContext
-    private let coreDataManager: CoreDataManagerProtocol
     
-    private lazy var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
+    weak var delegate: TrackerStorageCoreDataDelegate?
+    
+    lazy var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         fetchRequest.sortDescriptors = [
             NSSortDescriptor(keyPath: \TrackerCoreData.name, ascending: false)
@@ -33,16 +36,37 @@ final class TrackerStore: NSObject {
         return controller
     }()
     
-    init(coreDataManager: CoreDataManagerProtocol) throws {
-        guard let context = coreDataManager.managedObjectContext else {
-            throw DataProviderError.failedToInitializeContext
-        }
-        self.coreDataManager = coreDataManager
-        self.context = context
+    init(delegate: TrackerStorageCoreDataDelegate) {
+        self.context = delegate.managedObjectContext
+        self.delegate = delegate
     }
 }
 
 extension TrackerStore: TrackerStoreProtocol {
+    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
+        guard let name = trackerCoreData.name,
+              let weekDays = trackerCoreData.schedule,
+              let hexColor = trackerCoreData.color,
+              let emojie = trackerCoreData.emojie
+        else {
+            throw StoreError.decodingErrorInvalidCategoryData
+        }
+
+        let color = UIColorMarshalling.color(from: hexColor)
+        let schedule = WeekDays.getWeekDaysArray(from: weekDays)
+
+        return Tracker(name: name, color: color, emoji: emojie, schedule: schedule)
+    }
+    
+    func makeTracker(from tracker: Tracker) -> TrackerCoreData {
+        let trackerCoreData = TrackerCoreData(context: context)
+        trackerCoreData.name = tracker.name
+        trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
+        trackerCoreData.color = UIColorMarshalling.hexString(from: tracker.color)
+        trackerCoreData.emojie = tracker.emoji
+        return trackerCoreData
+    }
+    
     
 }
 

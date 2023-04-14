@@ -9,26 +9,28 @@ import Foundation
 import CoreData
 
 protocol CoreDataManagerProtocol {
-    var managedObjectContext: NSManagedObjectContext? { get }
-    func addCategory(_ category: TrackerCategoryCoreData) throws
+    func fetchTrackerCategories() throws -> [TrackerCategory]
+    func saveTracker(tracker: Tracker, to categoryName: String) throws
 }
 
-enum StoreError: Error {
-    case decodingErrorInvalidCategoryData
-    case decodingErrorInvalidTrackerData
+protocol CoreDataManagerDelegate: AnyObject {
+    func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates)
 }
 
-enum DataProviderError: Error {
-    case failedToInitializeContext
-}
-
-enum ConvertError: Error {
-    case failedToConvertCoreDataCategoriesToTrackerCategories
-}
+protocol TrackerStorageCoreDataDelegate: AnyObject {
+    var managedObjectContext: NSManagedObjectContext { get }
+    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates)
+} 
 
 final class CoreDataManager {
     private let context: NSManagedObjectContext
     
+    weak var coreDataManagerDelegate: CoreDataManagerDelegate?
+    
+    private var trackerCategoryStore: TrackerCategoryStoreProtocol?
+    private var trackerRecordStore: TrackerRecordStoreProtocol?
+    private var trackerStore: TrackerStoreProtocol?
+
     private let persistentContainer = {
         let container = NSPersistentContainer(name: "CoreDataModel")
         container.loadPersistentStores { storeDescription, error in
@@ -39,20 +41,96 @@ final class CoreDataManager {
         return container
     }()
     
-    init() {
+    init(coreDataManagerDelegate: CoreDataManagerDelegate) {
         self.context = persistentContainer.newBackgroundContext()
+        self.coreDataManagerDelegate = coreDataManagerDelegate
+        self.trackerStore = TrackerStore(delegate: self)
+        self.trackerCategoryStore = TrackerCategoryStore(delegate: self)
+        self.trackerRecordStore = TrackerRecordStore(delegate: self)
+    }
+    
+    // TODO: move to trackerCategoryStore
+    private func makeCategory(from category: TrackerCategory) -> TrackerCategoryCoreData {
+        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
+        trackerCategoryCoreData.name = category.name
+        trackerCategoryCoreData.trackers = NSSet(array: category.trackers.compactMap({ trackerStore?.makeTracker(from: $0) }))
+        return trackerCategoryCoreData
+    }
+    // TODO: move to trackerCategoryStore
+    private func getCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
+        guard let name = categoryCoreData.name,
+              let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
+              let trackers = try? coreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
+        else {
+            throw StoreError.decodingErrorInvalidCategoryData
+        }
+        
+        return TrackerCategory(name: name, trackers: trackers)
     }
 }
 
+// MARK: - Ext CoreDataManagerProtocol
 extension CoreDataManager: CoreDataManagerProtocol {
-    var managedObjectContext: NSManagedObjectContext? {
+    func fetchTrackerCategories() throws -> [TrackerCategory] {
+        guard let categoriesCoreData = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects,
+              let trackersCoreData = trackerStore?.trackerFetchedResultsController.fetchedObjects
+        else {
+            return []
+        }
+        
+        var trackerCategories: [TrackerCategory] = []
+        
+        categoriesCoreData.forEach { trackerCategoryCoreData in
+            let filteredCoreDataTrackers = trackersCoreData.filter({ $0.category?.name == trackerCategoryCoreData.name })
+            let trackerToView = try? filteredCoreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
+            let category = TrackerCategory(name: trackerCategoryCoreData.name ?? "", trackers: trackerToView ?? [])
+            trackerCategories.append(category)
+        }
+        
+        return trackerCategories
+    }
+   
+    func saveTracker(tracker: Tracker, to categoryName: String) throws {
+        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker)
+        else {
+            return
+        }
+        
+        // загрузить действующую категорию с таким именем
+        if let existingCategory = try? trackerCategoryStore?.fetchCategory(with: categoryName),
+           var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
+            // если она есть, поменять у нее свойство трэкерс и загрузить обратно
+            newCoreDataTrackers.append(trackerCoreData)
+            existingCategory.trackers = NSSet(array: newCoreDataTrackers)
+            // TODO: Работает ок до этой строки
+        } else {
+            // если ее нет, создать новую
+            // TODO: Работает только для первой категории
+            let newCategory = TrackerCategoryCoreData(context: context)
+            newCategory.name = categoryName
+            newCategory.trackers = NSSet(array: [trackerCoreData])
+        }
+        
+        do {
+            // TODO: если добавлена вторая категория, то краш
+            try context.save()
+        } catch {
+            throw StoreError.failedToSaveContext
+        }
+    }
+}
+
+// MARK: - Ext TrackerStorageCoreDataDelegate
+extension CoreDataManager: TrackerStorageCoreDataDelegate {
+    var managedObjectContext: NSManagedObjectContext {
         return context
     }
     
-    func addCategory(_ category: TrackerCategoryCoreData) throws {
-        let trackerCategory = TrackerCategoryCoreData(context: context)
-        trackerCategory.name = category.name
-        trackerCategory.trackers = category.trackers
-        try context.save()
+    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates) {
+        guard let fetchedCoreDataCategories = store.trackerFetchedResultsController.fetchedObjects,
+              let trackerCategories = try? fetchedCoreDataCategories.compactMap({ try getCategory(from: $0) })
+        else { return }
+        
+        coreDataManagerDelegate?.didUpdateCategory(trackerCategories, updates)
     }
 }

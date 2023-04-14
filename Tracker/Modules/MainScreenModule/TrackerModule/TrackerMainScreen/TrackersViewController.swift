@@ -12,26 +12,15 @@ protocol TrackerToCoordinatorProtocol {
 }
 
 protocol TrackerMainScreenDelegate: AnyObject {
-    func saveTracker(tracker: Tracker, to category: String)
-}
-
-protocol TrackerCategoryDelegate: AnyObject {
-    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates)
+    func saveTracker(tracker: Tracker, to categoryName: String)
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
     
-    private lazy var trackerCategoryStore: TrackerCategoryStoreProtocol? = {
-        do {
-            try trackerCategoryStore = TrackerCategoryStore(coreDataManager: CoreDataManager(), delegate: self)
-            return trackerCategoryStore
-        } catch {
-            print("trackerCategoryStore error")
-            return nil
-        }
+    private lazy var coreDataManager: CoreDataManagerProtocol = {
+        coreDataManager = CoreDataManager(coreDataManagerDelegate: self)
+        return coreDataManager
     }()
-    
-    var trackerRecordStore: TrackerRecordStoreProtocol?
     
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
@@ -157,7 +146,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
         // загрузка трекеров и записей
         fetchTrackers()
-//        visibleCategories = categories
         
         checkForEmptyState()
         checkForScheduledTrackers()
@@ -168,20 +156,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     //MARK: Methods
     
     private func fetchTrackers() {
-        if let savedCategories = try? trackerCategoryStore?.fetchTrackerCategories() {
+        if let savedCategories = try? coreDataManager.fetchTrackerCategories() {
             visibleCategories = savedCategories
             categories = savedCategories
-            print("TrackersViewController fetchTrackers worked")
         } else {
-            print("TrackersViewController No saved categories")
-        }
-    }
-    
-    private func saveTrackers(_ category: TrackerCategory) {
-        do {
-            try trackerCategoryStore?.saveTrackerCategories(category)
-        } catch {
-            print("Saving of categories failed")
+            print("No saved categories")
         }
     }
     
@@ -285,47 +264,25 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - Ext TrackerMainScreenDelegate
 extension TrackersViewController: TrackerMainScreenDelegate {
-    func saveTracker(tracker: Tracker, to category: String) {
+    func saveTracker(tracker: Tracker, to categoryName: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            
-            if categories.contains(where: { $0.name == category }) {
-                // get category with the same name
-                guard var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
-                else {
-                    return
-                }
-                // append new tracker to the category with the same name
-                newCategoryTrackers.append(tracker)
-                // save updated category
-                saveTrackers(TrackerCategory(name: category, trackers: newCategoryTrackers))
-            } else {
-                // save new category
-                saveTrackers(TrackerCategory(name: category, trackers: [tracker]))
+            do {
+                try self.coreDataManager.saveTracker(tracker: tracker, to: categoryName)
+            } catch {
+                print("saveTracker failed")
             }
             
-            
-            
-            // сохраняем категории
-//            if !categories.contains(where: { $0.name == category }) {
-//                let newCategory = TrackerCategory(name: category, trackers: [tracker])
-//                var temporaryCategories = categories
-//                temporaryCategories.append(newCategory)
-//                categories = temporaryCategories
-//                visibleCategories = categories
-//            }
-//            else {
-//                var newCategoryTrackers = categories.first(where: { $0.name == category })?.trackers
-//                let newCategoryIndex = categories.firstIndex(where: { $0.name == category })
-//                newCategoryTrackers?.append(tracker)
-//                var temporaryCategories = categories
-//                temporaryCategories[newCategoryIndex!] = TrackerCategory(name: category, trackers: newCategoryTrackers!)
-//                categories = temporaryCategories
-//                visibleCategories = categories
-//            }
             checkForScheduledTrackers()
-//            collectionView.reloadData()
         }
+    }
+}
+
+// MARK: - Ext CoreDataManagerDelegate
+extension TrackersViewController: CoreDataManagerDelegate {
+    func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates) {
+        visibleCategories = updatedCategories
+        categories = updatedCategories
     }
 }
 
@@ -366,16 +323,6 @@ extension TrackersViewController: UITextFieldDelegate {
         }
         
         return true
-    }
-}
-
-// MARK: - Ext TrackerCategoryDelegate
-extension TrackersViewController: TrackerCategoryDelegate {
-    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates) {
-        self.fetchTrackers()
-//        collectionView.reloadSections(updates.insertedIndexes)
-        collectionView.reloadData()
-        print("TrackersViewController TrackerCategoryDelegate didUpdateCategory")
     }
 }
 
