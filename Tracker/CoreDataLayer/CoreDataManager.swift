@@ -92,8 +92,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
    
     func saveTracker(tracker: Tracker, to category: String) throws {
         guard let trackerCoreData = trackerStore?.makeTracker(from: tracker),
-              let request = trackerCategoryStore?.trackerFetchedResultsController.fetchRequest,
-              var fetchedObjects = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects
+              let request = trackerCategoryStore?.trackerFetchedResultsController.fetchRequest
         else {
             return
         }
@@ -105,19 +104,17 @@ extension CoreDataManager: CoreDataManagerProtocol {
             // если она есть, поменять у нее свойство трэкерс и загрузить обратно
             newCoreDataTrackers.append(trackerCoreData)
             existingCategory.trackers = NSSet(array: newCoreDataTrackers)
-            // TODO: Работает до сюда
+            // TODO: Работает ок до этой строки
         } else {
             // если ее нет, создать новую
             // TODO: Работает только для первой категории
             let newCategory = TrackerCategoryCoreData(context: context)
-            var newCoreDataTrackers: [TrackerCoreData] = []
-            newCoreDataTrackers.append(trackerCoreData)
             newCategory.name = category
             newCategory.trackers = NSSet(array: [trackerCoreData])
-            fetchedObjects.append(newCategory)
         }
         
         do {
+            // TODO: если добавлена вторая категория, то краш
             try context.save()
         } catch {
             throw StoreError.failedToSaveContext
