@@ -42,6 +42,7 @@ final class TrackerStore: NSObject {
     }
 }
 
+// MARK: - Ext TrackerStoreProtocol
 extension TrackerStore: TrackerStoreProtocol {
     func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
         guard let name = trackerCoreData.name,
@@ -70,6 +71,7 @@ extension TrackerStore: TrackerStoreProtocol {
     
 }
 
+// MARK: - Ext NSFetchedResultsControllerDelegate
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         

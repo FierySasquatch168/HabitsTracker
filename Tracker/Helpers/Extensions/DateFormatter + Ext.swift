@@ -8,9 +8,9 @@
 import Foundation
 
 extension Date {
-    func customlyFormatted() -> Date {
+    func customlyFormatted() -> Date? {
         let components = Calendar.current.dateComponents([.year, .month, .day], from: self)
-        return Calendar.current.date(from: components) ?? Date()
+        return Calendar.current.date(from: components)
        }
     
     var weekdayNameStandalone: String {

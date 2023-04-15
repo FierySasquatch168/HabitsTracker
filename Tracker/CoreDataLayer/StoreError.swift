@@ -13,4 +13,6 @@ enum StoreError: Error {
     case failedToInitializeContext
     case failedToConvertCoreDataCategoriesToTrackerCategories
     case failedToSaveContext
+    case failedToLoadRecords
+    case failedToManageRecords
 }
