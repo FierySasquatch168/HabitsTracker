@@ -50,7 +50,7 @@ extension TrackerStore: TrackerStoreProtocol {
               let hexColor = trackerCoreData.color,
               let emojie = trackerCoreData.emojie
         else {
-            throw StoreError.decodingErrorInvalidCategoryData
+            throw CoreDataError.decodingErrorInvalidCategoryData
         }
 
         let color = UIColorMarshalling.color(from: hexColor)

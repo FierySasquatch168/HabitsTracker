@@ -37,26 +37,12 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
             collectionView.reloadData()
         }
     }
-
     var visibleCategories: [TrackerCategory] = [] {
         didSet {
-            checkForEmptyState()
             collectionView.reloadData()
         }
     }
 
-    
-    var categories: [TrackerCategory] = [
-//        TrackerCategory(name: "Важное", trackers: [
-//            Tracker(name: "Play", color: .red, emoji: "🙂", schedule: [.tuesday, .thursday]),
-//            Tracker(name: "Run", color: .blue, emoji: "😻", schedule: [.thursday, .friday])
-//        ]),
-//        TrackerCategory(name: "Самочувствие", trackers: [
-//            Tracker(name: "Jump", color: .green, emoji: "🌺", schedule: [.tuesday, .wednesday, .thursday]),
-//            Tracker(name: "Fly", color: .gray, emoji: "🐶", schedule: [.thursday, .friday])
-//        ])
-    ]
-    
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -149,80 +135,24 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         fetchRecords()
         
         
-        checkForEmptyState()
         checkForScheduledTrackers()
-        
+        checkForEmptyState()
         
     }
     
     //MARK: Methods
     
     private func fetchTrackers() {
-        if let savedCategories = try? coreDataManager.fetchTrackerCategories() {
-            visibleCategories = savedCategories
-            categories = savedCategories
-        } else {
-            print("No saved categories")
-        }
+        visibleCategories = coreDataManager.fetchedCategories
     }
     
     private func fetchRecords() {
         completedTrackers = coreDataManager.fetchedRecords
     }
     
-    private func checkForEmptyState() {
-        emptyStateStackView.isHidden = visibleCategories.isEmpty ? false : true
-    }
-    
-    // TODO: move to coreDataManager
-    private func checkForScheduledTrackers() {
-        // TODO: rewrite to do everything through CoreData
-        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone, let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek) else { return }
-        var temporaryCategories: [TrackerCategory] = []
-        
-        for category in categories {
-            let filteredTrackers = category.trackers.filter({ $0.schedule.contains(weekDay) })
-            if !filteredTrackers.isEmpty {
-                let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
-                temporaryCategories.append(filteredCategory)
-                visibleCategories = temporaryCategories
-            } else {
-                visibleCategories = temporaryCategories
-            }
-        }
-    }
-    
-    private func chooseTrackerImage(for tracker: Tracker) -> UIImage {
-        for completedTracker in completedTrackers {
-            if completedTracker.id.uuidString == tracker.stringID && completedTracker.date == currentDate {
-                return UIImage(systemName: Constants.Icons.checkmark) ?? UIImage()
-            }
-        }
-
-        return UIImage(systemName: Constants.Icons.plus) ?? UIImage()
-    }
-
-    private func updateCellCounter(at indexPath: IndexPath) -> Int {
-        let id = visibleCategories[indexPath.section].trackers[indexPath.row].stringID
-        return completedTrackers.filter({ $0.id.uuidString == id }).count
-    }
-    
     private func closeTheDatePicker() {
         presentedViewController?.dismiss(animated: false)
     }
-    
-    @objc
-    private func addTracker() {
-        // сообщить о событии
-        addTrackerButtonPressed?()
-    }
-    
-    @objc
-    private func reloadTheDate() {
-        checkForScheduledTrackers()
-        closeTheDatePicker()
-    }
-
 }
 
 // MARK: - Ext Data Source
@@ -240,11 +170,9 @@ extension TrackersViewController: UICollectionViewDataSource {
         // cell delegate
         cell.trackersListCellDelegate = self
         // properties for the cell
-        let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
-        let image = chooseTrackerImage(for: tracker)
-        let count = updateCellCounter(at: indexPath)
+        let properties = configureCellProperties(with: currentDate, at: indexPath)
         // cell configuration
-        cell.configCell(with: tracker, image: image, count: count)
+        cell.configCell(with: properties.tracker, image: properties.image, count: properties.count)
         return cell
     }
     
@@ -252,6 +180,68 @@ extension TrackersViewController: UICollectionViewDataSource {
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: HeaderView.reuseIdentifier, for: indexPath) as? HeaderView else { return UICollectionReusableView() }
         view.configure(with: visibleCategories[indexPath.section].name)
         return view
+    }
+}
+
+// MARK: - Ext OBJS
+@objc private extension TrackersViewController {
+    func addTracker() {
+        addTrackerButtonPressed?()
+    }
+    
+    func reloadTheDate() {
+        checkForScheduledTrackers()
+        checkForEmptyState()
+        closeTheDatePicker()
+    }
+}
+
+// MARK: - Ext Cell properties
+private extension TrackersViewController {
+    func configureCellProperties(with date: Date?, at indexPath: IndexPath) -> (tracker: Tracker, image: UIImage, count: Int) {
+        let tracker = returnTracker(for: indexPath)
+        let image = chooseTrackerImage(for: tracker, with: currentDate)
+        let cellCount = updateCellCounter(at: indexPath)
+        return (tracker, image, cellCount)
+    }
+    
+    func returnTracker(for indexPath: IndexPath) -> Tracker {
+        return visibleCategories[indexPath.section].trackers[indexPath.row]
+    }
+    
+    func chooseTrackerImage(for tracker: Tracker, with date: Date?) -> UIImage {
+        let completedTrackerImage = UIImage(systemName: Constants.Icons.checkmark) ?? UIImage()
+        let uncompletedTrackerImage = UIImage(systemName: Constants.Icons.plus) ?? UIImage()
+        return coreDataManager.trackerCompleted(tracker, with: date) ? completedTrackerImage : uncompletedTrackerImage
+    }
+
+    func updateCellCounter(at indexPath: IndexPath) -> Int {
+        let id = coreDataManager.fetchedCategories[indexPath.section].trackers[indexPath.row].stringID
+        return coreDataManager.fetchedRecords.filter({ $0.id.uuidString == id }).count
+    }
+}
+
+// MARK: - Ext Collection view checkers
+private extension TrackersViewController {
+    func checkForEmptyState() {
+        emptyStateStackView.isHidden = visibleCategories.isEmpty ? false : true
+    }
+    
+    func checkForScheduledTrackers() {
+        // TODO: rewrite to do everything through CoreData
+        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone, let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek) else { return }
+        var temporaryCategories: [TrackerCategory] = []
+        
+        for category in coreDataManager.fetchedCategories {
+            let filteredTrackers = category.trackers.filter({ $0.schedule.contains(weekDay) })
+            if !filteredTrackers.isEmpty {
+                let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
+                temporaryCategories.append(filteredCategory)
+                visibleCategories = temporaryCategories
+            } else {
+                visibleCategories = temporaryCategories
+            }
+        }
     }
 }
 
@@ -288,7 +278,6 @@ extension TrackersViewController: TrackerMainScreenDelegate {
 extension TrackersViewController: CoreDataManagerDelegate {
     func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates) {
         visibleCategories = updatedCategories
-        categories = updatedCategories
     }
     
     func didUpdateRecords(_ updatedRecords: Set<TrackerRecord>, _ updates: RecordUpdates) {
@@ -306,8 +295,6 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
         } catch {
             print("Saving of record failed")
         }
-        print("completedTrackers are: \(completedTrackers)")
-        print("completedTrackers.count is: \(completedTrackers.count)")
     }
 }
 

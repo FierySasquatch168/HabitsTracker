@@ -11,9 +11,9 @@ import CoreData
 protocol CoreDataManagerProtocol {
     var fetchedCategories: [TrackerCategory] { get }
     var fetchedRecords: Set<TrackerRecord> { get }
-    func fetchTrackerCategories() throws -> [TrackerCategory]
     func saveTracker(tracker: Tracker, to categoryName: String) throws
     func updateRecords(_ id: String, with date: Date) throws
+    func trackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
 }
 
 protocol CoreDataManagerDelegate: AnyObject {
@@ -75,7 +75,7 @@ final class CoreDataManager {
               let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
               let trackers = try? coreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
         else {
-            throw StoreError.decodingErrorInvalidCategoryData
+            throw CoreDataError.decodingErrorInvalidCategoryData
         }
         
         return TrackerCategory(name: name, trackers: trackers)
@@ -84,26 +84,10 @@ final class CoreDataManager {
 
 // MARK: - Ext CoreDataManagerProtocol
 extension CoreDataManager: CoreDataManagerProtocol {
-    //TODO: Delete fetchTrackerCategories and reorganize fetch to "fetchedCategories"
-    func fetchTrackerCategories() throws -> [TrackerCategory] {
-        guard let categoriesCoreData = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects,
-              let trackersCoreData = trackerStore?.trackerFetchedResultsController.fetchedObjects
-        else {
-            return []
-        }
-        
-        var trackerCategories: [TrackerCategory] = []
-        
-        categoriesCoreData.forEach { trackerCategoryCoreData in
-            let filteredCoreDataTrackers = trackersCoreData.filter({ $0.category?.name == trackerCategoryCoreData.name })
-            let trackerToView = try? filteredCoreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
-            let category = TrackerCategory(name: trackerCategoryCoreData.name ?? "", trackers: trackerToView ?? [])
-            trackerCategories.append(category)
-        }
-        
-        return trackerCategories
+    func trackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool {
+        return fetchedRecords.filter({ $0.id.uuidString == tracker.stringID && $0.date == date }).isEmpty ? false : true
     }
-   
+    
     func saveTracker(tracker: Tracker, to categoryName: String) throws {
         guard let trackerCoreData = trackerStore?.makeTracker(from: tracker)
         else {
@@ -126,7 +110,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
         do {
             try context.save()
         } catch {
-            throw StoreError.failedToSaveContext
+            throw CoreDataError.failedToSaveContext
         }
     }
     
@@ -136,7 +120,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
             let record = TrackerRecord(id: uuid, date: date)
             try trackerRecordStore?.updateRecordsCoreData(record: record)
         } catch {
-            throw StoreError.failedToManageRecords
+            throw CoreDataError.failedToManageRecords
         }
     }
     

@@ -74,7 +74,7 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         do {
             try context.save()
         } catch {
-            throw StoreError.failedToSaveContext
+            throw CoreDataError.failedToSaveContext
         }
         
     }

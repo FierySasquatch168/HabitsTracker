@@ -85,7 +85,7 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             let category = try context.fetch(request).first
             return category
         } catch {
-            throw StoreError.decodingErrorInvalidCategoryData
+            throw CoreDataError.decodingErrorInvalidCategoryData
         }
     }
 }
