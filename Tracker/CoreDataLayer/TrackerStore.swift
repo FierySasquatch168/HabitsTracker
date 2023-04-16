@@ -42,6 +42,7 @@ final class TrackerStore: NSObject {
     }
 }
 
+// MARK: - Ext TrackerStoreProtocol
 extension TrackerStore: TrackerStoreProtocol {
     func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
         guard let name = trackerCoreData.name,
@@ -55,7 +56,7 @@ extension TrackerStore: TrackerStoreProtocol {
         let color = UIColorMarshalling.color(from: hexColor)
         let schedule = WeekDays.getWeekDaysArray(from: weekDays)
 
-        return Tracker(name: name, color: color, emoji: emojie, schedule: schedule)
+        return Tracker(name: name, color: color, emoji: emojie, schedule: schedule, stringID: trackerCoreData.stringID)
     }
     
     func makeTracker(from tracker: Tracker) -> TrackerCoreData {
@@ -64,12 +65,15 @@ extension TrackerStore: TrackerStoreProtocol {
         trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
         trackerCoreData.color = UIColorMarshalling.hexString(from: tracker.color)
         trackerCoreData.emojie = tracker.emoji
+        // При сохранении задаем в модели КорДаты текстовый айди
+        trackerCoreData.stringID = tracker.id.uuidString
         return trackerCoreData
     }
     
     
 }
 
+// MARK: - Ext NSFetchedResultsControllerDelegate
 extension TrackerStore: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         

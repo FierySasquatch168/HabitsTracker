@@ -8,13 +8,13 @@
 import UIKit
 
 protocol TrackersListCollectionViewCellDelegate: AnyObject {
-    func plusTapped(trackerID: UUID?)
+    func plusTapped(trackerID: String?)
 }
 
 final class TrackersListCollectionViewCell: UICollectionViewCell {
     weak var trackersListCellDelegate: TrackersListCollectionViewCellDelegate?
     
-    var trackerID: UUID?
+    var trackerID: String?
     
     lazy var cellBackgroundColorImageView: UIImageView = {
         let imageView = UIImageView()
@@ -107,7 +107,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     
     func configCell(with tracker: Tracker, image: UIImage, count: Int) {
         // category should be configured as Header
-        trackerID = tracker.id
+        trackerID = tracker.stringID
         emojieLabel.text = tracker.emoji
         cellBackgroundColorImageView.backgroundColor = tracker.color
         trackerNameLabel.text = tracker.name

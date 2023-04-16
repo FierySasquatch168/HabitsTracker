@@ -13,7 +13,7 @@ protocol DataSourceManagerProtocol {
     var emojieCelldelegate: EmojieCellDelegate? { get set }
     var colorCellDelegate: ColorCellDelegate? { get set }
     var categorySubtitles: String { get set }
-    var timetableSubtitles: String { get set }
+    var scheduleSubtitles: String { get set }
     func createDataSource(collectionView: UICollectionView)
     func getTitle() -> String
 }
@@ -33,7 +33,7 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     var categorySubtitles: String = ""
     
     // initialized after user picks up schedule
-    var timetableSubtitles: String = ""
+    var scheduleSubtitles: String = ""
     
     var headerLabeltext: String
     
@@ -115,8 +115,8 @@ private extension DataSourceManager {
                 cell.setupCellSubtitle(subtitle: categorySubtitles)
             }
             
-            if indexPath.row == 1 && !timetableSubtitles.isEmpty {
-                cell.setupCellSubtitle(subtitle: timetableSubtitles)
+            if indexPath.row == 1 && !scheduleSubtitles.isEmpty {
+                cell.setupCellSubtitle(subtitle: scheduleSubtitles)
             }
             
             return cell

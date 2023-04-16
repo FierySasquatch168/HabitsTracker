@@ -146,6 +146,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
         // загрузка трекеров и записей
         fetchTrackers()
+        fetchRecords()
+        
         
         checkForEmptyState()
         checkForScheduledTrackers()
@@ -164,11 +166,15 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         }
     }
     
+    private func fetchRecords() {
+        completedTrackers = coreDataManager.fetchedRecords
+    }
+    
     private func checkForEmptyState() {
         emptyStateStackView.isHidden = visibleCategories.isEmpty ? false : true
     }
     
-    // TODO: move to coreDataCategories
+    // TODO: move to coreDataManager
     private func checkForScheduledTrackers() {
         // TODO: rewrite to do everything through CoreData
         guard let stringDayOfWeek = currentDate?.weekdayNameStandalone, let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek) else { return }
@@ -188,17 +194,17 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private func chooseTrackerImage(for tracker: Tracker) -> UIImage {
         for completedTracker in completedTrackers {
-            if completedTracker.id == tracker.id && completedTracker.date == currentDate {
+            if completedTracker.id.uuidString == tracker.stringID && completedTracker.date == currentDate {
                 return UIImage(systemName: Constants.Icons.checkmark) ?? UIImage()
             }
         }
-        
+
         return UIImage(systemName: Constants.Icons.plus) ?? UIImage()
     }
-    
+
     private func updateCellCounter(at indexPath: IndexPath) -> Int {
-        let id = visibleCategories[indexPath.section].trackers[indexPath.row].id
-        return completedTrackers.filter({ $0.id == id }).count
+        let id = visibleCategories[indexPath.section].trackers[indexPath.row].stringID
+        return completedTrackers.filter({ $0.id.uuidString == id }).count
     }
     
     private func closeTheDatePicker() {
@@ -284,20 +290,24 @@ extension TrackersViewController: CoreDataManagerDelegate {
         visibleCategories = updatedCategories
         categories = updatedCategories
     }
+    
+    func didUpdateRecords(_ updatedRecords: Set<TrackerRecord>, _ updates: RecordUpdates) {
+        completedTrackers = updatedRecords
+    }
 }
 
 // MARK: - Ext TrackersListCellDelegate
 extension TrackersViewController: TrackersListCollectionViewCellDelegate {
-    func plusTapped(trackerID: UUID?) {
+    func plusTapped(trackerID: String?) {
         guard let trackerID = trackerID, let currentDate = currentDate, currentDate <= Date() else { return }
-        let dateOfCompletion = currentDate.customlyFormatted()
-        let completedTracker = TrackerRecord(id: trackerID, date: dateOfCompletion)
         
-        if !completedTrackers.contains(where: { $0.id == trackerID && $0.date == currentDate }) {
-            completedTrackers.insert(completedTracker)
-        } else {
-            completedTrackers.remove(completedTracker)
+        do {
+            try coreDataManager.updateRecords(trackerID, with: currentDate)
+        } catch {
+            print("Saving of record failed")
         }
+        print("completedTrackers are: \(completedTrackers)")
+        print("completedTrackers.count is: \(completedTrackers.count)")
     }
 }
 

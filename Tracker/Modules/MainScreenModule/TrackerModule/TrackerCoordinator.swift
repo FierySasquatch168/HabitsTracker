@@ -50,8 +50,8 @@ private extension TrackerCoordinator {
             self?.showTrackerHabitScreen(with: trackerSelectionScreen)
         }
 
-        trackerSelectionScreen.headToSingleEvent = { [weak self] in
-            self?.showHabitSingleEventScreen()
+        trackerSelectionScreen.headToSingleEvent = { [weak self, weak trackerSelectionScreen] in
+            self?.showHabitSingleEventScreen(with: trackerSelectionScreen)
         }
         
         router.presentViewController(trackerSelectionScreen, animated: true, presentationStyle: .pageSheet)
@@ -70,7 +70,7 @@ private extension TrackerCoordinator {
             self?.showCategorySelectionScreen(timetableDelegate: trackerHabitScreen)
         }
         
-        trackerHabitScreen.timeTableTapped = { [weak self, weak trackerHabitScreen] in
+        trackerHabitScreen.scheduleTapped = { [weak self, weak trackerHabitScreen] in
             // TODO: think about a better way of setting the delegate
             self?.showTrackerTimeTableScreen(timetableDelegate: trackerHabitScreen)
         }
@@ -84,8 +84,9 @@ private extension TrackerCoordinator {
     
     // MARK: SingleEvent
     
-    func showHabitSingleEventScreen() {
-        var trackerSingleEventScreen = factory.makeTrackerSingleEventScreenView()
+    func showHabitSingleEventScreen(with mainScreenDelegate: TrackerViceMainScreenDelegate?) {
+        var trackerSingleEventScreen = factory.makeTrackerSingleEventScreenView(with: mainScreenDelegate)
+        
         trackerSingleEventScreen.returnOnCancel = { [weak self, weak trackerSingleEventScreen] in
             self?.router.dismissViewController(trackerSingleEventScreen, animated: true, completion: nil)
         }

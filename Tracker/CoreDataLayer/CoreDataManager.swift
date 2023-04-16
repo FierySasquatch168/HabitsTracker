@@ -9,17 +9,22 @@ import Foundation
 import CoreData
 
 protocol CoreDataManagerProtocol {
+    var fetchedCategories: [TrackerCategory] { get }
+    var fetchedRecords: Set<TrackerRecord> { get }
     func fetchTrackerCategories() throws -> [TrackerCategory]
     func saveTracker(tracker: Tracker, to categoryName: String) throws
+    func updateRecords(_ id: String, with date: Date) throws
 }
 
 protocol CoreDataManagerDelegate: AnyObject {
     func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates)
+    func didUpdateRecords(_ updatedRecords: Set<TrackerRecord>, _ updates: RecordUpdates)
 }
 
 protocol TrackerStorageCoreDataDelegate: AnyObject {
     var managedObjectContext: NSManagedObjectContext { get }
     func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates)
+    func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates)
 } 
 
 final class CoreDataManager {
@@ -30,7 +35,22 @@ final class CoreDataManager {
     private var trackerCategoryStore: TrackerCategoryStoreProtocol?
     private var trackerRecordStore: TrackerRecordStoreProtocol?
     private var trackerStore: TrackerStoreProtocol?
-
+    
+    //TODO: Move to TrackerCategoryStore
+    var fetchedCategories: [TrackerCategory] {
+        guard let objects = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects,
+              let categories = try? objects.compactMap({ try getCategory(from: $0) })
+        else {
+            return []
+        }
+        return categories
+    }
+    
+    var fetchedRecords: Set<TrackerRecord> {
+        guard let objects = trackerRecordStore?.getTrackerRecords() else { return [] }
+        return objects
+    }
+    
     private let persistentContainer = {
         let container = NSPersistentContainer(name: "CoreDataModel")
         container.loadPersistentStores { storeDescription, error in
@@ -50,13 +70,6 @@ final class CoreDataManager {
     }
     
     // TODO: move to trackerCategoryStore
-    private func makeCategory(from category: TrackerCategory) -> TrackerCategoryCoreData {
-        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
-        trackerCategoryCoreData.name = category.name
-        trackerCategoryCoreData.trackers = NSSet(array: category.trackers.compactMap({ trackerStore?.makeTracker(from: $0) }))
-        return trackerCategoryCoreData
-    }
-    // TODO: move to trackerCategoryStore
     private func getCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
         guard let name = categoryCoreData.name,
               let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
@@ -71,6 +84,7 @@ final class CoreDataManager {
 
 // MARK: - Ext CoreDataManagerProtocol
 extension CoreDataManager: CoreDataManagerProtocol {
+    //TODO: Delete fetchTrackerCategories and reorganize fetch to "fetchedCategories"
     func fetchTrackerCategories() throws -> [TrackerCategory] {
         guard let categoriesCoreData = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects,
               let trackersCoreData = trackerStore?.trackerFetchedResultsController.fetchedObjects
@@ -115,6 +129,18 @@ extension CoreDataManager: CoreDataManagerProtocol {
             throw StoreError.failedToSaveContext
         }
     }
+    
+    func updateRecords(_ id: String, with date: Date) throws {
+        guard let uuid = UUID(uuidString: id) else { return }
+        do {
+            let record = TrackerRecord(id: uuid, date: date)
+            try trackerRecordStore?.updateRecordsCoreData(record: record)
+        } catch {
+            throw StoreError.failedToManageRecords
+        }
+    }
+    
+    
 }
 
 // MARK: - Ext TrackerStorageCoreDataDelegate
@@ -129,5 +155,10 @@ extension CoreDataManager: TrackerStorageCoreDataDelegate {
         else { return }
         
         coreDataManagerDelegate?.didUpdateCategory(trackerCategories, updates)
+    }
+    
+    func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates) {
+        guard let trackerRecords = trackerRecordStore?.getTrackerRecords() else { return }
+        coreDataManagerDelegate?.didUpdateRecords(trackerRecords, updates)
     }
 }
