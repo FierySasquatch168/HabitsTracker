@@ -17,4 +17,8 @@ struct Constants {
         static let statisticsTabIcon = "hare.fill"
         static let checkmark = "checkmark"
     }
+    
+    struct Strings {
+        static let allDays = "Все дни"
+    }
 }

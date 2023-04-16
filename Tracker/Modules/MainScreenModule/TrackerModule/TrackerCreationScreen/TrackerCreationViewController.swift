@@ -10,7 +10,7 @@ import UIKit
 protocol TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)? { get set }
     var saveTrackerTapped: (() -> Void)? { get set }
-    var timeTableTapped: (() -> Void)? { get set }
+    var scheduleTapped: (() -> Void)? { get set }
     var categoryTapped: (() -> Void)? { get set }
     var selectedCategories: [String]? { get set }
 }
@@ -25,7 +25,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     var selectedCategories: [String]?
     var returnOnCancel: (() -> Void)?
     var saveTrackerTapped: (() -> Void)?
-    var timeTableTapped: (() -> Void)?
+    var scheduleTapped: (() -> Void)?
     var categoryTapped: (() -> Void)?
     
     weak var mainScreenDelegate: TrackerViceMainScreenDelegate?
@@ -59,14 +59,15 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     private var templateCategory: String = "" {
         didSet {
+            updateCategorySubtitles()
             checkForCorrectTrackerInfo()
-            updateCollectionView()
+            createDataSource()
         }
     }
-    private var templateTimetable: [WeekDays] = [] {
+    private var templateSchedule: [WeekDays] = [] {
         didSet {
-            checkForCorrectTrackerInfo()
-            updateCollectionView()
+            updateScheduleView()
+            createDataSource()
         }
     }
     
@@ -141,14 +142,17 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         setDataSourceDelegates()
         // swipe down delegate
         presentationController?.delegate = self
+        
+        print("mainScreenDelegate is: \(mainScreenDelegate)")
     }
     
     // MARK: Methods
+    private func updateScheduleView() {
+        dataSourceManager?.scheduleSubtitles = convertWeekDayToString(from: templateSchedule)
+    }
     
-    private func updateCollectionView() {
-        dataSourceManager?.timetableSubtitles = convertWeekDayToString(from: templateTimetable)
+    private func updateCategorySubtitles() {
         dataSourceManager?.categorySubtitles = templateCategory
-        dataSourceManager?.createDataSource(collectionView: collectionView)
     }
     
     private func checkForCorrectTrackerInfo() {
@@ -163,18 +167,24 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }
     
     private func convertWeekDayToString(from weekDay: [WeekDays]) -> String {
-        return weekDay.map({ $0.shortName }).joined(separator: ", ")
+        return weekDay.count == WeekDays.allCases.count ? Constants.Strings.allDays : weekDay.map({ $0.shortName }).joined(separator: ", ")
+    }
+    
+    private func scheduleAllDaysIfEmpty() {
+        templateSchedule.isEmpty ? templateSchedule = WeekDays.allCases : ()
     }
     
     private func saveTracker() {
+        // check if schedule is empty
+        scheduleAllDaysIfEmpty()
         // create tracker
-        let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
+        let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, schedule: templateSchedule)
         // delegate - save tracker
         mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
     }
     
-    private func createTracker(name: String, color: UIColor, emoji: String, timetable: [WeekDays]) -> Tracker {
-        return Tracker(name: name, color: color, emoji: emoji, schedule: timetable)
+    private func createTracker(name: String, color: UIColor, emoji: String, schedule: [WeekDays]) -> Tracker {
+        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: nil)
     }
     
     private func createDataSource() {
@@ -214,7 +224,7 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
             }
             // proceed to schedule
             if indexPath.row == 1 {
-                timeTableTapped?()
+                scheduleTapped?()
             }
             
         case 2:
@@ -268,7 +278,7 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 // MARK: - Ext Timetable delegate
 extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
     func transferTimeTable(from selectedWeekdays: [WeekDays]) {
-        templateTimetable = selectedWeekdays
+        templateSchedule = selectedWeekdays
     }
     
     func transferCategory(from selectedCategory: String) {

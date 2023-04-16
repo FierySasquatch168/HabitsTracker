@@ -13,7 +13,7 @@ protocol CoreDataManagerProtocol {
     var fetchedRecords: Set<TrackerRecord> { get }
     func fetchTrackerCategories() throws -> [TrackerCategory]
     func saveTracker(tracker: Tracker, to categoryName: String) throws
-    func updateRecords(_ id: UUID, with date: Date) throws
+    func updateRecords(_ id: String, with date: Date) throws
 }
 
 protocol CoreDataManagerDelegate: AnyObject {
@@ -130,9 +130,10 @@ extension CoreDataManager: CoreDataManagerProtocol {
         }
     }
     
-    func updateRecords(_ id: UUID, with date: Date) throws {
+    func updateRecords(_ id: String, with date: Date) throws {
+        guard let uuid = UUID(uuidString: id) else { return }
         do {
-            let record = TrackerRecord(id: id, date: date)
+            let record = TrackerRecord(id: uuid, date: date)
             try trackerRecordStore?.updateRecordsCoreData(record: record)
         } catch {
             throw StoreError.failedToManageRecords

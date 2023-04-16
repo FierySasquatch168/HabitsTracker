@@ -17,7 +17,7 @@ protocol TrackerViceMainScreenDelegate: AnyObject {
     func saveTracker(tracker: Tracker, to category: String)
 }
 
-final class TrackerSelectionViewController: UIViewController & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate {
+final class TrackerSelectionViewController: UIViewController & TrackerSelectionCoordinatorProtocol {
     
     var headToHabit: (() -> Void)?
     var headToSingleEvent: (() -> Void)?
@@ -79,10 +79,6 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
         presentationController?.delegate = self
     }
     
-    func saveTracker(tracker: Tracker, to category: String) {
-        mainScreenDelegate?.saveTracker(tracker: tracker, to: category)
-    }
-    
     @objc
     private func dismissDidTapped() {
         returnOnCancel?()
@@ -141,6 +137,13 @@ private extension TrackerSelectionViewController {
             headerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
             headerLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
+    }
+}
+
+// MARK: - Ext TrackerViceMainScreenDelegate
+extension TrackerSelectionViewController: TrackerViceMainScreenDelegate {
+    func saveTracker(tracker: Tracker, to category: String) {
+        mainScreenDelegate?.saveTracker(tracker: tracker, to: category)
     }
 }
 

@@ -194,17 +194,17 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private func chooseTrackerImage(for tracker: Tracker) -> UIImage {
         for completedTracker in completedTrackers {
-            if completedTracker.id == tracker.id && completedTracker.date == currentDate {
+            if completedTracker.id.uuidString == tracker.stringID && completedTracker.date == currentDate {
                 return UIImage(systemName: Constants.Icons.checkmark) ?? UIImage()
             }
         }
-        
+
         return UIImage(systemName: Constants.Icons.plus) ?? UIImage()
     }
-    
+
     private func updateCellCounter(at indexPath: IndexPath) -> Int {
-        let id = visibleCategories[indexPath.section].trackers[indexPath.row].id
-        return completedTrackers.filter({ $0.id == id }).count
+        let id = visibleCategories[indexPath.section].trackers[indexPath.row].stringID
+        return completedTrackers.filter({ $0.id.uuidString == id }).count
     }
     
     private func closeTheDatePicker() {
@@ -298,7 +298,7 @@ extension TrackersViewController: CoreDataManagerDelegate {
 
 // MARK: - Ext TrackersListCellDelegate
 extension TrackersViewController: TrackersListCollectionViewCellDelegate {
-    func plusTapped(trackerID: UUID?) {
+    func plusTapped(trackerID: String?) {
         guard let trackerID = trackerID, let currentDate = currentDate, currentDate <= Date() else { return }
         
         do {
@@ -306,6 +306,7 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
         } catch {
             print("Saving of record failed")
         }
+        print("completedTrackers are: \(completedTrackers)")
         print("completedTrackers.count is: \(completedTrackers.count)")
     }
 }

@@ -50,9 +50,8 @@ final class TrackerRecordStore: NSObject {
     private func convertCoreDataToRecord(from record: TrackerRecordCoreData) -> TrackerRecord? {
         guard let id = record.id,
               let date = record.date
-        else {
-            return nil
-        }
+        else { return nil }
+        
         return TrackerRecord(id: id, date: date)
     }
 }
