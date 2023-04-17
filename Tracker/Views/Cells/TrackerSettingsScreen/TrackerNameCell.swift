@@ -44,9 +44,9 @@ final class TrackerNameCell: UICollectionViewCell {
 
 // MARK: - TextFieldDelegate
 extension TrackerNameCell: UITextFieldDelegate {
-    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-        if let delegate = delegate, let text = textField.text {
-            delegate.textDidChange(text: text)
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let delegate = delegate {
+            delegate.textDidChange(text: string)
         }
         return true
     }
