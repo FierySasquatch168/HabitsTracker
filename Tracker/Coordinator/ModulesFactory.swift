@@ -14,7 +14,7 @@ protocol ModulesFactoryProtocol {
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol & TrackerMainScreenDelegate
     func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate
     func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
-    func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
+    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
     func makeTrackerCategorieScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
     func makeTimeTableScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
     func makeStatisticsScreenView() -> Presentable
@@ -52,8 +52,9 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return trackerCreationVC
     }
     
-    func makeTrackerSingleEventScreenView() -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
+    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
         let trackerCreationVC = TrackerCreationViewController()
+        trackerCreationVC.mainScreenDelegate = mainScreenDelegate
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), settings: singleEventSettings)
         trackerCreationVC.dataSourceManager = DataSourceManager(emojieModel: EmojieModel(), colorModel: ColorModel(), settings: singleEventSettings, headerLabeltext: singleEventLabeltext)
         

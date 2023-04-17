@@ -10,7 +10,7 @@ import UIKit
 protocol TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)? { get set }
     var saveTrackerTapped: (() -> Void)? { get set }
-    var timeTableTapped: (() -> Void)? { get set }
+    var scheduleTapped: (() -> Void)? { get set }
     var categoryTapped: (() -> Void)? { get set }
     var selectedCategories: [String]? { get set }
 }
@@ -25,7 +25,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     var selectedCategories: [String]?
     var returnOnCancel: (() -> Void)?
     var saveTrackerTapped: (() -> Void)?
-    var timeTableTapped: (() -> Void)?
+    var scheduleTapped: (() -> Void)?
     var categoryTapped: (() -> Void)?
     
     weak var mainScreenDelegate: TrackerViceMainScreenDelegate?
@@ -59,14 +59,15 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     private var templateCategory: String = "" {
         didSet {
+            updateCategorySubtitles()
             checkForCorrectTrackerInfo()
-            updateCollectionView()
+            createDataSource()
         }
     }
-    private var templateTimetable: [WeekDays] = [] {
+    private var templateSchedule: [WeekDays] = [] {
         didSet {
-            checkForCorrectTrackerInfo()
-            updateCollectionView()
+            updateScheduleView()
+            createDataSource()
         }
     }
     
@@ -140,42 +141,10 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         // dataSource delegates
         setDataSourceDelegates()
         // swipe down delegate
-        presentationController?.delegate = self
+        presentationController?.delegate = self        
     }
     
     // MARK: Methods
-    
-    private func updateCollectionView() {
-        dataSourceManager?.timetableSubtitles = convertWeekDayToString(from: templateTimetable)
-        dataSourceManager?.categorySubtitles = templateCategory
-        dataSourceManager?.createDataSource(collectionView: collectionView)
-    }
-    
-    private func checkForCorrectTrackerInfo() {
-        if !templateName.isEmpty
-        && templateColor != .clear
-        && !templateEmojie.isEmpty
-        && !templateCategory.isEmpty {
-            createButton.setAppearance(for: .confirm)
-        } else {
-            createButton.setAppearance(for: .disabled)
-        }
-    }
-    
-    private func convertWeekDayToString(from weekDay: [WeekDays]) -> String {
-        return weekDay.map({ $0.shortName }).joined(separator: ", ")
-    }
-    
-    private func saveTracker() {
-        // create tracker
-        let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, timetable: templateTimetable)
-        // delegate - save tracker
-        mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
-    }
-    
-    private func createTracker(name: String, color: UIColor, emoji: String, timetable: [WeekDays]) -> Tracker {
-        return Tracker(name: name, color: color, emoji: emoji, timetable: timetable)
-    }
     
     private func createDataSource() {
         dataSourceManager?.createDataSource(collectionView: collectionView)
@@ -187,17 +156,12 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         dataSourceManager?.colorCellDelegate = self
     }
     
-    // MARK: objc
-    
-    @objc
-    private func cancelDidTap() {
-        returnOnCancel?()
+    private func updateScheduleView() {
+        dataSourceManager?.scheduleSubtitles = WeekDays.populateShortWeekDaysSubtitle(from: templateSchedule)
     }
     
-    @objc
-    private func saveDidTap() {
-        saveTracker()
-        saveTrackerTapped?()
+    private func updateCategorySubtitles() {
+        dataSourceManager?.categorySubtitles = templateCategory
     }
 }
 
@@ -212,9 +176,9 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
             if indexPath.row == 0 {
                 categoryTapped?()
             }
-            // proceed to timetable
+            // proceed to schedule
             if indexPath.row == 1 {
-                timeTableTapped?()
+                scheduleTapped?()
             }
             
         case 2:
@@ -268,7 +232,7 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 // MARK: - Ext Timetable delegate
 extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
     func transferTimeTable(from selectedWeekdays: [WeekDays]) {
-        templateTimetable = selectedWeekdays
+        templateSchedule = selectedWeekdays
     }
     
     func transferCategory(from selectedCategory: String) {
@@ -286,7 +250,6 @@ extension TrackerCreationViewController: TrackerNameCellDelegate {
 
 // MARK: - Ext EmojieCellDelegate
 extension TrackerCreationViewController: EmojieCellDelegate {
-    
     func didSelectEmojie(emojie: String?) {
         guard let emojie = emojie else { return }
         templateEmojie = emojie
@@ -298,6 +261,55 @@ extension TrackerCreationViewController: ColorCellDelegate {
     func didSelectColor(color: UIColor?) {
         guard let color = color else { return }
         templateColor = color
+    }
+}
+
+// MARK: - Ext WeekDay management
+private extension TrackerCreationViewController {
+    func scheduleAllDaysIfEmpty() {
+        templateSchedule.isEmpty ? templateSchedule = WeekDays.allCases : ()
+    }
+}
+
+// MARK: - Ext TrackerProperties check
+private extension TrackerCreationViewController {
+    func checkForCorrectTrackerInfo() {
+        if !templateName.isEmpty
+        && templateColor != .clear
+        && !templateEmojie.isEmpty
+        && !templateCategory.isEmpty {
+            createButton.setAppearance(for: .confirm)
+        } else {
+            createButton.setAppearance(for: .disabled)
+        }
+    }
+}
+
+// MARK: - Ext Saving data
+private extension TrackerCreationViewController {
+    func saveTracker() {
+        // check if schedule is empty
+        scheduleAllDaysIfEmpty()
+        // create tracker
+        let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, schedule: templateSchedule)
+        // delegate - save tracker
+        mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
+    }
+    
+    func createTracker(name: String, color: UIColor, emoji: String, schedule: [WeekDays]) -> Tracker {
+        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: nil)
+    }
+}
+
+// MARK: - Ext OBJS
+@objc private extension TrackerCreationViewController {
+    func cancelDidTap() {
+        returnOnCancel?()
+    }
+    
+    func saveDidTap() {
+        saveTracker()
+        saveTrackerTapped?()
     }
 }
 

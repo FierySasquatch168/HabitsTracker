@@ -17,7 +17,8 @@ struct Tracker: Identifiable {
     let name: String
     let color: UIColor
     let emoji: String
-    let timetable: [WeekDays]
+    let schedule: [WeekDays]
+    let stringID: String?
 }
 
 struct TrackerRecord: Identifiable, Hashable {
