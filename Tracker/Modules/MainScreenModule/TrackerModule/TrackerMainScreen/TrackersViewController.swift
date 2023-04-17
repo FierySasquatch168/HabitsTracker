@@ -270,6 +270,7 @@ extension TrackersViewController: TrackerMainScreenDelegate {
             }
             
             checkForScheduledTrackers()
+            checkForEmptyState()
         }
     }
 }
