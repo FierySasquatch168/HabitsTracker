@@ -157,7 +157,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }
     
     private func updateScheduleView() {
-        dataSourceManager?.scheduleSubtitles = convertWeekDayToString(from: templateSchedule)
+        dataSourceManager?.scheduleSubtitles = WeekDays.populateShortWeekDaysSubtitle(from: templateSchedule)
     }
     
     private func updateCategorySubtitles() {
@@ -266,10 +266,6 @@ extension TrackerCreationViewController: ColorCellDelegate {
 
 // MARK: - Ext WeekDay management
 private extension TrackerCreationViewController {
-    func convertWeekDayToString(from weekDay: [WeekDays]) -> String {
-        return weekDay.count == WeekDays.allCases.count ? Constants.Strings.allDays : weekDay.map({ $0.shortName }).joined(separator: ", ")
-    }
-    
     func scheduleAllDaysIfEmpty() {
         templateSchedule.isEmpty ? templateSchedule = WeekDays.allCases : ()
     }

@@ -70,4 +70,8 @@ enum WeekDays: Int, CustomStringConvertible, CaseIterable {
         
         return weekDays
     }
+    
+    static func populateShortWeekDaysSubtitle(from weekDay: [WeekDays]) -> String {
+        return weekDay.count == WeekDays.allCases.count ? Constants.Strings.allDays : weekDay.map({ $0.shortName }).joined(separator: ", ")
+    }
 }
