@@ -14,7 +14,7 @@ protocol TrackerNameCellDelegate: AnyObject {
 final class TrackerNameCell: UICollectionViewCell {
     weak var delegate: TrackerNameCellDelegate?
     
-    private lazy var textField: CustomTextField = {
+    lazy var textField: CustomTextField = {
         let textField = CustomTextField()
         // view
         textField.backgroundColor = .YPBackground
@@ -45,8 +45,8 @@ final class TrackerNameCell: UICollectionViewCell {
 // MARK: - TextFieldDelegate
 extension TrackerNameCell: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        if let delegate = delegate {
-            delegate.textDidChange(text: string)
+        if let delegate = delegate, let text = textField.text {
+            delegate.textDidChange(text: (text + string))
         }
         return true
     }
