@@ -61,13 +61,14 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         didSet {
             updateCategorySubtitles()
             checkForCorrectTrackerInfo()
-            createDataSource()
+            collectionView.reloadData()
         }
     }
     private var templateSchedule: [WeekDays] = [] {
         didSet {
             updateScheduleView()
             createDataSource()
+            collectionView.reloadData()
         }
     }
     
