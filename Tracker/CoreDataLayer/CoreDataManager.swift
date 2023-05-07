@@ -36,19 +36,21 @@ final class CoreDataManager {
     private var trackerRecordStore: TrackerRecordStoreProtocol?
     private var trackerStore: TrackerStoreProtocol?
     
-    //TODO: Move to TrackerCategoryStore
     var fetchedCategories: [TrackerCategory] {
-        guard let objects = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects,
-              let categories = try? objects.compactMap({ try getCategory(from: $0) })
+        
+        //TODO: fetchObjects from trackerStore
+        guard let trackerCategoryCoreDataArray = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects,
+              let viewCategories = try? trackerCategoryCoreDataArray.compactMap({ try convertToViewCategory(from: $0) })
         else {
             return []
         }
-        return categories
+        return viewCategories
     }
     
     var fetchedRecords: Set<TrackerRecord> {
-        guard let objects = trackerRecordStore?.getTrackerRecords() else { return [] }
-        return objects
+        //TODO: fetchObjects from trackerStore
+        guard let trackerRecordSet = trackerRecordStore?.getTrackerRecords() else { return [] }
+        return trackerRecordSet
     }
     
     private let persistentContainer = {
@@ -70,7 +72,7 @@ final class CoreDataManager {
     }
     
     // TODO: move to trackerCategoryStore
-    private func getCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
+    private func convertToViewCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
         guard let name = categoryCoreData.name,
               let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
               let trackers = try? coreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
@@ -135,7 +137,7 @@ extension CoreDataManager: TrackerStorageCoreDataDelegate {
     
     func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates) {
         guard let fetchedCoreDataCategories = store.trackerFetchedResultsController.fetchedObjects,
-              let trackerCategories = try? fetchedCoreDataCategories.compactMap({ try getCategory(from: $0) })
+              let trackerCategories = try? fetchedCoreDataCategories.compactMap({ try convertToViewCategory(from: $0) })
         else { return }
         
         coreDataManagerDelegate?.didUpdateCategory(trackerCategories, updates)
