@@ -16,9 +16,17 @@ struct Constants {
         static let trackersTabIcon = "record.circle.fill"
         static let statisticsTabIcon = "hare.fill"
         static let checkmark = "checkmark"
+        static let onboardingBackgroundBlue = "OnboardingBackgroundBlue"
+        static let onboardingBackgroundRed = "OnboardingBackgroundRed"
     }
     
     struct Strings {
         static let allDays = "Все дни"
+        static let blueOnboardingText = "Отслеживайте только то, что хотите"
+        static let redOnboardingText = "Даже если это не литры воды или йога"
+    }
+    
+    struct FirstLaunchCheck {
+        static let firstLaunch = "FirstLaunch"
     }
 }

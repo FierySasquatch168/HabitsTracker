@@ -60,6 +60,9 @@
 		37C7E6B229CDDA64002027E3 /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6B129CDDA64002027E3 /* Router.swift */; };
 		37C7E6B629CDDF56002027E3 /* SplashScreenCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6B529CDDF56002027E3 /* SplashScreenCoordinator.swift */; };
 		37C7E6B929CDE593002027E3 /* MainScreenCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6B829CDE593002027E3 /* MainScreenCoordinator.swift */; };
+		37D5D8502A07EB1A0072D336 /* OnboardingPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D5D84F2A07EB1A0072D336 /* OnboardingPageViewController.swift */; };
+		37D5D8732A07F0B10072D336 /* FirstEnterChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D5D8722A07F0B10072D336 /* FirstEnterChecker.swift */; };
+		37D5D8772A0804CD0072D336 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D5D8762A0804CD0072D336 /* OnboardingViewController.swift */; };
 		37E4836A29E6BDD700870CF0 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 37E4836829E6BDD700870CF0 /* CoreDataModel.xcdatamodeld */; };
 		37FB4AEB29CEF39A00EFD7D7 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB4AEA29CEF39A00EFD7D7 /* StatisticsViewController.swift */; };
 		37FD82EA29CCAC7300EA9128 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FD82E929CCAC7300EA9128 /* AppDelegate.swift */; };
@@ -124,6 +127,9 @@
 		37C7E6B129CDDA64002027E3 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		37C7E6B529CDDF56002027E3 /* SplashScreenCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenCoordinator.swift; sourceTree = "<group>"; };
 		37C7E6B829CDE593002027E3 /* MainScreenCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenCoordinator.swift; sourceTree = "<group>"; };
+		37D5D84F2A07EB1A0072D336 /* OnboardingPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageViewController.swift; sourceTree = "<group>"; };
+		37D5D8722A07F0B10072D336 /* FirstEnterChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstEnterChecker.swift; sourceTree = "<group>"; };
+		37D5D8762A0804CD0072D336 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		37E4836929E6BDD700870CF0 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
 		37FB4AEA29CEF39A00EFD7D7 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
 		37FD82E629CCAC7300EA9128 /* Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -325,6 +331,7 @@
 			isa = PBXGroup;
 			children = (
 				37C7E6B429CDDE58002027E3 /* SplashScreenModule */,
+				37D5D8712A07EF530072D336 /* OnboardingModule */,
 				37C7E6B729CDE571002027E3 /* MainScreenModule */,
 			);
 			path = Modules;
@@ -335,6 +342,7 @@
 			children = (
 				37C7E6B529CDDF56002027E3 /* SplashScreenCoordinator.swift */,
 				37C7E6AA29CDC434002027E3 /* SplashViewController.swift */,
+				37D5D8722A07F0B10072D336 /* FirstEnterChecker.swift */,
 			);
 			path = SplashScreenModule;
 			sourceTree = "<group>";
@@ -349,6 +357,15 @@
 				37784D8D29CF2C2E00505FFC /* StatisticsModule */,
 			);
 			path = MainScreenModule;
+			sourceTree = "<group>";
+		};
+		37D5D8712A07EF530072D336 /* OnboardingModule */ = {
+			isa = PBXGroup;
+			children = (
+				37D5D84F2A07EB1A0072D336 /* OnboardingPageViewController.swift */,
+				37D5D8762A0804CD0072D336 /* OnboardingViewController.swift */,
+			);
+			path = OnboardingModule;
 			sourceTree = "<group>";
 		};
 		37E4836729E6BD6000870CF0 /* CoreDataModel */ = {
@@ -527,6 +544,7 @@
 				37C7E6AB29CDC434002027E3 /* SplashViewController.swift in Sources */,
 				3794D45429D5F9AA006FDE95 /* WeekDays.swift in Sources */,
 				37FD82EE29CCAC7300EA9128 /* TrackersViewController.swift in Sources */,
+				37D5D8772A0804CD0072D336 /* OnboardingViewController.swift in Sources */,
 				37784D8C29CF2B5D00505FFC /* TrackerCoordinator.swift in Sources */,
 				37E4836A29E6BDD700870CF0 /* CoreDataModel.xcdatamodeld in Sources */,
 				3794D45029D5DB57006FDE95 /* TrackerAdditionalSetupCell.swift in Sources */,
@@ -560,12 +578,14 @@
 				3767A54729D4B99400B1B5A9 /* LayoutManager.swift in Sources */,
 				378440B329D0D4DB001AE972 /* CustomDismissButton.swift in Sources */,
 				3767A53D29D4AC5500B1B5A9 /* SingleEventTrackerModel.swift in Sources */,
+				37D5D8502A07EB1A0072D336 /* OnboardingPageViewController.swift in Sources */,
 				3794D44C29D5D2D4006FDE95 /* TrackerAdditionalSetupViewController.swift in Sources */,
 				37FD830729CCB70800EA9128 /* ReuseIdentifier+Ext.swift in Sources */,
 				378440A429D0B28F001AE972 /* CustomActionButton.swift in Sources */,
 				37FD830329CCB6B600EA9128 /* TrackersListCollectionViewCell.swift in Sources */,
 				37C7E6B929CDE593002027E3 /* MainScreenCoordinator.swift in Sources */,
 				374C285C29E6FA7F007F6D72 /* CoreDataManager.swift in Sources */,
+				37D5D8732A07F0B10072D336 /* FirstEnterChecker.swift in Sources */,
 				37A78BF929DC4D9A00781490 /* DateFormatter + Ext.swift in Sources */,
 				37518A3329D3703D00F0DA71 /* RoundedBackgroundView.swift in Sources */,
 				37C7E6AE29CDC8C9002027E3 /* CoordinatorFactory.swift in Sources */,

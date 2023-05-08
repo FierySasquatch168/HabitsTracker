@@ -11,6 +11,7 @@ import UIKit
 
 protocol ModulesFactoryProtocol {
     func makeSplashScreenView() -> Presentable
+    func makeOnboardingScreenView() -> OnboardingProtocol & Presentable
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol & TrackerMainScreenDelegate
     func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate
     func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
@@ -31,6 +32,10 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeSplashScreenView() -> Presentable {
         return SplashViewController()
+    }
+    
+    func makeOnboardingScreenView() -> OnboardingProtocol & Presentable {
+        return OnboardingPageViewController()
     }
     
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol & TrackerMainScreenDelegate {
