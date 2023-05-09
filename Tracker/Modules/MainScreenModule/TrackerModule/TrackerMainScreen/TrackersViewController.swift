@@ -12,18 +12,13 @@ protocol TrackerToCoordinatorProtocol {
     var viewModel: TrackersViewModel? { get set }
 }
 
-protocol TrackerMainScreenDelegate: AnyObject {
-    func saveTracker(tracker: Tracker, to categoryName: String)
-}
-
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
-    
-    var viewModel: TrackersViewModel?
     
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
         
     var addTrackerButtonPressed: (() -> Void)?
+    var viewModel: TrackersViewModel?
     
     var currentDate: Date? {
         viewModel?.getCurrentDate(from: datePicker.date)

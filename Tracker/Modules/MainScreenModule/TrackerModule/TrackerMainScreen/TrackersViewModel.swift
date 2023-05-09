@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol TrackerMainScreenDelegate: AnyObject {
+    func saveTracker(tracker: Tracker, to categoryName: String)
+}
+
 final class TrackersViewModel: NSObject {
             
     @Observable
