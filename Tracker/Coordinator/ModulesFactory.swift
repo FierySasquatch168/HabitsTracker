@@ -12,7 +12,7 @@ import UIKit
 protocol ModulesFactoryProtocol {
     func makeSplashScreenView() -> Presentable
     func makeOnboardingScreenView() -> OnboardingProtocol & Presentable
-    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol & TrackerMainScreenDelegate
+    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol
     func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate
     func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
     func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
@@ -38,8 +38,11 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return OnboardingPageViewController()
     }
     
-    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol & TrackerMainScreenDelegate {
-        return TrackersViewController()
+    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
+        let trackerVC = TrackersViewController()
+        let viewModel = TrackersViewModel()
+        trackerVC.viewModel = viewModel
+        return trackerVC
     }
     
     func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate {
