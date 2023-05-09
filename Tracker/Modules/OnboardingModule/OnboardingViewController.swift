@@ -28,9 +28,7 @@ final class OnboardingViewController: UIViewController {
         case .red:
             backgroundImageView.image = UIImage(named: Constants.Icons.onboardingBackgroundRed)
             textLabel.text = Constants.Strings.redOnboardingText
-        }
-        
-        print("done")
+        }        
     }
     
     required init?(coder: NSCoder) {

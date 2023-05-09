@@ -22,6 +22,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         return coreDataManager
     }()
     
+    private var viewModel: TrackersViewModel?
+    
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
         
