@@ -39,8 +39,8 @@ final class ModulesFactory: ModulesFactoryProtocol {
     }
     
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
-        let trackerVC = TrackersViewController()
         let viewModel = TrackersViewModel()
+        let trackerVC = TrackersViewController(viewModel: viewModel)
         let coreDataManager = CoreDataManager()
         coreDataManager.coreDataManagerDelegate = viewModel
         coreDataManager.trackerConverter = TrackerConverter()
@@ -48,7 +48,6 @@ final class ModulesFactory: ModulesFactoryProtocol {
         coreDataManager.trackerCategoryStore = TrackerCategoryStore(delegate: coreDataManager)
         coreDataManager.trackerRecordStore = TrackerRecordStore(delegate: coreDataManager)
         viewModel.coreDataManager = coreDataManager
-        trackerVC.viewModel = viewModel
         return trackerVC
     }
     

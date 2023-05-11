@@ -65,19 +65,16 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             do {
-                try self.coreDataManager?.saveTracker(tracker: tracker, to: categoryName)
+                try? self.coreDataManager?.saveTracker(tracker: tracker, to: categoryName)
                 self.checkForScheduledTrackers(with: getCurrentDate(from: Date()))
-            } catch {
-                print("saveTracker failed")
             }
         }
-        
     }
 }
 
 // MARK: - Ext Collection view checkers
 extension TrackersViewModel {
-    func checkForEmptyState(){
+    func checkForEmptyState() {
         emptyStackViewIsHidden = visibleCategories.isEmpty ? false : true
     }
     

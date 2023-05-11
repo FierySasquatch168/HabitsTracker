@@ -9,7 +9,7 @@ import UIKit
 
 protocol TrackerToCoordinatorProtocol {
     var addTrackerButtonPressed: (() -> Void)? { get set }
-    var viewModel: TrackersViewModel? { get set }
+    var viewModel: TrackersViewModel { get set }
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
@@ -20,10 +20,10 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     private let datePickerCornerRadius: CGFloat = 8
         
     var addTrackerButtonPressed: (() -> Void)?
-    var viewModel: TrackersViewModel?
+    var viewModel: TrackersViewModel
     
     var currentDate: Date? {
-        viewModel?.getCurrentDate(from: datePicker.date)
+        viewModel.getCurrentDate(from: datePicker.date)
     }
 
     private lazy var mainStackView: UIStackView = {
@@ -106,6 +106,15 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     // MARK: Lifecycle
     
+    init(viewModel: TrackersViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
                 
@@ -121,25 +130,25 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     //MARK: Methods
     
     private func bind() {
-        viewModel?.$emptyStackViewIsHidden.bind(action: { [weak self] isHidden in
+        viewModel.$emptyStackViewIsHidden.bind(action: { [weak self] isHidden in
             guard let self else { return }
             self.emptyStateStackView.isHidden = isHidden
         })
         
-        viewModel?.$visibleCategories.bind(action: { [weak self] trackerCategories in
+        viewModel.$visibleCategories.bind(action: { [weak self] trackerCategories in
             guard let self else { return }
             self.collectionView.reloadData()
         })
         
-        viewModel?.$completedTrackers.bind(action: { [weak self] trackerRecords in
+        viewModel.$completedTrackers.bind(action: { [weak self] trackerRecords in
             guard let self else { return }
             self.collectionView.reloadData()
         })
     }
     
     private func checkTheCollectionViewState() {
-        viewModel?.checkForScheduledTrackers(with: currentDate)
-        viewModel?.checkForEmptyState()
+        viewModel.checkForScheduledTrackers(with: currentDate)
+        viewModel.checkForEmptyState()
     }
     
     private func closeTheDatePicker() {
@@ -150,12 +159,12 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
 // MARK: - Ext Data Source
 extension TrackersViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return viewModel?.visibleCategories.count ?? 0
+        return viewModel.visibleCategories.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return viewModel?.visibleCategories[section].trackers.count ?? 0
+        return viewModel.visibleCategories[section].trackers.count
     }
     
     func collectionView(_ collectionView: UICollectionView,
@@ -164,8 +173,7 @@ extension TrackersViewController: UICollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: TrackersListCollectionViewCell.reuseIdentifier,
                 for: indexPath
-            ) as? TrackersListCollectionViewCell,
-            let viewModel = viewModel
+            ) as? TrackersListCollectionViewCell
         else {
             return UICollectionViewCell()
         }
@@ -190,7 +198,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         else {
             return UICollectionReusableView()
         }
-        view.configure(with: viewModel?.visibleCategories[indexPath.section].name ?? "Error")
+        view.configure(with: viewModel.visibleCategories[indexPath.section].name)
         return view
     }
 }
@@ -223,14 +231,14 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - Ext TrackersListCellDelegate
 extension TrackersViewController: TrackersListCollectionViewCellDelegate {
     func plusTapped(trackerID: String?) {
-        viewModel?.plusTapped(trackerID: trackerID, currentDate: currentDate)
+        viewModel.plusTapped(trackerID: trackerID, currentDate: currentDate)
     }
 }
 
 // MARK: - Ext TextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        string.isEmpty ? viewModel?.checkForScheduledTrackers(with: currentDate) : viewModel?.filterTrackers(with: string)
+        string.isEmpty ? viewModel.checkForScheduledTrackers(with: currentDate) : viewModel.filterTrackers(with: string)
         return true
     }
 }
