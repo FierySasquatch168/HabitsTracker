@@ -12,7 +12,7 @@ final class OnboardingViewController: UIViewController {
     lazy var textLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 32)
-        label.textColor = .StableBlack
+        label.textColor = .stableBlack
         label.numberOfLines = 0
         label.textAlignment = .center
         label.lineBreakMode = .byWordWrapping

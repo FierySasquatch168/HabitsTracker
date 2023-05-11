@@ -10,7 +10,7 @@ import CoreData
 
 protocol TrackerRecordStoreProtocol {
     var trackerFetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> { get set }
-    func getTrackerRecords() -> Set<TrackerRecord>
+    func getTrackerRecords(with converter: TrackerConverter) -> Set<TrackerRecord>
     func updateRecordsCoreData(record: TrackerRecord) throws
 }
 
@@ -46,14 +46,6 @@ final class TrackerRecordStore: NSObject {
         self.context = delegate.managedObjectContext
         self.delegate = delegate
     }
-    
-    private func convertCoreDataToRecord(from record: TrackerRecordCoreData) -> TrackerRecord? {
-        guard let id = record.id,
-              let date = record.date
-        else { return nil }
-        
-        return TrackerRecord(id: id, date: date)
-    }
 }
 
 // MARK: - Ext TrackerRecordStoreProtocol
@@ -79,9 +71,9 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
         
     }
     
-    func getTrackerRecords() -> Set<TrackerRecord> {
+    func getTrackerRecords(with converter: TrackerConverter) -> Set<TrackerRecord> {
         guard let existingRecords = trackerFetchedResultsController.fetchedObjects else { return [] }
-        return Set(existingRecords.compactMap({ convertCoreDataToRecord(from: $0) }))
+        return Set(existingRecords.compactMap({ converter.convertCoreDataToRecord(from: $0) }))
     }
 }
 

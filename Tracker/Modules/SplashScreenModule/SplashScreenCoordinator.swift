@@ -31,7 +31,7 @@ private extension SplashScreenCoordinator {
     }
     
     func createMainFlow() {
-        let isFirstLaunch = FirstEnterChecker.firstEntrance()
+        let isFirstLaunch = OnboardingFirstEnterChecker.firstEntrance()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }

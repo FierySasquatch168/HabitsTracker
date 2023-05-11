@@ -54,6 +54,7 @@
 		37AE419129D1E9B0005EDD79 /* TrackerEmojieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AE419029D1E9B0005EDD79 /* TrackerEmojieCell.swift */; };
 		37AE419329D1E9BF005EDD79 /* TrackerColorsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AE419229D1E9BF005EDD79 /* TrackerColorsCell.swift */; };
 		37AE419729D1EA85005EDD79 /* TrackerSettingsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37AE419629D1EA85005EDD79 /* TrackerSettingsCell.swift */; };
+		37BF97072A0D50FE00BC62B8 /* TrackerConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BF97062A0D50FE00BC62B8 /* TrackerConverter.swift */; };
 		37C7E6A429CDBA54002027E3 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6A329CDBA54002027E3 /* MainCoordinator.swift */; };
 		37C7E6A729CDBE69002027E3 /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6A629CDBE69002027E3 /* MainTabBarController.swift */; };
 		37C7E6A929CDC326002027E3 /* UIColor+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6A829CDC326002027E3 /* UIColor+Ext.swift */; };
@@ -63,7 +64,7 @@
 		37C7E6B629CDDF56002027E3 /* SplashScreenCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6B529CDDF56002027E3 /* SplashScreenCoordinator.swift */; };
 		37C7E6B929CDE593002027E3 /* MainScreenCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C7E6B829CDE593002027E3 /* MainScreenCoordinator.swift */; };
 		37D5D8502A07EB1A0072D336 /* OnboardingPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D5D84F2A07EB1A0072D336 /* OnboardingPageViewController.swift */; };
-		37D5D8732A07F0B10072D336 /* FirstEnterChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D5D8722A07F0B10072D336 /* FirstEnterChecker.swift */; };
+		37D5D8732A07F0B10072D336 /* OnboardingFirstEnterChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D5D8722A07F0B10072D336 /* OnboardingFirstEnterChecker.swift */; };
 		37D5D8772A0804CD0072D336 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37D5D8762A0804CD0072D336 /* OnboardingViewController.swift */; };
 		37E4836A29E6BDD700870CF0 /* CoreDataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 37E4836829E6BDD700870CF0 /* CoreDataModel.xcdatamodeld */; };
 		37FB4AEB29CEF39A00EFD7D7 /* StatisticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37FB4AEA29CEF39A00EFD7D7 /* StatisticsViewController.swift */; };
@@ -123,6 +124,7 @@
 		37AE419029D1E9B0005EDD79 /* TrackerEmojieCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerEmojieCell.swift; sourceTree = "<group>"; };
 		37AE419229D1E9BF005EDD79 /* TrackerColorsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerColorsCell.swift; sourceTree = "<group>"; };
 		37AE419629D1EA85005EDD79 /* TrackerSettingsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerSettingsCell.swift; sourceTree = "<group>"; };
+		37BF97062A0D50FE00BC62B8 /* TrackerConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerConverter.swift; sourceTree = "<group>"; };
 		37C7E6A329CDBA54002027E3 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		37C7E6A629CDBE69002027E3 /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		37C7E6A829CDC326002027E3 /* UIColor+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Ext.swift"; sourceTree = "<group>"; };
@@ -132,7 +134,7 @@
 		37C7E6B529CDDF56002027E3 /* SplashScreenCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenCoordinator.swift; sourceTree = "<group>"; };
 		37C7E6B829CDE593002027E3 /* MainScreenCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainScreenCoordinator.swift; sourceTree = "<group>"; };
 		37D5D84F2A07EB1A0072D336 /* OnboardingPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageViewController.swift; sourceTree = "<group>"; };
-		37D5D8722A07F0B10072D336 /* FirstEnterChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstEnterChecker.swift; sourceTree = "<group>"; };
+		37D5D8722A07F0B10072D336 /* OnboardingFirstEnterChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFirstEnterChecker.swift; sourceTree = "<group>"; };
 		37D5D8762A0804CD0072D336 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		37E4836929E6BDD700870CF0 /* CoreDataModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataModel.xcdatamodel; sourceTree = "<group>"; };
 		37FB4AEA29CEF39A00EFD7D7 /* StatisticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewController.swift; sourceTree = "<group>"; };
@@ -348,7 +350,7 @@
 			children = (
 				37C7E6B529CDDF56002027E3 /* SplashScreenCoordinator.swift */,
 				37C7E6AA29CDC434002027E3 /* SplashViewController.swift */,
-				37D5D8722A07F0B10072D336 /* FirstEnterChecker.swift */,
+				37D5D8722A07F0B10072D336 /* OnboardingFirstEnterChecker.swift */,
 			);
 			path = SplashScreenModule;
 			sourceTree = "<group>";
@@ -389,6 +391,7 @@
 				374C285729E6F667007F6D72 /* TrackerCategoryStore.swift */,
 				374C285529E6F652007F6D72 /* TrackerStore.swift */,
 				374C285929E6F67B007F6D72 /* TrackerRecordStore.swift */,
+				37BF97062A0D50FE00BC62B8 /* TrackerConverter.swift */,
 				372F577829E721E100CE8965 /* UIColorMarshalling.swift */,
 				3798495029E873DA00560F9B /* CoreDataError.swift */,
 			);
@@ -587,12 +590,13 @@
 				3767A53D29D4AC5500B1B5A9 /* SingleEventTrackerModel.swift in Sources */,
 				37D5D8502A07EB1A0072D336 /* OnboardingPageViewController.swift in Sources */,
 				3794D44C29D5D2D4006FDE95 /* TrackerAdditionalSetupViewController.swift in Sources */,
+				37BF97072A0D50FE00BC62B8 /* TrackerConverter.swift in Sources */,
 				37FD830729CCB70800EA9128 /* ReuseIdentifier+Ext.swift in Sources */,
 				378440A429D0B28F001AE972 /* CustomActionButton.swift in Sources */,
 				37FD830329CCB6B600EA9128 /* TrackersListCollectionViewCell.swift in Sources */,
 				37C7E6B929CDE593002027E3 /* MainScreenCoordinator.swift in Sources */,
 				374C285C29E6FA7F007F6D72 /* CoreDataManager.swift in Sources */,
-				37D5D8732A07F0B10072D336 /* FirstEnterChecker.swift in Sources */,
+				37D5D8732A07F0B10072D336 /* OnboardingFirstEnterChecker.swift in Sources */,
 				37A78BF929DC4D9A00781490 /* DateFormatter + Ext.swift in Sources */,
 				37518A3329D3703D00F0DA71 /* RoundedBackgroundView.swift in Sources */,
 				37C7E6AE29CDC8C9002027E3 /* CoordinatorFactory.swift in Sources */,

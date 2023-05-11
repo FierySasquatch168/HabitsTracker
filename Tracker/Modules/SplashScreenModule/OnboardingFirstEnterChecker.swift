@@ -1,5 +1,5 @@
 //
-//  FirstEnterChecker.swift
+//  OnboardingFirstEnterChecker.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 07.05.2023.
@@ -11,9 +11,9 @@ protocol Checkable {
     static func firstEntrance() -> Bool
 }
 
-final class FirstEnterChecker { }
+final class OnboardingFirstEnterChecker { }
 
-extension FirstEnterChecker: Checkable {
+extension OnboardingFirstEnterChecker: Checkable {
     static func firstEntrance() -> Bool {
         if UserDefaults.standard.bool(forKey: Constants.FirstLaunchCheck.firstLaunch) == true {
             return false

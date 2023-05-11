@@ -10,8 +10,8 @@ import CoreData
 
 protocol TrackerStoreProtocol {
     var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> { get set }
-    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
-    func makeTracker(from tracker: Tracker) -> TrackerCoreData
+//    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
+//    func makeTracker(from tracker: Tracker) -> TrackerCoreData
 }
 
 final class TrackerStore: NSObject {
@@ -44,32 +44,6 @@ final class TrackerStore: NSObject {
 
 // MARK: - Ext TrackerStoreProtocol
 extension TrackerStore: TrackerStoreProtocol {
-    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
-        guard let name = trackerCoreData.name,
-              let weekDays = trackerCoreData.schedule,
-              let hexColor = trackerCoreData.color,
-              let emojie = trackerCoreData.emojie
-        else {
-            throw CoreDataError.decodingErrorInvalidCategoryData
-        }
-
-        let color = UIColorMarshalling.color(from: hexColor)
-        let schedule = WeekDays.getWeekDaysArray(from: weekDays)
-
-        return Tracker(name: name, color: color, emoji: emojie, schedule: schedule, stringID: trackerCoreData.stringID)
-    }
-    
-    func makeTracker(from tracker: Tracker) -> TrackerCoreData {
-        let trackerCoreData = TrackerCoreData(context: context)
-        trackerCoreData.name = tracker.name
-        trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
-        trackerCoreData.color = UIColorMarshalling.hexString(from: tracker.color)
-        trackerCoreData.emojie = tracker.emoji
-        // При сохранении задаем в модели КорДаты текстовый айди
-        trackerCoreData.stringID = tracker.id.uuidString
-        return trackerCoreData
-    }
-    
     
 }
 

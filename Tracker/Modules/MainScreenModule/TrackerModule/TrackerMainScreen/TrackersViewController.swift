@@ -14,6 +14,8 @@ protocol TrackerToCoordinatorProtocol {
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
     
+    typealias cellConfigurationProperties = (tracker: Tracker, image: UIImage, count: Int)
+    
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
         
@@ -171,8 +173,9 @@ extension TrackersViewController: UICollectionViewDataSource {
         cell.trackersListCellDelegate = self
         // properties for the cell
         let properties = viewModel.configureCellProperties(with: currentDate, at: indexPath)
+        let trackerImage = properties.completed ? UIImage(systemName: Constants.Icons.checkmark) ?? UIImage() : UIImage(systemName: Constants.Icons.plus) ?? UIImage()
         // cell configuration
-        cell.configCell(with: properties.tracker, image: properties.image, count: properties.count)
+        cell.configCell(with: properties.tracker, image: trackerImage, count: properties.count)
         return cell
     }
     

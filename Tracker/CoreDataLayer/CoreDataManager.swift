@@ -11,6 +11,10 @@ import CoreData
 protocol CoreDataManagerProtocol {
     var fetchedCategories: [TrackerCategory] { get }
     var fetchedRecords: Set<TrackerRecord> { get }
+    var trackerConverter: TrackerConverter? { get set }
+    var trackerCategoryStore: TrackerCategoryStoreProtocol? { get set }
+    var trackerRecordStore: TrackerRecordStoreProtocol? { get set }
+    var trackerStore: TrackerStoreProtocol? { get set }
     func saveTracker(tracker: Tracker, to categoryName: String) throws
     func updateRecords(_ id: String, with date: Date) throws
     func trackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
@@ -32,25 +36,19 @@ final class CoreDataManager {
     
     weak var coreDataManagerDelegate: CoreDataManagerDelegate?
     
-    private var trackerCategoryStore: TrackerCategoryStoreProtocol?
-    private var trackerRecordStore: TrackerRecordStoreProtocol?
-    private var trackerStore: TrackerStoreProtocol?
+    var trackerConverter: TrackerConverter?
+    var trackerCategoryStore: TrackerCategoryStoreProtocol?
+    var trackerRecordStore: TrackerRecordStoreProtocol?
+    var trackerStore: TrackerStoreProtocol?
     
     var fetchedCategories: [TrackerCategory] {
-        
-        //TODO: fetchObjects from trackerStore
-        guard let trackerCategoryCoreDataArray = trackerCategoryStore?.trackerFetchedResultsController.fetchedObjects,
-              let viewCategories = try? trackerCategoryCoreDataArray.compactMap({ try convertToViewCategory(from: $0) })
-        else {
-            return []
-        }
-        return viewCategories
+        guard let trackerConverter else { return [] }
+        return trackerCategoryStore?.getTrackers(with: trackerConverter) ?? []
     }
     
     var fetchedRecords: Set<TrackerRecord> {
-        //TODO: fetchObjects from trackerStore
-        guard let trackerRecordSet = trackerRecordStore?.getTrackerRecords() else { return [] }
-        return trackerRecordSet
+        guard let trackerConverter else { return [] }
+        return trackerRecordStore?.getTrackerRecords(with: trackerConverter) ?? []
     }
     
     private let persistentContainer = {
@@ -63,24 +61,8 @@ final class CoreDataManager {
         return container
     }()
     
-    init(coreDataManagerDelegate: CoreDataManagerDelegate) {
+    init() {
         self.context = persistentContainer.newBackgroundContext()
-        self.coreDataManagerDelegate = coreDataManagerDelegate
-        self.trackerStore = TrackerStore(delegate: self)
-        self.trackerCategoryStore = TrackerCategoryStore(delegate: self)
-        self.trackerRecordStore = TrackerRecordStore(delegate: self)
-    }
-    
-    // TODO: move to trackerCategoryStore
-    private func convertToViewCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory {
-        guard let name = categoryCoreData.name,
-              let coreDataTrackers = categoryCoreData.trackers?.allObjects as? [TrackerCoreData],
-              let trackers = try? coreDataTrackers.compactMap({ try trackerStore?.getTracker(from: $0) })
-        else {
-            throw CoreDataError.decodingErrorInvalidCategoryData
-        }
-        
-        return TrackerCategory(name: name, trackers: trackers)
     }
 }
 
@@ -91,26 +73,10 @@ extension CoreDataManager: CoreDataManagerProtocol {
     }
     
     func saveTracker(tracker: Tracker, to categoryName: String) throws {
-        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker)
-        else {
-            return
-        }
-        
-        // загрузить действующую категорию с таким именем
-        if let existingCategory = try? trackerCategoryStore?.fetchCategory(with: categoryName),
-           var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
-            // если она есть, поменять у нее свойство трэкерс и загрузить обратно
-            newCoreDataTrackers.append(trackerCoreData)
-            existingCategory.trackers = NSSet(array: newCoreDataTrackers)
-        } else {
-            // если ее нет, создать новую
-            let newCategory = TrackerCategoryCoreData(context: context)
-            newCategory.name = categoryName
-            newCategory.trackers = NSSet(array: [trackerCoreData])
-        }
-        
+        guard let trackerConverter else { return }
+        let trackerCoreData = trackerConverter.makeTracker(from: tracker, with: context)
         do {
-            try context.save()
+            try trackerCategoryStore?.saveTracker(with: trackerCoreData, to: categoryName)
         } catch {
             throw CoreDataError.failedToSaveContext
         }
@@ -136,15 +102,14 @@ extension CoreDataManager: TrackerStorageCoreDataDelegate {
     }
     
     func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates) {
-        guard let fetchedCoreDataCategories = store.trackerFetchedResultsController.fetchedObjects,
-              let trackerCategories = try? fetchedCoreDataCategories.compactMap({ try convertToViewCategory(from: $0) })
-        else { return }
-        
+        guard let trackerConverter,
+              let trackerCategories = trackerCategoryStore?.getTrackers(with: trackerConverter) else { return }
         coreDataManagerDelegate?.didUpdateCategory(trackerCategories, updates)
     }
     
     func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates) {
-        guard let trackerRecords = trackerRecordStore?.getTrackerRecords() else { return }
+        guard let trackerConverter,
+              let trackerRecords = trackerRecordStore?.getTrackerRecords(with: trackerConverter) else { return }
         coreDataManagerDelegate?.didUpdateRecords(trackerRecords, updates)
     }
 }
