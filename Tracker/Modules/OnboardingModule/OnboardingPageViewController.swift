@@ -19,6 +19,7 @@ final class OnboardingPageViewController: UIPageViewController, OnboardingProtoc
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
         
+        
         pageControl.currentPageIndicatorTintColor = .YPBlack
         pageControl.pageIndicatorTintColor = .YPBlack?.withAlphaComponent(0.3)
         return pageControl
@@ -52,8 +53,8 @@ final class OnboardingPageViewController: UIPageViewController, OnboardingProtoc
     }
     
     private func setupConstraints() {
-        setupPageControl()
         setupFinishButton()
+        setupPageControl()
     }
 }
 
@@ -110,8 +111,8 @@ private extension OnboardingPageViewController {
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            pageControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            pageControl.bottomAnchor.constraint(equalTo: finishButton.topAnchor, constant: -24)
         ])
         
     }
