@@ -83,8 +83,6 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         return viewCategories
     }
     
-    
-    
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws {
         // загрузить действующую категорию с таким именем
         if let existingCategory = trackerFetchedResultsController.fetchedObjects?.filter({ $0.name == categoryName }).first,

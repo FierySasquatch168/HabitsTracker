@@ -131,18 +131,15 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private func bind() {
         viewModel.$emptyStackViewIsHidden.bind(action: { [weak self] isHidden in
-            guard let self else { return }
-            self.emptyStateStackView.isHidden = isHidden
+            self?.emptyStateStackView.isHidden = isHidden
         })
         
         viewModel.$visibleCategories.bind(action: { [weak self] trackerCategories in
-            guard let self else { return }
-            self.collectionView.reloadData()
+            self?.collectionView.reloadData()
         })
         
         viewModel.$completedTrackers.bind(action: { [weak self] trackerRecords in
-            guard let self else { return }
-            self.collectionView.reloadData()
+            self?.collectionView.reloadData()
         })
     }
     

@@ -10,8 +10,6 @@ import CoreData
 
 protocol TrackerStoreProtocol {
     var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> { get set }
-//    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
-//    func makeTracker(from tracker: Tracker) -> TrackerCoreData
 }
 
 final class TrackerStore: NSObject {
