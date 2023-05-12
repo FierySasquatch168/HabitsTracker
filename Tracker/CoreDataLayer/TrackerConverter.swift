@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import CoreData
 
 protocol TrackerConverterProtocol {
     func convertToViewCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory
     func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
-    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
+//    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
     func convertCoreDataToRecord(from record: TrackerRecordCoreData) -> TrackerRecord?
 }
 
@@ -42,16 +41,7 @@ final class TrackerConverter: TrackerConverterProtocol {
         return Tracker(name: name, color: color, emoji: emojie, schedule: schedule, stringID: trackerCoreData.stringID)
     }
     
-    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData {
-        let trackerCoreData = TrackerCoreData(context: context)
-        trackerCoreData.name = tracker.name
-        trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
-        trackerCoreData.color = UIColorMarshalling.hexString(from: tracker.color)
-        trackerCoreData.emojie = tracker.emoji
-        // При сохранении задаем в модели КорДаты текстовый айди
-        trackerCoreData.stringID = tracker.id.uuidString
-        return trackerCoreData
-    }
+    
     
     func convertCoreDataToRecord(from record: TrackerRecordCoreData) -> TrackerRecord? {
         guard let id = record.id,

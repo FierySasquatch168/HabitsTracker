@@ -10,6 +10,7 @@ import CoreData
 
 protocol TrackerStoreProtocol {
     var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> { get set }
+    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
 }
 
 final class TrackerStore: NSObject {
@@ -42,7 +43,16 @@ final class TrackerStore: NSObject {
 
 // MARK: - Ext TrackerStoreProtocol
 extension TrackerStore: TrackerStoreProtocol {
-    
+    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData {
+        let trackerCoreData = TrackerCoreData(context: context)
+        trackerCoreData.name = tracker.name
+        trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
+        trackerCoreData.color = UIColorMarshalling.hexString(from: tracker.color)
+        trackerCoreData.emojie = tracker.emoji
+        // При сохранении задаем в модели КорДаты текстовый айди
+        trackerCoreData.stringID = tracker.id.uuidString
+        return trackerCoreData
+    }
 }
 
 // MARK: - Ext NSFetchedResultsControllerDelegate

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		371264402A0E1C2800A20381 /* OnboardingFirstEnterStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3712643F2A0E1C2800A20381 /* OnboardingFirstEnterStorage.swift */; };
 		372F577929E721E100CE8965 /* UIColorMarshalling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372F577829E721E100CE8965 /* UIColorMarshalling.swift */; };
 		3738E12529D024FE00FB1B21 /* UIViewController+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738E12429D024FE00FB1B21 /* UIViewController+Ext.swift */; };
 		3738E12729D033F300FB1B21 /* NavigationControllerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3738E12629D033F300FB1B21 /* NavigationControllerFactory.swift */; };
@@ -77,6 +78,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3712643F2A0E1C2800A20381 /* OnboardingFirstEnterStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFirstEnterStorage.swift; sourceTree = "<group>"; };
 		372F577829E721E100CE8965 /* UIColorMarshalling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorMarshalling.swift; sourceTree = "<group>"; };
 		3738E12429D024FE00FB1B21 /* UIViewController+Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Ext.swift"; sourceTree = "<group>"; };
 		3738E12629D033F300FB1B21 /* NavigationControllerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationControllerFactory.swift; sourceTree = "<group>"; };
@@ -350,7 +352,6 @@
 			children = (
 				37C7E6B529CDDF56002027E3 /* SplashScreenCoordinator.swift */,
 				37C7E6AA29CDC434002027E3 /* SplashViewController.swift */,
-				37D5D8722A07F0B10072D336 /* OnboardingFirstEnterChecker.swift */,
 			);
 			path = SplashScreenModule;
 			sourceTree = "<group>";
@@ -372,6 +373,8 @@
 			children = (
 				37D5D84F2A07EB1A0072D336 /* OnboardingPageViewController.swift */,
 				37D5D8762A0804CD0072D336 /* OnboardingViewController.swift */,
+				37D5D8722A07F0B10072D336 /* OnboardingFirstEnterChecker.swift */,
+				3712643F2A0E1C2800A20381 /* OnboardingFirstEnterStorage.swift */,
 			);
 			path = OnboardingModule;
 			sourceTree = "<group>";
@@ -560,6 +563,7 @@
 				3794D45029D5DB57006FDE95 /* TrackerAdditionalSetupCell.swift in Sources */,
 				3754A13929D189A100AEFBD5 /* TrackerNameCell.swift in Sources */,
 				37784DAA29CF4D5400505FFC /* MainTabBarItem.swift in Sources */,
+				371264402A0E1C2800A20381 /* OnboardingFirstEnterStorage.swift in Sources */,
 				37C7E6B629CDDF56002027E3 /* SplashScreenCoordinator.swift in Sources */,
 				3767A54D29D4BB6700B1B5A9 /* HeaderCreator.swift in Sources */,
 				37FD82EA29CCAC7300EA9128 /* AppDelegate.swift in Sources */,

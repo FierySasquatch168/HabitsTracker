@@ -68,13 +68,16 @@ final class CoreDataManager {
 
 // MARK: - Ext CoreDataManagerProtocol
 extension CoreDataManager: CoreDataManagerProtocol {
-    func trackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool {
+    func trackerCompleted(_ tracker: Tracker,
+                          with date: Date?) -> Bool {
         return fetchedRecords.filter({ $0.id.uuidString == tracker.stringID && $0.date == date }).isEmpty ? false : true
     }
     
-    func saveTracker(tracker: Tracker, to categoryName: String) throws {
-        guard let trackerConverter else { return }
-        let trackerCoreData = trackerConverter.makeTracker(from: tracker, with: context)
+    func saveTracker(tracker: Tracker,
+                     to categoryName: String) throws {
+        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker, with: context)
+        else { return }
+        
         do {
             try trackerCategoryStore?.saveTracker(with: trackerCoreData, to: categoryName)
         } catch {
@@ -101,13 +104,15 @@ extension CoreDataManager: TrackerStorageCoreDataDelegate {
         return context
     }
     
-    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates) {
+    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol,
+                           _ updates: CategoryUpdates) {
         guard let trackerConverter,
               let trackerCategories = trackerCategoryStore?.getTrackers(with: trackerConverter) else { return }
         coreDataManagerDelegate?.didUpdateCategory(trackerCategories, updates)
     }
     
-    func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates) {
+    func didUpdateRecord(_ store: TrackerRecordStoreProtocol,
+                         _ updates: RecordUpdates) {
         guard let trackerConverter,
               let trackerRecords = trackerRecordStore?.getTrackerRecords(with: trackerConverter) else { return }
         coreDataManagerDelegate?.didUpdateRecords(trackerRecords, updates)

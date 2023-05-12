@@ -11,11 +11,13 @@ final class SplashScreenCoordinator: MainCoordinator, CoordinatorProtocol {
     private var factory: CoordinatorFactoryProtocol
     private var modulesFactory: ModulesFactoryProtocol
     private var router: Routable
+    private var onboardingFirstEnterChecker: FirstEnterCheckableProtocol
     
-    init(factory: CoordinatorFactoryProtocol, modulesFactory: ModulesFactoryProtocol, router: Routable) {
+    init(factory: CoordinatorFactoryProtocol, modulesFactory: ModulesFactoryProtocol, router: Routable, onboardingFirstEnterChecker: FirstEnterCheckableProtocol) {
         self.factory = factory
         self.modulesFactory = modulesFactory
         self.router = router
+        self.onboardingFirstEnterChecker = onboardingFirstEnterChecker
     }
     
     func start() {
@@ -31,7 +33,7 @@ private extension SplashScreenCoordinator {
     }
     
     func createMainFlow() {
-        let isFirstLaunch = OnboardingFirstEnterChecker.firstEntrance()
+        let isFirstLaunch = onboardingFirstEnterChecker.didEnter()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
