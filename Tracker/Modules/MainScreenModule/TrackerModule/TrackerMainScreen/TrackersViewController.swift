@@ -9,13 +9,11 @@ import UIKit
 
 protocol TrackerToCoordinatorProtocol {
     var addTrackerButtonPressed: (() -> Void)? { get set }
-    var viewModel: TrackersViewModel { get set }
+    var viewModel: TrackersViewModel { get }
 }
 
 final class TrackersViewController: UIViewController & TrackerToCoordinatorProtocol {
-    
-    typealias cellConfigurationProperties = (tracker: Tracker, image: UIImage, count: Int)
-    
+        
     private let titleFontSize: CGFloat = 34
     private let datePickerCornerRadius: CGFloat = 8
         

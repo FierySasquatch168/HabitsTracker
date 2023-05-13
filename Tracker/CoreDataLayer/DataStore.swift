@@ -1,5 +1,5 @@
 //
-//  CoreDataManager.swift
+//  DataStore.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 12.04.2023.
@@ -8,33 +8,29 @@
 import Foundation
 import CoreData
 
-protocol CoreDataManagerProtocol {
-    var fetchedCategories: [TrackerCategory] { get }
-    var fetchedRecords: Set<TrackerRecord> { get }
-    var trackerConverter: TrackerConverter? { get set }
-    var trackerCategoryStore: TrackerCategoryStoreProtocol? { get set }
-    var trackerRecordStore: TrackerRecordStoreProtocol? { get set }
-    var trackerStore: TrackerStoreProtocol? { get set }
+protocol DataStoreProtocol {
+    func fetchCategories() -> [TrackerCategory]
+    func fetchRecords() -> Set<TrackerRecord>
     func saveTracker(tracker: Tracker, to categoryName: String) throws
     func updateRecords(_ id: String, with date: Date) throws
-    func trackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
+    func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
 }
 
-protocol CoreDataManagerDelegate: AnyObject {
+protocol DataStoreDelegate: AnyObject {
     func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates)
     func didUpdateRecords(_ updatedRecords: Set<TrackerRecord>, _ updates: RecordUpdates)
 }
 
-protocol TrackerStorageCoreDataDelegate: AnyObject {
+protocol TrackerStorageDataStoreDelegate: AnyObject {
     var managedObjectContext: NSManagedObjectContext { get }
     func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates)
     func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates)
 } 
 
-final class CoreDataManager {
+final class DataStore {
     private let context: NSManagedObjectContext
     
-    weak var coreDataManagerDelegate: CoreDataManagerDelegate?
+    weak var dataStoreDelegate: DataStoreDelegate?
     
     var trackerConverter: TrackerConverter?
     var trackerCategoryStore: TrackerCategoryStoreProtocol?
@@ -66,9 +62,17 @@ final class CoreDataManager {
     }
 }
 
-// MARK: - Ext CoreDataManagerProtocol
-extension CoreDataManager: CoreDataManagerProtocol {
-    func trackerCompleted(_ tracker: Tracker,
+// MARK: - Ext DataStoreProtocol
+extension DataStore: DataStoreProtocol {
+    func fetchCategories() -> [TrackerCategory] {
+        return fetchedCategories
+    }
+    
+    func fetchRecords() -> Set<TrackerRecord> {
+        return fetchedRecords
+    }
+    
+    func isTrackerCompleted(_ tracker: Tracker,
                           with date: Date?) -> Bool {
         return fetchedRecords.filter({ $0.id.uuidString == tracker.stringID && $0.date == date }).isEmpty ? false : true
     }
@@ -89,7 +93,7 @@ extension CoreDataManager: CoreDataManagerProtocol {
         guard let uuid = UUID(uuidString: id) else { return }
         do {
             let record = TrackerRecord(id: uuid, date: date)
-            try trackerRecordStore?.updateRecordsCoreData(record: record)
+            try trackerRecordStore?.updateStoredRecords(record: record)
         } catch {
             throw CoreDataError.failedToManageRecords
         }
@@ -98,8 +102,8 @@ extension CoreDataManager: CoreDataManagerProtocol {
     
 }
 
-// MARK: - Ext TrackerStorageCoreDataDelegate
-extension CoreDataManager: TrackerStorageCoreDataDelegate {
+// MARK: - Ext TrackerStorageDataStoreDelegate
+extension DataStore: TrackerStorageDataStoreDelegate {
     var managedObjectContext: NSManagedObjectContext {
         return context
     }
@@ -108,13 +112,13 @@ extension CoreDataManager: TrackerStorageCoreDataDelegate {
                            _ updates: CategoryUpdates) {
         guard let trackerConverter,
               let trackerCategories = trackerCategoryStore?.getTrackers(with: trackerConverter) else { return }
-        coreDataManagerDelegate?.didUpdateCategory(trackerCategories, updates)
+        dataStoreDelegate?.didUpdateCategory(trackerCategories, updates)
     }
     
     func didUpdateRecord(_ store: TrackerRecordStoreProtocol,
                          _ updates: RecordUpdates) {
         guard let trackerConverter,
               let trackerRecords = trackerRecordStore?.getTrackerRecords(with: trackerConverter) else { return }
-        coreDataManagerDelegate?.didUpdateRecords(trackerRecords, updates)
+        dataStoreDelegate?.didUpdateRecords(trackerRecords, updates)
     }
 }

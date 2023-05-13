@@ -9,7 +9,6 @@ import Foundation
 import CoreData
 
 protocol TrackerStoreProtocol {
-    var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> { get set }
     func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
 }
 
@@ -17,7 +16,7 @@ final class TrackerStore: NSObject {
     
     private let context: NSManagedObjectContext
     
-    weak var delegate: TrackerStorageCoreDataDelegate?
+    weak var delegate: TrackerStorageDataStoreDelegate?
     
     lazy var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
@@ -35,7 +34,7 @@ final class TrackerStore: NSObject {
         return controller
     }()
     
-    init(delegate: TrackerStorageCoreDataDelegate) {
+    init(delegate: TrackerStorageDataStoreDelegate) {
         self.context = delegate.managedObjectContext
         self.delegate = delegate
     }

@@ -9,9 +9,8 @@ import Foundation
 import CoreData
 
 protocol TrackerRecordStoreProtocol {
-    var trackerFetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> { get set }
     func getTrackerRecords(with converter: TrackerConverter) -> Set<TrackerRecord>
-    func updateRecordsCoreData(record: TrackerRecord) throws
+    func updateStoredRecords(record: TrackerRecord) throws
 }
 
 struct RecordUpdates {
@@ -24,7 +23,7 @@ final class TrackerRecordStore: NSObject {
     private let context: NSManagedObjectContext
     private var insertedIndexes: IndexSet?
     private var deletedIndexes: IndexSet?
-    weak var delegate: TrackerStorageCoreDataDelegate?
+    weak var delegate: TrackerStorageDataStoreDelegate?
     
     lazy var trackerFetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
@@ -42,7 +41,7 @@ final class TrackerRecordStore: NSObject {
         return controller
     }()
     
-    init(delegate: TrackerStorageCoreDataDelegate) {
+    init(delegate: TrackerStorageDataStoreDelegate) {
         self.context = delegate.managedObjectContext
         self.delegate = delegate
     }
@@ -50,7 +49,7 @@ final class TrackerRecordStore: NSObject {
 
 // MARK: - Ext TrackerRecordStoreProtocol
 extension TrackerRecordStore: TrackerRecordStoreProtocol {
-    func updateRecordsCoreData(record: TrackerRecord) throws {
+    func updateStoredRecords(record: TrackerRecord) throws {
         guard let existingRecordSet = trackerFetchedResultsController.fetchedObjects else { return }
         let recordToCompare = existingRecordSet.filter({ $0.id == record.id && $0.date == record.date })
         
@@ -73,7 +72,7 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
     
     func getTrackerRecords(with converter: TrackerConverter) -> Set<TrackerRecord> {
         guard let existingRecords = trackerFetchedResultsController.fetchedObjects else { return [] }
-        return Set(existingRecords.compactMap({ converter.convertCoreDataToRecord(from: $0) }))
+        return Set(existingRecords.compactMap({ converter.convertStoredDataToTrackerRecord(from: $0) }))
     }
 }
 

@@ -39,15 +39,14 @@ final class ModulesFactory: ModulesFactoryProtocol {
     }
     
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
-        let viewModel = TrackersViewModel()
+        let dataStore = DataStore()
+        let viewModel = TrackersViewModel(dataStore: dataStore)
         let trackerVC = TrackersViewController(viewModel: viewModel)
-        let coreDataManager = CoreDataManager()
-        coreDataManager.coreDataManagerDelegate = viewModel
-        coreDataManager.trackerConverter = TrackerConverter()
-        coreDataManager.trackerStore = TrackerStore(delegate: coreDataManager)
-        coreDataManager.trackerCategoryStore = TrackerCategoryStore(delegate: coreDataManager)
-        coreDataManager.trackerRecordStore = TrackerRecordStore(delegate: coreDataManager)
-        viewModel.coreDataManager = coreDataManager
+        dataStore.dataStoreDelegate = viewModel
+        dataStore.trackerConverter = TrackerConverter()
+        dataStore.trackerStore = TrackerStore(delegate: dataStore)
+        dataStore.trackerCategoryStore = TrackerCategoryStore(delegate: dataStore)
+        dataStore.trackerRecordStore = TrackerRecordStore(delegate: dataStore)
         return trackerVC
     }
     

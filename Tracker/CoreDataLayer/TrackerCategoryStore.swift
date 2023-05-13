@@ -9,8 +9,6 @@ import Foundation
 import CoreData
 
 protocol TrackerCategoryStoreProtocol {
-    var trackerFetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> { get set }
-//    func fetchCategory(with nameToShow: String) throws -> TrackerCategoryCoreData?
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws
     func getTrackers(with converter: TrackerConverter) -> [TrackerCategory]
 }
@@ -23,7 +21,7 @@ final class TrackerCategoryStore: NSObject {
     
     var insertedIndexes: IndexSet?
     // TODO: set the delegate
-    weak var delegate: TrackerStorageCoreDataDelegate?
+    weak var delegate: TrackerStorageDataStoreDelegate?
     
     private let context: NSManagedObjectContext
     
@@ -43,7 +41,7 @@ final class TrackerCategoryStore: NSObject {
         return controller
     }()
     
-    init(delegate: TrackerStorageCoreDataDelegate) {
+    init(delegate: TrackerStorageDataStoreDelegate) {
         self.context = delegate.managedObjectContext
         self.delegate = delegate
     }

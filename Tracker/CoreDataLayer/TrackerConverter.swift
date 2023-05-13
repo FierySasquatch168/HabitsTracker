@@ -10,8 +10,7 @@ import Foundation
 protocol TrackerConverterProtocol {
     func convertToViewCategory(from categoryCoreData: TrackerCategoryCoreData) throws -> TrackerCategory
     func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
-//    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
-    func convertCoreDataToRecord(from record: TrackerRecordCoreData) -> TrackerRecord?
+    func convertStoredDataToTrackerRecord(from record: TrackerRecordCoreData) -> TrackerRecord?
 }
 
 final class TrackerConverter: TrackerConverterProtocol {
@@ -41,9 +40,7 @@ final class TrackerConverter: TrackerConverterProtocol {
         return Tracker(name: name, color: color, emoji: emojie, schedule: schedule, stringID: trackerCoreData.stringID)
     }
     
-    
-    
-    func convertCoreDataToRecord(from record: TrackerRecordCoreData) -> TrackerRecord? {
+    func convertStoredDataToTrackerRecord(from record: TrackerRecordCoreData) -> TrackerRecord? {
         guard let id = record.id,
               let date = record.date
         else { return nil }

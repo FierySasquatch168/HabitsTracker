@@ -23,13 +23,12 @@ final class TrackersViewModel {
     }
     @Observable
     private (set) var emptyStackViewIsHidden: Bool = false
-        
-    init() {
-        self.fetchTrackers()
-        self.fetchRecords()
-    }
     
-    var coreDataManager: CoreDataManagerProtocol?
+    var dataStore: DataStore
+    
+    init(dataStore: DataStore) {
+        self.dataStore = dataStore
+    }
     
     func getCurrentDate(from date: Date) -> Date? {
         return date.customlyFormatted()
@@ -51,11 +50,11 @@ final class TrackersViewModel {
     }
     
     private func fetchTrackers() {
-        visibleCategories = coreDataManager?.fetchedCategories ?? []
+        visibleCategories = dataStore.fetchCategories()
     }
     
     private func fetchRecords() {
-        completedTrackers = coreDataManager?.fetchedRecords ?? []
+        completedTrackers = dataStore.fetchRecords()
     }
 }
 
@@ -65,7 +64,7 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             do {
-                try? self.coreDataManager?.saveTracker(tracker: tracker, to: categoryName)
+                try? self.dataStore.saveTracker(tracker: tracker, to: categoryName)
                 self.checkForScheduledTrackers(with: getCurrentDate(from: Date()))
             }
         }
@@ -80,13 +79,12 @@ extension TrackersViewModel {
     
     func checkForScheduledTrackers(with currentDate: Date?) {
         // TODO: rewrite to do everything through CoreData
-        guard let coreDataManager,
-              let stringDayOfWeek = currentDate?.weekdayNameStandalone,
+        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone,
               let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek)
         else { return }
         var temporaryCategories: [TrackerCategory] = []
         
-        for category in coreDataManager.fetchedCategories {
+        for category in dataStore.fetchCategories() {
             let filteredTrackers = category.trackers.filter({ $0.schedule.contains(weekDay) })
             if !filteredTrackers.isEmpty {
                 let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
@@ -113,19 +111,17 @@ extension TrackersViewModel {
     }
     
     private func checkIfTrackerIsCompleted(for tracker: Tracker, with date: Date?) -> Bool {
-        guard let coreDataManager else { return false }
-        return coreDataManager.trackerCompleted(tracker, with: date) ? true : false
+        return dataStore.isTrackerCompleted(tracker, with: date) ? true : false
     }
 
     private func updateCellCounter(at indexPath: IndexPath) -> Int {
-        guard let coreDataManager else { return 0 }
-        let id = coreDataManager.fetchedCategories[indexPath.section].trackers[indexPath.row].stringID
-        return coreDataManager.fetchedRecords.filter({ $0.id.uuidString == id }).count
+        let id = dataStore.fetchCategories()[indexPath.section].trackers[indexPath.row].stringID
+        return dataStore.fetchRecords().filter({ $0.id.uuidString == id }).count
     }
 }
 
-// MARK: - Ext CoreDataManagerDelegate
-extension TrackersViewModel: CoreDataManagerDelegate {
+// MARK: - Ext DataStoreDelegate
+extension TrackersViewModel: DataStoreDelegate {
     func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates) {
         visibleCategories = updatedCategories
     }
@@ -141,7 +137,7 @@ extension TrackersViewModel {
         guard let trackerID = trackerID, let currentDate = currentDate, currentDate <= Date() else { return }
         
         do {
-            try coreDataManager?.updateRecords(trackerID, with: currentDate)
+            try dataStore.updateRecords(trackerID, with: currentDate)
         } catch {
             print("Saving of record failed")
         }
