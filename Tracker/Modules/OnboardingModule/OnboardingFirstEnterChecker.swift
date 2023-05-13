@@ -8,7 +8,8 @@
 import Foundation
 
 protocol FirstEnterCheckableProtocol {
-    func didEnter() -> Bool
+    func shouldShowOnboarding() -> Bool
+    func didCompleteOnboarding()
 }
 
 final class OnboardingFirstEnterChecker {
@@ -20,12 +21,12 @@ final class OnboardingFirstEnterChecker {
 }
 
 extension OnboardingFirstEnterChecker: FirstEnterCheckableProtocol {
-    func didEnter() -> Bool {
-        if onboardingFirstEnterStorage.didEnterBefore == true {
-            return false
-        } else {
-            onboardingFirstEnterStorage.didEnterBefore = true
-            return true
-        }
+    func shouldShowOnboarding() -> Bool {
+        onboardingFirstEnterStorage.hasEnteredBefore ? false : true
+    }
+    
+    func didCompleteOnboarding() {
+        onboardingFirstEnterStorage.hasEnteredBefore = true
     }
 }
+

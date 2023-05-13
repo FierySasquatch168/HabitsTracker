@@ -10,7 +10,7 @@ import Foundation
 final class OnboardingFirstEnterStorage {
     let userDefaults = UserDefaults.standard
     
-    var didEnterBefore: Bool? {
+    var hasEnteredBefore: Bool {
         get {
             userDefaults.bool(forKey: "FirstLaunch")
         }
