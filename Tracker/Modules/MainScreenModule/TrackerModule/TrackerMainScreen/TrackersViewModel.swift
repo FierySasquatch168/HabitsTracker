@@ -24,7 +24,7 @@ final class TrackersViewModel {
     @Observable
     private (set) var emptyStackViewIsHidden: Bool = false
     
-    var dataStore: DataStore
+    private var dataStore: DataStore
     
     init(dataStore: DataStore) {
         self.dataStore = dataStore
