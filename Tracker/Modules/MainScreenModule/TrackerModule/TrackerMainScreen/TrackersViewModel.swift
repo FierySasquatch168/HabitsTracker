@@ -48,14 +48,6 @@ final class TrackersViewModel {
             }
         }
     }
-    
-    private func fetchTrackers() {
-        visibleCategories = dataStore.fetchCategories()
-    }
-    
-    private func fetchRecords() {
-        completedTrackers = dataStore.fetchRecords()
-    }
 }
 
 // MARK: - Ext TrackerMainScreenDelegate
