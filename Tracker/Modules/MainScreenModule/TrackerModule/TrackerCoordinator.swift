@@ -32,7 +32,7 @@ private extension TrackerCoordinator {
         let navController = navigationControllerFactory.createNavigationController(.trackers, largeTitle: true, rootViewController: trackerMainScreen)
         
         trackerMainScreen.addTrackerButtonPressed = { [weak self] in
-            self?.showTrackerSelectionScreen(with: trackerMainScreen)
+            self?.showTrackerSelectionScreen(with: trackerMainScreen.viewModel)
         }
         
         router.addTabBarItem(navController)

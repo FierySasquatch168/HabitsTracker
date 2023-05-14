@@ -9,16 +9,15 @@ import Foundation
 import CoreData
 
 protocol TrackerStoreProtocol {
-    var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> { get set }
-    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker
-    func makeTracker(from tracker: Tracker) -> TrackerCoreData
+    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
+    func fetchTrackers(with converter: TrackerConverter) -> [Tracker]
 }
 
 final class TrackerStore: NSObject {
     
     private let context: NSManagedObjectContext
     
-    weak var delegate: TrackerStorageCoreDataDelegate?
+    weak var delegate: TrackerStorageDataStoreDelegate?
     
     lazy var trackerFetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
         let fetchRequest = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
@@ -36,7 +35,7 @@ final class TrackerStore: NSObject {
         return controller
     }()
     
-    init(delegate: TrackerStorageCoreDataDelegate) {
+    init(delegate: TrackerStorageDataStoreDelegate) {
         self.context = delegate.managedObjectContext
         self.delegate = delegate
     }
@@ -44,22 +43,7 @@ final class TrackerStore: NSObject {
 
 // MARK: - Ext TrackerStoreProtocol
 extension TrackerStore: TrackerStoreProtocol {
-    func getTracker(from trackerCoreData: TrackerCoreData) throws -> Tracker {
-        guard let name = trackerCoreData.name,
-              let weekDays = trackerCoreData.schedule,
-              let hexColor = trackerCoreData.color,
-              let emojie = trackerCoreData.emojie
-        else {
-            throw CoreDataError.decodingErrorInvalidCategoryData
-        }
-
-        let color = UIColorMarshalling.color(from: hexColor)
-        let schedule = WeekDays.getWeekDaysArray(from: weekDays)
-
-        return Tracker(name: name, color: color, emoji: emojie, schedule: schedule, stringID: trackerCoreData.stringID)
-    }
-    
-    func makeTracker(from tracker: Tracker) -> TrackerCoreData {
+    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.name = tracker.name
         trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
@@ -70,7 +54,14 @@ extension TrackerStore: TrackerStoreProtocol {
         return trackerCoreData
     }
     
-    
+    func fetchTrackers(with converter: TrackerConverter) -> [Tracker] {
+        guard let trackerCategoryCoreDataArray = trackerFetchedResultsController.fetchedObjects,
+              let viewTrackers = try? trackerCategoryCoreDataArray.compactMap({ try converter.getTracker(from: $0) })
+        else { return [] }
+        
+        return viewTrackers
+        
+    }
 }
 
 // MARK: - Ext NSFetchedResultsControllerDelegate

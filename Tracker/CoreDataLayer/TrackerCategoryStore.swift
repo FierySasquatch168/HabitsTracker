@@ -9,8 +9,8 @@ import Foundation
 import CoreData
 
 protocol TrackerCategoryStoreProtocol {
-    var trackerFetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> { get set }
-    func fetchCategory(with nameToShow: String) throws -> TrackerCategoryCoreData?
+    func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws
+    func getCategories(with converter: TrackerConverter) -> [TrackerCategory]
 }
 
 struct CategoryUpdates {
@@ -21,7 +21,7 @@ final class TrackerCategoryStore: NSObject {
     
     var insertedIndexes: IndexSet?
     // TODO: set the delegate
-    weak var delegate: TrackerStorageCoreDataDelegate?
+    weak var delegate: TrackerStorageDataStoreDelegate?
     
     private let context: NSManagedObjectContext
     
@@ -41,7 +41,7 @@ final class TrackerCategoryStore: NSObject {
         return controller
     }()
     
-    init(delegate: TrackerStorageCoreDataDelegate) {
+    init(delegate: TrackerStorageDataStoreDelegate) {
         self.context = delegate.managedObjectContext
         self.delegate = delegate
     }
@@ -73,19 +73,32 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
 
 // MARK: - Ext TrackerCategoryStoreProtocol
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
-    func fetchCategory(with nameToShow: String) throws -> TrackerCategoryCoreData? {
-        let request = trackerFetchedResultsController.fetchRequest
-        request.predicate = NSPredicate(format: "%K == %@",
-                                        argumentArray: ["name", nameToShow])
-        request.sortDescriptors = [
-            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name,
-                             ascending: false)
-        ]
+    func getCategories(with converter: TrackerConverter) -> [TrackerCategory] {
+        guard let trackerCategoryCoreDataArray = trackerFetchedResultsController.fetchedObjects,
+              let viewCategories = try? trackerCategoryCoreDataArray.compactMap({ try converter.convertToViewCategory(from: $0) })
+        else { return [] }
+        
+        return viewCategories
+    }
+    
+    func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws {
+        // загрузить действующую категорию с таким именем
+        if let existingCategory = trackerFetchedResultsController.fetchedObjects?.filter({ $0.name == categoryName }).first,
+           var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
+            // если она есть, поменять у нее свойство трэкерс и загрузить обратно
+            newCoreDataTrackers.append(trackerCoreData)
+            existingCategory.trackers = NSSet(array: newCoreDataTrackers)
+        } else {
+            // если ее нет, создать новую
+            let newCategory = TrackerCategoryCoreData(context: context)
+            newCategory.name = categoryName
+            newCategory.trackers = NSSet(array: [trackerCoreData])
+        }
+        
         do {
-            let category = try context.fetch(request).first
-            return category
+            try context.save()
         } catch {
-            throw CoreDataError.decodingErrorInvalidCategoryData
+            throw CoreDataError.failedToSaveContext
         }
     }
 }

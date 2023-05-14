@@ -17,11 +17,12 @@ protocol CoordinatorFactoryProtocol {
 final class CoordinatorFactory  {
     private let modulesFactory: ModulesFactoryProtocol = ModulesFactory()
     private let navigationControllerFactory: NavigationControllerFactoryProtocol = NavigationControllerFactory()
+    private let onboardingFirstEnterChecker: FirstEnterCheckableProtocol = OnboardingFirstEnterChecker(onboardingFirstEnterStorage: OnboardingFirstEnterStorage())
 }
 
 extension CoordinatorFactory: CoordinatorFactoryProtocol {
     func makeSplashCoordinator(with router: Routable) -> CoordinatorProtocol {
-        SplashScreenCoordinator(factory: self, modulesFactory: modulesFactory, router: router)
+        SplashScreenCoordinator(factory: self, modulesFactory: modulesFactory, router: router, onboardingFirstEnterChecker: onboardingFirstEnterChecker)
     }
     
     func makeMainCoordinator(with router: Routable) -> CoordinatorProtocol {

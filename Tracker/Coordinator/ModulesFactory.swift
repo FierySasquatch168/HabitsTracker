@@ -11,7 +11,8 @@ import UIKit
 
 protocol ModulesFactoryProtocol {
     func makeSplashScreenView() -> Presentable
-    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol & TrackerMainScreenDelegate
+    func makeOnboardingScreenView() -> OnboardingProtocol & Presentable
+    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol
     func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate
     func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
     func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
@@ -33,8 +34,20 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return SplashViewController()
     }
     
-    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol & TrackerMainScreenDelegate {
-        return TrackersViewController()
+    func makeOnboardingScreenView() -> OnboardingProtocol & Presentable {
+        return OnboardingPageViewController()
+    }
+    
+    func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
+        let dataStore = DataStore()
+        let viewModel = TrackersViewModel(dataStore: dataStore)
+        let trackerVC = TrackersViewController(viewModel: viewModel)
+        dataStore.dataStoreDelegate = viewModel
+        dataStore.trackerConverter = TrackerConverter()
+        dataStore.trackerStore = TrackerStore(delegate: dataStore)
+        dataStore.trackerCategoryStore = TrackerCategoryStore(delegate: dataStore)
+        dataStore.trackerRecordStore = TrackerRecordStore(delegate: dataStore)
+        return trackerVC
     }
     
     func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate {

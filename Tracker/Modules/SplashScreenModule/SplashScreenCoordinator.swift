@@ -11,11 +11,13 @@ final class SplashScreenCoordinator: MainCoordinator, CoordinatorProtocol {
     private var factory: CoordinatorFactoryProtocol
     private var modulesFactory: ModulesFactoryProtocol
     private var router: Routable
+    private var onboardingFirstEnterChecker: FirstEnterCheckableProtocol
     
-    init(factory: CoordinatorFactoryProtocol, modulesFactory: ModulesFactoryProtocol, router: Routable) {
+    init(factory: CoordinatorFactoryProtocol, modulesFactory: ModulesFactoryProtocol, router: Routable, onboardingFirstEnterChecker: FirstEnterCheckableProtocol) {
         self.factory = factory
         self.modulesFactory = modulesFactory
         self.router = router
+        self.onboardingFirstEnterChecker = onboardingFirstEnterChecker
     }
     
     func start() {
@@ -27,15 +29,32 @@ private extension SplashScreenCoordinator {
     func showScreen() {
         let viewController = modulesFactory.makeSplashScreenView()
         router.setupRootViewController(viewController: viewController)
-        createMainScreen()
+        createMainFlow()
+    }
+    
+    func createMainFlow() {
+        let isFirstLaunch = onboardingFirstEnterChecker.shouldShowOnboarding()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            isFirstLaunch ? self.createOnboardingScreen() : self.createMainScreen()
+        }
+    }
+    
+    func createOnboardingScreen() {
+        var onboardingScreen = modulesFactory.makeOnboardingScreenView()
+        
+        onboardingScreen.onFinish = { [weak self] in
+            self?.onboardingFirstEnterChecker.didCompleteOnboarding()
+            self?.createMainScreen()
+        }
+        
+        router.presentViewController(onboardingScreen, animated: true, presentationStyle: .fullScreen)
     }
     
     func createMainScreen() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else { return }
-            let coordinator = self.factory.makeMainCoordinator(with: self.router)
-            self.addViewController(coordinator)
-            coordinator.start()
-        }
+        let coordinator = factory.makeMainCoordinator(with: router)
+        addViewController(coordinator)
+        coordinator.start()
     }
 }
