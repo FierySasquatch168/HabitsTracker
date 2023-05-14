@@ -10,7 +10,7 @@ import CoreData
 
 protocol TrackerCategoryStoreProtocol {
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws
-    func getTrackers(with converter: TrackerConverter) -> [TrackerCategory]
+    func getCategories(with converter: TrackerConverter) -> [TrackerCategory]
 }
 
 struct CategoryUpdates {
@@ -73,7 +73,7 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
 
 // MARK: - Ext TrackerCategoryStoreProtocol
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
-    func getTrackers(with converter: TrackerConverter) -> [TrackerCategory] {
+    func getCategories(with converter: TrackerConverter) -> [TrackerCategory] {
         guard let trackerCategoryCoreDataArray = trackerFetchedResultsController.fetchedObjects,
               let viewCategories = try? trackerCategoryCoreDataArray.compactMap({ try converter.convertToViewCategory(from: $0) })
         else { return [] }

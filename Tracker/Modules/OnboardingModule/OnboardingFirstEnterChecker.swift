@@ -22,7 +22,7 @@ final class OnboardingFirstEnterChecker {
 
 extension OnboardingFirstEnterChecker: FirstEnterCheckableProtocol {
     func shouldShowOnboarding() -> Bool {
-        onboardingFirstEnterStorage.hasEnteredBefore ? false : true
+        !onboardingFirstEnterStorage.hasEnteredBefore
     }
     
     func didCompleteOnboarding() {

@@ -11,6 +11,7 @@ import CoreData
 protocol DataStoreProtocol {
     func fetchCategories() -> [TrackerCategory]
     func fetchRecords() -> Set<TrackerRecord>
+    func fetchTrackers() -> [Tracker]
     func saveTracker(tracker: Tracker, to categoryName: String) throws
     func updateRecords(_ id: String, with date: Date) throws
     func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
@@ -37,14 +38,19 @@ final class DataStore {
     var trackerRecordStore: TrackerRecordStoreProtocol?
     var trackerStore: TrackerStoreProtocol?
     
-    var fetchedCategories: [TrackerCategory] {
+    private var fetchedCategories: [TrackerCategory] {
         guard let trackerConverter else { return [] }
-        return trackerCategoryStore?.getTrackers(with: trackerConverter) ?? []
+        return trackerCategoryStore?.getCategories(with: trackerConverter) ?? []
     }
     
-    var fetchedRecords: Set<TrackerRecord> {
+    private var fetchedRecords: Set<TrackerRecord> {
         guard let trackerConverter else { return [] }
         return trackerRecordStore?.getTrackerRecords(with: trackerConverter) ?? []
+    }
+    
+    private var fetchedTrackers: [Tracker] {
+        guard let trackerConverter else { return [] }
+        return trackerStore?.fetchTrackers(with: trackerConverter) ?? []
     }
     
     private let persistentContainer = {
@@ -70,6 +76,10 @@ extension DataStore: DataStoreProtocol {
     
     func fetchRecords() -> Set<TrackerRecord> {
         return fetchedRecords
+    }
+    
+    func fetchTrackers() -> [Tracker] {
+        return fetchedTrackers
     }
     
     func isTrackerCompleted(_ tracker: Tracker,
@@ -111,7 +121,7 @@ extension DataStore: TrackerStorageDataStoreDelegate {
     func didUpdateCategory(_ store: TrackerCategoryStoreProtocol,
                            _ updates: CategoryUpdates) {
         guard let trackerConverter,
-              let trackerCategories = trackerCategoryStore?.getTrackers(with: trackerConverter) else { return }
+              let trackerCategories = trackerCategoryStore?.getCategories(with: trackerConverter) else { return }
         dataStoreDelegate?.didUpdateCategory(trackerCategories, updates)
     }
     

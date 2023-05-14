@@ -94,7 +94,7 @@ extension TrackersViewModel {
     func configureCellProperties(with date: Date?, at indexPath: IndexPath) -> (tracker: Tracker, completed: Bool, count: Int) {
         let tracker = returnTracker(for: indexPath)
         let isCompleted = checkIfTrackerIsCompleted(for: tracker, with: date)
-        let cellCount = updateCellCounter(at: indexPath)
+        let cellCount = updateCellCounterNew(for: tracker)
         return (tracker, isCompleted, cellCount)
     }
     
@@ -105,9 +105,9 @@ extension TrackersViewModel {
     private func checkIfTrackerIsCompleted(for tracker: Tracker, with date: Date?) -> Bool {
         return dataStore.isTrackerCompleted(tracker, with: date) ? true : false
     }
-
-    private func updateCellCounter(at indexPath: IndexPath) -> Int {
-        let id = dataStore.fetchCategories()[indexPath.section].trackers[indexPath.row].stringID
+    
+    private func updateCellCounterNew(for tracker: Tracker) -> Int {
+        let id = dataStore.fetchTrackers().filter({ $0.stringID == tracker.stringID }).first?.stringID
         return dataStore.fetchRecords().filter({ $0.id.uuidString == id }).count
     }
 }

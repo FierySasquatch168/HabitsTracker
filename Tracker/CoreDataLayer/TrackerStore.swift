@@ -10,6 +10,7 @@ import CoreData
 
 protocol TrackerStoreProtocol {
     func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
+    func fetchTrackers(with converter: TrackerConverter) -> [Tracker]
 }
 
 final class TrackerStore: NSObject {
@@ -51,6 +52,15 @@ extension TrackerStore: TrackerStoreProtocol {
         // При сохранении задаем в модели КорДаты текстовый айди
         trackerCoreData.stringID = tracker.id.uuidString
         return trackerCoreData
+    }
+    
+    func fetchTrackers(with converter: TrackerConverter) -> [Tracker] {
+        guard let trackerCategoryCoreDataArray = trackerFetchedResultsController.fetchedObjects,
+              let viewTrackers = try? trackerCategoryCoreDataArray.compactMap({ try converter.getTracker(from: $0) })
+        else { return [] }
+        
+        return viewTrackers
+        
     }
 }
 
