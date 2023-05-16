@@ -52,7 +52,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private lazy var searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
-        textField.placeholder = "Поиск"
+        textField.placeholder = NSLocalizedString(Constants.LocalizableStringsKeys.search, comment: "Search")
         textField.delegate = self
         return textField
     }()
@@ -81,7 +81,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private let emptyStateTextLabel: UILabel = {
         let label = UILabel()
-        let text = "Что будем отслеживать?"
+        let text = NSLocalizedString(Constants.LocalizableStringsKeys.emptyStateTitle, comment: "String showed when there is no trackers to show")
         let attrs = [
             NSAttributedString.Key.font : UIFont(name: CustomFonts.YPMedium.rawValue, size: 12),
             NSAttributedString.Key.foregroundColor : UIColor.YPBlack

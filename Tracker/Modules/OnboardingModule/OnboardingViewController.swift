@@ -24,10 +24,10 @@ final class OnboardingViewController: UIViewController {
         switch color {
         case .blue:
             backgroundImageView.image = UIImage(named: Constants.Icons.onboardingBackgroundBlue)
-            textLabel.text = Constants.Strings.blueOnboardingText
+            textLabel.text = NSLocalizedString(Constants.LocalizableStringsKeys.blueOnboardingText, comment: "")
         case .red:
             backgroundImageView.image = UIImage(named: Constants.Icons.onboardingBackgroundRed)
-            textLabel.text = Constants.Strings.redOnboardingText
+            textLabel.text = NSLocalizedString(Constants.LocalizableStringsKeys.redOnboardingText, comment: "")
         }        
     }
     

@@ -13,17 +13,17 @@ enum Categories: String, CaseIterable, CustomStringConvertible {
     var description: String {
         switch self {
         case .important:
-            return "Важное"
+            return NSLocalizedString(Constants.LocalizableStringsKeys.categoriesImportant, comment: "Important")
         case .joyfullThings:
-            return "Радостные мелочи"
+            return NSLocalizedString(Constants.LocalizableStringsKeys.categoriesJoyfullThings, comment: "Joyfull things")
         case .feeling:
-            return "Самочувствие"
+            return NSLocalizedString(Constants.LocalizableStringsKeys.categoriesFeelings, comment: "Feelings")
         case .habits:
-            return "Привычки"
+            return NSLocalizedString(Constants.LocalizableStringsKeys.categoriesHabits, comment: "Habits")
         case .attentiveness:
-            return "Внимательность"
+            return NSLocalizedString(Constants.LocalizableStringsKeys.categoriesAttentiveness, comment: "Attentiveness")
         case .sport:
-            return "Спорт"
+            return NSLocalizedString(Constants.LocalizableStringsKeys.categoriesSport, comment: "Sport")
         }
     }
 }

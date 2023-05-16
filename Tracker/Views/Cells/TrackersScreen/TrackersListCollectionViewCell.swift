@@ -79,19 +79,36 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
         return stackView
     }()
     
+//    var daysAmount: Int? {
+//        didSet {
+//            if let daysAmount {
+//                var suffix: String
+//                let lastDigit = daysAmount % 10
+//
+//                switch lastDigit {
+//                case 1: suffix = "день"
+//                case 2, 3, 4: suffix = "дня"
+//                case 5, 6, 7, 8, 9 , 0: suffix = "дней"
+//                default: suffix = ""
+//                }
+//                daysLabel.text = "\(daysAmount) " + suffix
+//            }
+//        }
+//    }
+    
+//    let tasksRemaining = 3 // Для простоты примера используем числовой литерал
+//    let tasksString = String.localizedStringWithFormat(
+//        NSLocalizedString("numberOfTasks", comment: "Number of remaining tasks"),
+//        tasksRemaining
+//    )
+    
     var daysAmount: Int? {
         didSet {
             if let daysAmount {
-                var suffix: String
-                let lastDigit = daysAmount % 10
-                
-                switch lastDigit {
-                case 1: suffix = "день"
-                case 2, 3, 4: suffix = "дня"
-                case 5, 6, 7, 8, 9 , 0: suffix = "дней"
-                default: suffix = ""
-                }
-                daysLabel.text = "\(daysAmount) " + suffix
+                let daysString = String.localizedStringWithFormat(
+                    NSLocalizedString("numberOfDays", comment: "Number of days when the tracker was completed"),
+                    daysAmount)
+                daysLabel.text = daysString
             }
         }
     }

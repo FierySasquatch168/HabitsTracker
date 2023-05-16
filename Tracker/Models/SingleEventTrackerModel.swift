@@ -8,6 +8,6 @@
 import Foundation
 
 struct SingleEventTrackerModel {
-    static let title: String = "Новое нерегулярное событие"
-    static let settings = ["Категория"]
+    static let title: String = NSLocalizedString(Constants.LocalizableStringsKeys.newSingleEvent, comment: "New single event")
+    static let settings = [NSLocalizedString(Constants.LocalizableStringsKeys.category, comment: "Category")]
 }

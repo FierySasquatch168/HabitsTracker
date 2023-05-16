@@ -8,6 +8,9 @@
 import Foundation
 
 struct HabitTrackerModel {
-    static let title: String = "Новая привычка"
-    static let settings = ["Категория", "Расписание"]
+    static let title: String = NSLocalizedString(Constants.LocalizableStringsKeys.newHabbit, comment: "New habbit")
+    static let settings = [
+        NSLocalizedString(Constants.LocalizableStringsKeys.category, comment: "Category"),
+        NSLocalizedString(Constants.LocalizableStringsKeys.schedule, comment: "Schedule")
+    ]
 }

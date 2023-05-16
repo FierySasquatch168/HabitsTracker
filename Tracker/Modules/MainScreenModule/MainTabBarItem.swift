@@ -8,8 +8,8 @@
 import UIKit
 
 enum MainTabBarItem: String {
-    case trackers = "Трекеры"
-    case statistics = "Статистика"
+    case trackers
+    case statistics
     
     var tabImage: UIImage? {
         switch self {
@@ -21,6 +21,11 @@ enum MainTabBarItem: String {
     }
     
     var title: String {
-        return self.rawValue
+        switch self {
+        case .trackers:
+            return NSLocalizedString(Constants.LocalizableStringsKeys.tabBarTitletrackers, comment: "Tracker title")
+        case .statistics:
+            return NSLocalizedString(Constants.LocalizableStringsKeys.tabBarTitlestatistics, comment: "Statistics title")
+        }
     }
 }
