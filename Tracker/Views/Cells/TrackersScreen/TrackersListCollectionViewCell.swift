@@ -18,7 +18,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     
     lazy var cellBackgroundColorImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.layer.cornerRadius = 16
+        imageView.layer.cornerRadius = 13
         imageView.clipsToBounds = true
         return imageView
     }()
@@ -48,7 +48,6 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     lazy var daysLabel: UILabel = {
         let label = UILabel()
         // text
-//        label.text = "0 дней"
         label.font = UIFont(name: CustomFonts.YPMedium.rawValue, size: 12)
         label.textColor = .YPBlack
         return label

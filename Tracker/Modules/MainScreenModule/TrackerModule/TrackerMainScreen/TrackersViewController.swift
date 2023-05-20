@@ -234,14 +234,14 @@ extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard indexPaths.count > 0, let indexPath = indexPaths.first else { return nil }
         return UIContextMenuConfiguration(actionProvider: { actions in
-            return UIMenu(children: [ // 5 Создаём само меню.
+            return UIMenu(children: [
                 UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin the tracker"), handler: { [weak self] _ in
                     self?.viewModel.pinTapped(at: indexPath)
                 }),
                 UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"), handler: { [weak self] _ in
                     self?.viewModel.modifyTapped(at: indexPath)
                 }),
-                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"), handler: { [weak self] _ in
+                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"), attributes: .destructive, handler: { [weak self] _ in
                     self?.viewModel.deleteTapped(at: indexPath)
                 })
             ])
