@@ -31,6 +31,7 @@
 		3767A54D29D4BB6700B1B5A9 /* HeaderCreator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767A54C29D4BB6700B1B5A9 /* HeaderCreator.swift */; };
 		3767A54F29D4BBF400B1B5A9 /* DataSourceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767A54E29D4BBF400B1B5A9 /* DataSourceManager.swift */; };
 		3767A55129D4C3BE00B1B5A9 /* LayoutDataProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3767A55029D4C3BE00B1B5A9 /* LayoutDataProtocol.swift */; };
+		377846582A18B292006CFBDF /* ContextMenuOperator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377846572A18B292006CFBDF /* ContextMenuOperator.swift */; };
 		37784D8929CF289600505FFC /* ModulesFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8829CF289600505FFC /* ModulesFactory.swift */; };
 		37784D8C29CF2B5D00505FFC /* TrackerCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */; };
 		37784D8F29CF2C4000505FFC /* StatisticsCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37784D8E29CF2C4000505FFC /* StatisticsCoordinator.swift */; };
@@ -105,6 +106,7 @@
 		3767A54C29D4BB6700B1B5A9 /* HeaderCreator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderCreator.swift; sourceTree = "<group>"; };
 		3767A54E29D4BBF400B1B5A9 /* DataSourceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceManager.swift; sourceTree = "<group>"; };
 		3767A55029D4C3BE00B1B5A9 /* LayoutDataProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutDataProtocol.swift; sourceTree = "<group>"; };
+		377846572A18B292006CFBDF /* ContextMenuOperator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContextMenuOperator.swift; sourceTree = "<group>"; };
 		37784D8829CF289600505FFC /* ModulesFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModulesFactory.swift; sourceTree = "<group>"; };
 		37784D8B29CF2B5D00505FFC /* TrackerCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCoordinator.swift; sourceTree = "<group>"; };
 		37784D8E29CF2C4000505FFC /* StatisticsCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsCoordinator.swift; sourceTree = "<group>"; };
@@ -312,6 +314,7 @@
 				37FD82ED29CCAC7300EA9128 /* TrackersViewController.swift */,
 				37888F052A0A4C6E00E63ECE /* TrackersViewModel.swift */,
 				37888F072A0A5E2000E63ECE /* ObservableWrapper.swift */,
+				377846572A18B292006CFBDF /* ContextMenuOperator.swift */,
 			);
 			path = TrackerMainScreen;
 			sourceTree = "<group>";
@@ -614,6 +617,7 @@
 				3798495129E873DA00560F9B /* CoreDataError.swift in Sources */,
 				3767A54729D4B99400B1B5A9 /* LayoutManager.swift in Sources */,
 				378440B329D0D4DB001AE972 /* CustomDismissButton.swift in Sources */,
+				377846582A18B292006CFBDF /* ContextMenuOperator.swift in Sources */,
 				3767A53D29D4AC5500B1B5A9 /* SingleEventTrackerModel.swift in Sources */,
 				37D5D8502A07EB1A0072D336 /* OnboardingPageViewController.swift in Sources */,
 				3794D44C29D5D2D4006FDE95 /* TrackerAdditionalSetupViewController.swift in Sources */,

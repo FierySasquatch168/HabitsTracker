@@ -7,7 +7,7 @@
 */
 
 "emptyState.title" = "What are we going to track?";
-"search" = "Delete";
+"search" = "Search";
 "enterTrackerName" = "Enter a name for the tracker";
 "trackers" = "Trackers";
 "tracker.creation" = "Tracker creation";
@@ -50,3 +50,6 @@
 "redOnboardingText" = "Even if it's not litres of water or yoga";
 "tabBarTitletrackers" = "Trackers";
 "tabBarTitlestatistics" = "Statistics";
+"contextMenuOperatorPin" = "Pin";
+"contextMenuOperatorModify" = "Modify";
+"contextMenuOperatorDelete" = "Delete";

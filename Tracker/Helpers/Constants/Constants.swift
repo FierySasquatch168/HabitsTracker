@@ -69,5 +69,8 @@ struct Constants {
         static let redOnboardingText = "redOnboardingText"
         static let tabBarTitletrackers = "tabBarTitletrackers"
         static let tabBarTitlestatistics = "tabBarTitlestatistics"
+        static let contextMenuOperatorPin = "contextMenuOperatorPin"
+        static let contextMenuOperatorModify = "contextMenuOperatorModify"
+        static let contextMenuOperatorDelete = "contextMenuOperatorDelete"
     }
 }

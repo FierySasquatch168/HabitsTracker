@@ -18,7 +18,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     private let datePickerCornerRadius: CGFloat = 8
         
     var addTrackerButtonPressed: (() -> Void)?
-    var viewModel: TrackersViewModel
+    let viewModel: TrackersViewModel
     
     var currentDate: Date? {
         viewModel.getCurrentDate(from: datePicker.date)
@@ -220,6 +220,41 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: 36)
+    }
+}
+
+// MARK: - Ext CollectionViewDelegate
+extension TrackersViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        guard indexPaths.count > 0, let indexPath = indexPaths.first else { return nil }
+        return UIContextMenuConfiguration(actionProvider: { actions in // 4 Создаём конфигурацию меню и возвращаем её. Внутри этой конфигурации передаём кложуру, в которой и создаётся меню. Система вызовет эту кложуру, когда будет нужно, и сама анимированно покажет.
+            return UIMenu(children: [ // 5 Создаём само меню.
+                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin the tracker"), handler: { [weak self] _ in
+                    self?.pin(at: indexPath)
+                }),
+                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"), handler: { [weak self] _ in
+                    self?.modify(at: indexPath)
+                }),
+                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"), handler: { [weak self] _ in
+                    self?.delete(at: indexPath)
+                })
+            ])
+        })
+    }
+}
+
+// MARK: - Ext ContextMenuOperator
+extension TrackersViewController {
+    func pin(at indexPath: IndexPath) {
+        print("pin")
+    }
+    
+    func modify(at indexPath: IndexPath) {
+        print("modify")
+    }
+    
+    func delete(at indexPath: IndexPath) {
+        print("delete")
     }
 }
 

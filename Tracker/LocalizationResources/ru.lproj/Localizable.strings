@@ -7,7 +7,7 @@
 */
 
 "emptyState.title" = "Что будем отслеживать?";
-"search" = "Удалить";
+"search" = "Поиск";
 "enterTrackerName" = "Введите название трекера";
 "trackers" = "Трекеры";
 "tracker.creation" = "Создание трекера";
@@ -50,3 +50,6 @@
 "redOnboardingText" = "Даже если это не литры воды или йога";
 "tabBarTitletrackers" = "Трекеры";
 "tabBarTitlestatistics" = "Статистика";
+"contextMenuOperatorPin" = "Закрепить";
+"contextMenuOperatorModify" = "Редактировать";
+"contextMenuOperatorDelete" = "Удалить";
