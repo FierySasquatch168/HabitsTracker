@@ -130,17 +130,32 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let timetableSelected = timetableSelected, let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerAdditionalSetupCell.reuseIdentifier, for: indexPath) as? TrackerAdditionalSetupCell else { return UICollectionViewCell() }
+        guard let timetableSelected = timetableSelected,
+              let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: TrackerAdditionalSetupCell.reuseIdentifier,
+                for: indexPath) as? TrackerAdditionalSetupCell
+        else { return UICollectionViewCell() }
+        
         cell.trackerTimeTableCellDelegate = self
         let isFirstRow = indexPath.row == 0
         
         if timetableSelected {
             let isLastRow = indexPath.row == WeekDays.allCases.count - 1
-            cell.configTimeTableCell(title: WeekDays.allCases[indexPath.row].description, isFirst: isFirstRow, isLast: isLastRow, timetableSelected: timetableSelected)
+            cell.configTimeTableCell(
+                title: WeekDays.allCases[indexPath.row].description,
+                isFirst: isFirstRow,
+                isLast: isLastRow,
+                timetableSelected: timetableSelected
+            )
             
         } else {
             let isLastRow = indexPath.row == Categories.allCases.count - 1
-            cell.configTimeTableCell(title: Categories.allCases[indexPath.row].description, isFirst: isFirstRow, isLast: isLastRow, timetableSelected: timetableSelected)
+            cell.configTimeTableCell(
+                title: Categories.allCases[indexPath.row].description,
+                isFirst: isFirstRow,
+                isLast: isLastRow,
+                timetableSelected: timetableSelected
+            )
             
         }
         
