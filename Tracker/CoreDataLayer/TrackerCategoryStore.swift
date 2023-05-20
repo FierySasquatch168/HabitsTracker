@@ -10,17 +10,20 @@ import CoreData
 
 protocol TrackerCategoryStoreProtocol {
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws
+    func deleteTracker(with id: String, from categoryName: String) throws
     func getCategories(with converter: TrackerConverter) -> [TrackerCategory]
 }
 
 struct CategoryUpdates {
     let insertedIndexes: IndexSet
+    let deletedIndexes: IndexSet
 }
 
 final class TrackerCategoryStore: NSObject {
     
     var insertedIndexes: IndexSet?
-    // TODO: set the delegate
+    var deletedIndexes: IndexSet?
+
     weak var delegate: TrackerStorageDataStoreDelegate?
     
     private let context: NSManagedObjectContext
@@ -51,12 +54,16 @@ final class TrackerCategoryStore: NSObject {
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         insertedIndexes = IndexSet()
+        deletedIndexes = IndexSet()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        guard let indexesToInsert = insertedIndexes else { return }
-        delegate?.didUpdateCategory(self, CategoryUpdates(insertedIndexes: indexesToInsert))
+        guard let indexesToInsert = insertedIndexes,
+              let indexesToDelete = deletedIndexes
+        else { return }
+        delegate?.didUpdateCategory(self, CategoryUpdates(insertedIndexes: indexesToInsert, deletedIndexes: indexesToDelete))
         insertedIndexes = nil
+        deletedIndexes = nil
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>,
@@ -65,8 +72,27 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
                     for type: NSFetchedResultsChangeType,
                     newIndexPath: IndexPath?) {
         
-        if let indexPath = newIndexPath {
-            insertedIndexes?.insert(indexPath.item)
+//        if let indexPath = newIndexPath {
+//            insertedIndexes?.insert(indexPath.item)
+//        }
+        
+        switch type {
+        case .insert:
+            if let indexPath = newIndexPath {
+                insertedIndexes?.insert(indexPath.item)
+            }
+        case .delete:
+            if let indexPath = newIndexPath {
+                deletedIndexes?.insert(indexPath.item)
+            }
+        case .move:
+            fatalError("NSFetchedResultsController didChange .move type")
+        case .update:
+            if let indexPath = newIndexPath {
+                deletedIndexes?.insert(indexPath.item)
+            }
+        @unknown default:
+            fatalError("NSFetchedResultsController didChange unknown type")
         }
     }
 }
@@ -99,6 +125,24 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             try context.save()
         } catch {
             throw CoreDataError.failedToSaveContext
+        }
+    }
+    
+    func deleteTracker(with id: String, from categoryName: String) throws {
+        guard let trackerCategoryCoreData = trackerFetchedResultsController.fetchedObjects?.filter({ $0.name == categoryName }).first,
+              var coreDataTrackers = trackerCategoryCoreData.trackers?.allObjects as? [TrackerCoreData],
+              let trackerToDelete = coreDataTrackers.filter({ $0.stringID == id }).first
+        else { return }
+        
+        
+        coreDataTrackers.removeAll(where: { $0.stringID == id })
+        context.delete(trackerToDelete)
+        coreDataTrackers.isEmpty ? context.delete(trackerCategoryCoreData) : ()
+        
+        do {
+            try context.save()
+        } catch {
+            throw CoreDataError.failedToDeleteTracker
         }
     }
 }

@@ -15,6 +15,7 @@ protocol DataStoreProtocol {
     func saveTracker(tracker: Tracker, to categoryName: String) throws
     func updateRecords(_ id: String, with date: Date) throws
     func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
+    func deleteTrackers(with id: String, from categoryName: String)
 }
 
 protocol DataStoreDelegate: AnyObject {
@@ -26,7 +27,7 @@ protocol TrackerStorageDataStoreDelegate: AnyObject {
     var managedObjectContext: NSManagedObjectContext { get }
     func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates)
     func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates)
-} 
+}
 
 final class DataStore {
     private let context: NSManagedObjectContext
@@ -107,6 +108,10 @@ extension DataStore: DataStoreProtocol {
         } catch {
             throw CoreDataError.failedToManageRecords
         }
+    }
+    
+    func deleteTrackers(with id: String, from categoryName: String) {
+        try? trackerCategoryStore?.deleteTracker(with: id, from: categoryName)
     }
     
     

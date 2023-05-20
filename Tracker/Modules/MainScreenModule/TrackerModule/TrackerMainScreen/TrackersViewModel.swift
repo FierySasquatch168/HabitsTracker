@@ -24,6 +24,8 @@ final class TrackersViewModel {
     @Observable
     private (set) var emptyStackViewIsHidden: Bool = false
     
+    var selectedDate: Date?
+    
     private var dataStore: DataStore
     
     init(dataStore: DataStore) {
@@ -57,8 +59,29 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
             guard let self = self else { return }
             do {
                 try? self.dataStore.saveTracker(tracker: tracker, to: categoryName)
-                self.checkForScheduledTrackers(with: getCurrentDate(from: Date()))
+                self.checkForScheduledTrackers()
             }
+        }
+    }
+}
+
+// MARK: - Ext ContextMenuOperator
+extension TrackersViewModel {
+    func pinTapped(at indexPath: IndexPath) {
+        
+    }
+    
+    func modifyTapped(at indexPath: IndexPath) {
+        
+    }
+    
+    func deleteTapped(at indexPath: IndexPath) {
+        let trackerDeletingFromCategory = visibleCategories[indexPath.section]
+        let trackerToDelete = trackerDeletingFromCategory.trackers[indexPath.row]
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.dataStore.deleteTrackers(with: trackerToDelete.stringID ?? "", from: trackerDeletingFromCategory.name)
+            self.checkForScheduledTrackers()
         }
     }
 }
@@ -69,9 +92,9 @@ extension TrackersViewModel {
         emptyStackViewIsHidden = visibleCategories.isEmpty ? false : true
     }
     
-    func checkForScheduledTrackers(with currentDate: Date?) {
+    func checkForScheduledTrackers() {
         // TODO: rewrite to do everything through CoreData
-        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone,
+        guard let stringDayOfWeek = selectedDate?.weekdayNameStandalone,
               let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek)
         else { return }
         var temporaryCategories: [TrackerCategory] = []

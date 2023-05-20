@@ -121,6 +121,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         setupNavigationAttributes()
         
         bind()
+        transferTheCurrentDateToViewModel()
         checkTheCollectionViewState()
         
     }
@@ -142,8 +143,12 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     }
     
     private func checkTheCollectionViewState() {
-        viewModel.checkForScheduledTrackers(with: currentDate)
+        viewModel.checkForScheduledTrackers()
         viewModel.checkForEmptyState()
+    }
+    
+    private func transferTheCurrentDateToViewModel() {
+        viewModel.selectedDate = datePicker.date
     }
     
     private func closeTheDatePicker() {
@@ -205,6 +210,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
     
     func reloadTheDate() {
+        transferTheCurrentDateToViewModel()
         checkTheCollectionViewState()
         closeTheDatePicker()
     }
@@ -227,34 +233,19 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard indexPaths.count > 0, let indexPath = indexPaths.first else { return nil }
-        return UIContextMenuConfiguration(actionProvider: { actions in // 4 Создаём конфигурацию меню и возвращаем её. Внутри этой конфигурации передаём кложуру, в которой и создаётся меню. Система вызовет эту кложуру, когда будет нужно, и сама анимированно покажет.
+        return UIContextMenuConfiguration(actionProvider: { actions in
             return UIMenu(children: [ // 5 Создаём само меню.
                 UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin the tracker"), handler: { [weak self] _ in
-                    self?.pin(at: indexPath)
+                    self?.viewModel.pinTapped(at: indexPath)
                 }),
                 UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"), handler: { [weak self] _ in
-                    self?.modify(at: indexPath)
+                    self?.viewModel.modifyTapped(at: indexPath)
                 }),
                 UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"), handler: { [weak self] _ in
-                    self?.delete(at: indexPath)
+                    self?.viewModel.deleteTapped(at: indexPath)
                 })
             ])
         })
-    }
-}
-
-// MARK: - Ext ContextMenuOperator
-extension TrackersViewController {
-    func pin(at indexPath: IndexPath) {
-        print("pin")
-    }
-    
-    func modify(at indexPath: IndexPath) {
-        print("modify")
-    }
-    
-    func delete(at indexPath: IndexPath) {
-        print("delete")
     }
 }
 
@@ -268,7 +259,7 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
 // MARK: - Ext TextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        string.isEmpty ? viewModel.checkForScheduledTrackers(with: currentDate) : viewModel.filterTrackers(with: string)
+        string.isEmpty ? viewModel.checkForScheduledTrackers() : viewModel.filterTrackers(with: string)
         return true
     }
 }

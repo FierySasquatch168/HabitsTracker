@@ -16,4 +16,5 @@ enum CoreDataError: Error {
     case failedToSaveContext
     case failedToLoadRecords
     case failedToManageRecords
+    case failedToDeleteTracker
 }
