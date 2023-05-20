@@ -28,7 +28,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     var scheduleTapped: (() -> Void)?
     var categoryTapped: (() -> Void)?
     
-    weak var mainScreenDelegate: TrackerViceMainScreenDelegate?
+    weak var mainScreenDelegate: TrackerMainScreenDelegate?
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
     

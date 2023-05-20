@@ -13,9 +13,9 @@ protocol ModulesFactoryProtocol {
     func makeSplashScreenView() -> Presentable
     func makeOnboardingScreenView() -> OnboardingProtocol & Presentable
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol
-    func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate
-    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
-    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
+    func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol
+    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
+    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
     func makeTrackerCategorieScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
     func makeTimeTableScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
     func makeStatisticsScreenView() -> Presentable
@@ -50,13 +50,11 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return trackerVC
     }
     
-    func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate {
-        let trackerSelectionVC = TrackerSelectionViewController()
-        trackerSelectionVC.mainScreenDelegate = mainScreenDelegate
-        return trackerSelectionVC
+    func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol {
+        return TrackerSelectionViewController()
     }
     
-    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
+    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = mainScreenDelegate
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), settings: habitSettings)
@@ -65,7 +63,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return trackerCreationVC
     }
     
-    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
+    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = mainScreenDelegate
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), settings: singleEventSettings)

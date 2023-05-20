@@ -27,31 +27,38 @@ final class TrackerCoordinator: MainCoordinator, CoordinatorProtocol {
 // MARK: - Ext ScreensCreation
 private extension TrackerCoordinator {
     func createScreen() {
-        var trackerMainScreen = factory.makeTrackerScreenView()
+        let trackerMainScreen = factory.makeTrackerScreenView()
         
         let navController = navigationControllerFactory.createNavigationController(.trackers, largeTitle: true, rootViewController: trackerMainScreen)
         
-        trackerMainScreen.addTrackerButtonPressed = { [weak self] in
-            self?.showTrackerSelectionScreen(with: trackerMainScreen.viewModel)
+        trackerMainScreen.addTrackerButtonPressed = { [weak self, weak trackerMainScreen] in
+            guard let self, let trackerMainScreen else { return }
+            self.showTrackerSelectionScreen(with: trackerMainScreen.viewModel)
         }
+        
+//        trackerMainScreen.viewModel.$onModify.wrappedValue = { [weak self] tracker in
+//            
+//        }
         
         router.addTabBarItem(navController)
     }
     
     // MARK: Tracker Selection
-    func showTrackerSelectionScreen(with mainScreenDelegate: TrackerMainScreenDelegate?) {
-        var trackerSelectionScreen = factory.makeTrackerSelectionScreenView(with: mainScreenDelegate)
+    func showTrackerSelectionScreen(with mainScreenDelegate: TrackerMainScreenDelegate) {
+        let trackerSelectionScreen = factory.makeTrackerSelectionScreenView()
         
         trackerSelectionScreen.returnOnCancel = { [weak self, weak trackerSelectionScreen] in
             self?.router.dismissViewController(trackerSelectionScreen, animated: true, completion: nil)
         }
         
-        trackerSelectionScreen.headToHabit = { [weak self, weak trackerSelectionScreen] in
-            self?.showTrackerHabitScreen(with: trackerSelectionScreen)
+        trackerSelectionScreen.headToHabit = { [weak self, weak mainScreenDelegate] in
+            guard let self, let mainScreenDelegate else { return }
+            self.showTrackerHabitScreen(with: mainScreenDelegate)
         }
 
-        trackerSelectionScreen.headToSingleEvent = { [weak self, weak trackerSelectionScreen] in
-            self?.showHabitSingleEventScreen(with: trackerSelectionScreen)
+        trackerSelectionScreen.headToSingleEvent = { [weak self, weak mainScreenDelegate] in
+            guard let self, let mainScreenDelegate else { return }
+            self.showHabitSingleEventScreen(with: mainScreenDelegate)
         }
         
         router.presentViewController(trackerSelectionScreen, animated: true, presentationStyle: .pageSheet)
@@ -59,7 +66,7 @@ private extension TrackerCoordinator {
     
     // MARK: Habit
     
-    func showTrackerHabitScreen(with mainScreenDelegate: TrackerViceMainScreenDelegate?) {
+    func showTrackerHabitScreen(with mainScreenDelegate: TrackerMainScreenDelegate) {
         var trackerHabitScreen = factory.makeTrackerHabitScreenView(with: mainScreenDelegate)
         
         trackerHabitScreen.returnOnCancel = { [weak self, weak trackerHabitScreen] in
@@ -84,7 +91,7 @@ private extension TrackerCoordinator {
     
     // MARK: SingleEvent
     
-    func showHabitSingleEventScreen(with mainScreenDelegate: TrackerViceMainScreenDelegate?) {
+    func showHabitSingleEventScreen(with mainScreenDelegate: TrackerMainScreenDelegate) {
         var trackerSingleEventScreen = factory.makeTrackerSingleEventScreenView(with: mainScreenDelegate)
         
         trackerSingleEventScreen.returnOnCancel = { [weak self, weak trackerSingleEventScreen] in

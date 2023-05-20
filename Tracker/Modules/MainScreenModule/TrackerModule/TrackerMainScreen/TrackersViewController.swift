@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol TrackerToCoordinatorProtocol {
+protocol TrackerToCoordinatorProtocol: AnyObject {
     var addTrackerButtonPressed: (() -> Void)? { get set }
     var viewModel: TrackersViewModel { get }
 }
