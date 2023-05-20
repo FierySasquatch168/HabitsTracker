@@ -87,13 +87,11 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configTimeTableCell(title: String, for row: Int, timetableSelected: Bool) {
+    func configTimeTableCell(title: String, isFirst: Bool, isLast: Bool, timetableSelected: Bool) {
         cellTextLabel.text = title
         
-        if row > 0 {
-            installSeparator()
-        }
-        
+        isFirst ? roundTopCorners() : installSeparator()
+        isLast ? roundBottomCorners() : ()
         timetableSelected ? setupTimeTableConstraints() : setupCategoryConstraints()
         
     }
