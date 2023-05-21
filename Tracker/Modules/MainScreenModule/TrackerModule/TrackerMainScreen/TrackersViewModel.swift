@@ -24,6 +24,9 @@ final class TrackersViewModel {
     @Observable
     private (set) var emptyStackViewIsHidden: Bool = false
     
+    @Observable
+    private (set) var selectedTrackerForModifycation: (Tracker?, String?)
+    
     var selectedDate: Date?
     
     private var dataStore: DataStore
@@ -72,7 +75,9 @@ extension TrackersViewModel {
     }
     
     func modifyTapped(at indexPath: IndexPath) {
-        
+        let trackerToModifyFromCategory = visibleCategories[indexPath.section]
+        let trackerToModify = trackerToModifyFromCategory.trackers[indexPath.row]
+        selectedTrackerForModifycation = (trackerToModify, trackerToModifyFromCategory.name)
     }
     
     func deleteTapped(at indexPath: IndexPath) {

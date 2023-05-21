@@ -12,17 +12,17 @@ protocol TrackerCreationToCoordinatorProtocol {
     var saveTrackerTapped: (() -> Void)? { get set }
     var scheduleTapped: (() -> Void)? { get set }
     var categoryTapped: (() -> Void)? { get set }
-    var selectedCategories: [String]? { get set }
 }
 
 protocol AdditionalTrackerSetupProtocol: AnyObject {
+    var selectedCategory: String? { get }
+    var selectedCategoryIndexPath: IndexPath? { get }
     func transferTimeTable(from selectedWeekdays: [WeekDays])
-    func transferCategory(from selectedCategory: String)
+    func transferCategory(from selectedCategory: String, at indexPath: IndexPath?)
+    func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?)
 }
 
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
-    
-    var selectedCategories: [String]?
     var returnOnCancel: (() -> Void)?
     var saveTrackerTapped: (() -> Void)?
     var scheduleTapped: (() -> Void)?
@@ -39,6 +39,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var emojieSelectedItem: Int?
     private var colorSelectedItem: Int?
     private var selectedItem: IndexPath?
+    private var templateCategoryIndexPath: IndexPath?
     
     // tracker properties for model
     private var templateName: String = "" {
@@ -232,12 +233,30 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 
 // MARK: - Ext Timetable delegate
 extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
+    var selectedCategory: String? {
+        return templateCategory
+    }
+    
+    var selectedCategoryIndexPath: IndexPath? {
+        return templateCategoryIndexPath
+    }
+        
     func transferTimeTable(from selectedWeekdays: [WeekDays]) {
         templateSchedule = selectedWeekdays
     }
     
-    func transferCategory(from selectedCategory: String) {
+    func transferCategory(from selectedCategory: String, at indexPath: IndexPath?) {
         templateCategory = selectedCategory
+        templateCategoryIndexPath = indexPath
+    }
+    
+    func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?) {
+        guard let tracker, let categoryName else { return }
+        templateName = tracker.name
+        templateColor = tracker.color
+        templateEmojie = tracker.emoji
+        templateCategory = categoryName
+        templateSchedule = tracker.schedule
     }
 }
 
