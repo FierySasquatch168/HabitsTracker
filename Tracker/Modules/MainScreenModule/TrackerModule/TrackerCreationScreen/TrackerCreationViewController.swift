@@ -36,14 +36,23 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var createButtonTitle = NSLocalizedString(Constants.LocalizableStringsKeys.create, comment: "Create a new tracker")
     
     // properties for cell single selection
-    private var emojieSelectedItem: Int?
-    private var colorSelectedItem: Int?
+    private var emojieSelectedItem: Int? {
+        didSet {
+            updateSelectedEmoji()
+        }
+    }
+    private var colorSelectedItem: Int? {
+        didSet {
+            updateSelectedColor()
+        }
+    }
     private var selectedItem: IndexPath?
     private var templateCategoryIndexPath: IndexPath?
     
     // tracker properties for model
     private var templateName: String = "" {
         didSet {
+            updateSelectedTrackerName()
             checkForCorrectTrackerInfo()
         }
     }
@@ -68,7 +77,6 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var templateSchedule: [WeekDays] = [] {
         didSet {
             updateScheduleView()
-            createDataSource()
             collectionView.reloadData()
         }
     }
@@ -165,6 +173,18 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private func updateCategorySubtitles() {
         dataSourceManager?.categorySubtitles = templateCategory
     }
+    
+    private func updateSelectedEmoji() {
+        dataSourceManager?.emojieSelectedItem = emojieSelectedItem
+    }
+    
+    private func updateSelectedColor() {
+        dataSourceManager?.colorSelectedItem = colorSelectedItem
+    }
+    
+    private func updateSelectedTrackerName() {
+        dataSourceManager?.selectedTrackerName = templateName
+    }
 }
 
 // MARK: - Ext CollectionViewDelegate
@@ -257,6 +277,9 @@ extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
         templateEmojie = tracker.emoji
         templateCategory = categoryName
         templateSchedule = tracker.schedule
+        
+        colorSelectedItem = dataSourceManager?.getColorIndex(from: tracker.color)
+        emojieSelectedItem = dataSourceManager?.getEmojieIndex(from: tracker.emoji)
     }
 }
 

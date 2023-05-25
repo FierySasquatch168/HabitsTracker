@@ -13,4 +13,11 @@ struct ColorModel: Hashable {
     func getColor(for row: Int) -> UIColor {
         return colors[row]
     }
+    
+    func getIndex(for color: UIColor) -> Int {
+        let hexArray = colors.compactMap({ UIColorMarshalling.hexString(from: $0) })
+        let hexColor = UIColorMarshalling.hexString(from: color)
+        
+        return hexArray.firstIndex(of: hexColor) ?? 0
+    }
 }
