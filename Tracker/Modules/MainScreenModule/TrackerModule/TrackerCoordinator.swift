@@ -38,7 +38,7 @@ private extension TrackerCoordinator {
         
         trackerMainScreen.modifyTrackerButtonPressed = { [weak self, weak trackerMainScreen] tracker, categoryName in
             guard let self, let trackerMainScreen else { return }
-            self.showTrackerHabitScreen(with: trackerMainScreen.viewModel, with: tracker, at: categoryName)
+            self.showTrackerHabitScreen(with: trackerMainScreen.viewModel, with: tracker, at: categoryName, isEditing: true)
         }
         
         router.addTabBarItem(navController)
@@ -54,7 +54,7 @@ private extension TrackerCoordinator {
         
         trackerSelectionScreen.headToHabit = { [weak self, weak mainScreenDelegate] in
             guard let self, let mainScreenDelegate else { return }
-            self.showTrackerHabitScreen(with: mainScreenDelegate, with: nil, at: nil)
+            self.showTrackerHabitScreen(with: mainScreenDelegate, with: nil, at: nil, isEditing: false)
         }
 
         trackerSelectionScreen.headToSingleEvent = { [weak self, weak mainScreenDelegate] in
@@ -67,9 +67,10 @@ private extension TrackerCoordinator {
     
     // MARK: Habit
     
-    func showTrackerHabitScreen(with mainScreenDelegate: TrackerMainScreenDelegate, with templateTracker: Tracker?, at templateCategory: String?) {
+    func showTrackerHabitScreen(with mainScreenDelegate: TrackerMainScreenDelegate, with templateTracker: Tracker?, at templateCategory: String?, isEditing: Bool) {
         var trackerHabitScreen = factory.makeTrackerHabitScreenView(with: mainScreenDelegate)
         trackerHabitScreen.populateTheTemplatesWithSelectedTrackerToModify(with: templateTracker, for: templateCategory)
+        trackerHabitScreen.editingTapped = isEditing
         
         trackerHabitScreen.returnOnCancel = { [weak self, weak trackerHabitScreen] in
             self?.router.dismissViewController(trackerHabitScreen, animated: true, completion: nil)

@@ -9,6 +9,7 @@ import Foundation
 
 protocol TrackerMainScreenDelegate: AnyObject {
     func saveTracker(tracker: Tracker, to categoryName: String)
+    func updateTracker(tracker: Tracker, at categoryName: String)
 }
 
 final class TrackersViewModel {
@@ -64,6 +65,13 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
                 try? self.dataStore.saveTracker(tracker: tracker, to: categoryName)
                 self.checkForScheduledTrackers()
             }
+        }
+    }
+    
+    func updateTracker(tracker: Tracker, at categoryName: String) {
+        do {
+            try? self.dataStore.updateTracker(tracker: tracker, at: categoryName)
+            self.checkForScheduledTrackers()
         }
     }
 }

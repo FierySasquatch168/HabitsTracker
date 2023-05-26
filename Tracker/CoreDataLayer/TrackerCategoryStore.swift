@@ -11,6 +11,7 @@ import CoreData
 protocol TrackerCategoryStoreProtocol {
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws
     func deleteTracker(with id: String, from categoryName: String) throws
+    func updateTracker(tracker: Tracker, at categoryName: String) throws
     func getCategories(with converter: TrackerConverter) -> [TrackerCategory]
 }
 
@@ -125,6 +126,29 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
             try context.save()
         } catch {
             throw CoreDataError.failedToSaveContext
+        }
+    }
+    
+    func updateTracker(tracker: Tracker, at categoryName: String) throws {
+        guard let storedObjects = trackerFetchedResultsController.fetchedObjects else { return }
+        var trackerToModify: TrackerCoreData?
+        for category in storedObjects {
+            guard let storedTrackers = category.trackers?.allObjects as? [TrackerCoreData] else { return }
+            if storedTrackers.contains(where: { $0.stringID == tracker.stringID }) {
+                trackerToModify = storedTrackers.first(where: { $0.stringID == tracker.stringID })
+            }
+        }
+        
+        trackerToModify?.category?.name = categoryName
+        trackerToModify?.color = UIColorMarshalling.hexString(from: tracker.color)
+        trackerToModify?.emojie = tracker.emoji
+        trackerToModify?.name = tracker.name
+        trackerToModify?.schedule = WeekDays.getString(from: tracker.schedule)
+        
+        do {
+            try context.save()
+        } catch {
+            throw CoreDataError.failedToUpdateTracker
         }
     }
     
