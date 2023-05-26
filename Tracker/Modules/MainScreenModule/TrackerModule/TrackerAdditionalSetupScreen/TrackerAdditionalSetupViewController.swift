@@ -115,6 +115,7 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     
     private func checkIfAlreadySelectedACategory() {
         if let selectedCategoryIndexPath {
+            print("selected")
             self.collectionView.selectItem(at: selectedCategoryIndexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
         }
     }

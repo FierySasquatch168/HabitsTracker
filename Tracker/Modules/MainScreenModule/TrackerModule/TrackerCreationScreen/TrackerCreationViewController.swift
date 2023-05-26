@@ -151,7 +151,9 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         // dataSource delegates
         setDataSourceDelegates()
         // swipe down delegate
-        presentationController?.delegate = self        
+        presentationController?.delegate = self
+        
+        print("selectedItem is: \(selectedItem)")
     }
     
     // MARK: Methods
@@ -184,6 +186,13 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     private func updateSelectedTrackerName() {
         dataSourceManager?.selectedTrackerName = templateName
+    }
+    
+    private func findIndexOfSelectedCategory(with categoryName: String) -> Int {
+        return Categories
+            .allCases
+            .compactMap({ $0.description })
+            .firstIndex(of: categoryName) ?? 4
     }
 }
 
@@ -222,6 +231,7 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         selectedItem = indexPath
+        print("selectedItem is: \(selectedItem)")
         return true
     }
 
@@ -273,13 +283,14 @@ extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
     func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?) {
         guard let tracker, let categoryName else { return }
         templateName = tracker.name
-        templateColor = tracker.color
-        templateEmojie = tracker.emoji
         templateCategory = categoryName
         templateSchedule = tracker.schedule
         
         colorSelectedItem = dataSourceManager?.getColorIndex(from: tracker.color)
         emojieSelectedItem = dataSourceManager?.getEmojieIndex(from: tracker.emoji)
+        
+        let selectedCategoryIndex = findIndexOfSelectedCategory(with: categoryName)
+        templateCategoryIndexPath = IndexPath(item: selectedCategoryIndex, section: 0)
     }
 }
 

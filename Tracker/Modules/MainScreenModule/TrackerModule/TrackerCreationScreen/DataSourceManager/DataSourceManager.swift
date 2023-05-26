@@ -113,12 +113,16 @@ private extension DataSourceManager {
 // MARK: - Ext Cell creation
 private extension DataSourceManager {
     func cell(collectionView: UICollectionView, indexPath: IndexPath, item: AnyHashable) -> UICollectionViewCell {
+        
+        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
+        
         switch indexPath.section {
         case 0:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerNameCell.reuseIdentifier, for: indexPath) as? TrackerNameCell else { return UICollectionViewCell() }
             cell.delegate = trackerNameCellDelegate
             cell.setupUI()
             cell.textField.text = selectedTrackerName
+            
             return cell
             
         case 1:
