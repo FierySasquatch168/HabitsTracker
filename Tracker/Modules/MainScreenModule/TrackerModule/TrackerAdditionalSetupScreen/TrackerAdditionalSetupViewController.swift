@@ -9,18 +9,21 @@ import UIKit
 
 protocol TrackerAdditionalSetupToCoordinatorProtocol: AnyObject {
     var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol? { get set }
-    var timetableSelected: Bool? { get set }
+    var isTimetableSelected: Bool? { get set }
     var returnOnCancel: (() -> Void)? { get set }
     var returnOnTimetableReady: (([WeekDays]) -> Void)? { get set }
-    var returnOnCategoryReady: ((String) -> Void)? { get set }
+    var returnOnCategoryReady: ((String, IndexPath?) -> Void)? { get set }
+    var selectedCategory: String? { get set }
+    var selectedCategoryIndexPath: IndexPath? { get set }
+    var selectedWeekDays: [WeekDays]? { get set }
 }
 
 final class TrackerAdditionalSetupViewController: UIViewController, TrackerAdditionalSetupToCoordinatorProtocol {
     weak var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol?
-    var timetableSelected: Bool?
+    var isTimetableSelected: Bool?
     var returnOnCancel: (() -> Void)?
     var returnOnTimetableReady: (([WeekDays]) -> Void)?
-    var returnOnCategoryReady: ((String) -> Void)?
+    var returnOnCategoryReady: ((String, IndexPath?) -> Void)?
     
     private var headerTitle: String?
     private var readyButtonTitle: String?
@@ -31,8 +34,9 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     private var categoryDoneButtonTitle = NSLocalizedString(Constants.LocalizableStringsKeys.addCategory, comment: "To add a category")
     
     // data for transfering between the screens
-    private var selectedWeekDays: [WeekDays] = []
-    private var selectedCategory: String = ""
+    var selectedWeekDays: [WeekDays]?
+    var selectedCategory: String?
+    var selectedCategoryIndexPath: IndexPath?
         
     private lazy var backgroundView: UIImageView = {
         let imageView = UIImageView()
@@ -86,28 +90,38 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
         chooseReadyButtonTitle()
         setupConstraints()
         presentationController?.delegate = self
+        checkIfAlreadySelectedACategory()
+        
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        timetableSelected = nil
+        isTimetableSelected = nil
     }
     
     private func chooseHeader() {
-        guard let timetableSelected = timetableSelected else { return }
+        guard let timetableSelected = isTimetableSelected else { return }
         headerTitle = timetableSelected ? timetableScreenTitle : categoryScreenTitle
     }
     
     private func chooseReadyButtonTitle() {
-        guard let timetableSelected = timetableSelected else { return }
+        guard let timetableSelected = isTimetableSelected else { return }
         readyButtonTitle = timetableSelected ? timetableDoneButtonTitle : categoryDoneButtonTitle
     }
     
     private func addTimetableIfNeeded(day: WeekDays) {
         // works, appends and removes .tuesday or etc
-        selectedWeekDays.contains(day) ? selectedWeekDays.removeAll(where: { $0 == day }) : selectedWeekDays.append(day)
+        guard let selectedWeekDays else { return }
+        selectedWeekDays.contains(day) ? self.selectedWeekDays?.removeAll(where: { $0 == day }) : self.selectedWeekDays?.append(day)
     }
     
+    private func checkIfAlreadySelectedACategory() {
+        if let selectedCategoryIndexPath {
+            self.collectionView.selectItem(at: selectedCategoryIndexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
+        }
+    }
+    
+    // MARK: - OBJC
     @objc
     private func dismissDidTapped() {
         returnOnCancel?()
@@ -115,8 +129,8 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     
     @objc
     private func readyDidTap() {
-        guard let timetableSelected = timetableSelected else { return }
-        timetableSelected ? returnOnTimetableReady?(selectedWeekDays) : returnOnCategoryReady?(selectedCategory)
+        guard let timetableSelected = isTimetableSelected else { return }
+        timetableSelected ? returnOnTimetableReady?(selectedWeekDays ?? []) : returnOnCategoryReady?(selectedCategory ?? "", selectedCategoryIndexPath)
         
     }
 
@@ -125,13 +139,14 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
 // MARK: - Ext DataSource
 extension TrackerAdditionalSetupViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let timetableSelected = timetableSelected else { return 0 }
+        guard let timetableSelected = isTimetableSelected else { return 0 }
         return timetableSelected ? WeekDays.allCases.count : Categories.allCases.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let timetableSelected = timetableSelected,
-              let cell = collectionView.dequeueReusableCell(
+        guard
+            let isTimetableSelected = isTimetableSelected,
+            let cell = collectionView.dequeueReusableCell(
                 withReuseIdentifier: TrackerAdditionalSetupCell.reuseIdentifier,
                 for: indexPath) as? TrackerAdditionalSetupCell
         else { return UICollectionViewCell() }
@@ -139,24 +154,27 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDataSource {
         cell.trackerTimeTableCellDelegate = self
         let isFirstRow = indexPath.row == 0
         
-        if timetableSelected {
+        if isTimetableSelected {
             let isLastRow = indexPath.row == WeekDays.allCases.count - 1
+            let isSelected = selectedWeekDays?.contains(WeekDays.allCases[indexPath.row]) ?? false
             cell.configTimeTableCell(
                 title: WeekDays.allCases[indexPath.row].description,
                 isFirst: isFirstRow,
                 isLast: isLastRow,
-                timetableSelected: timetableSelected
+                timetableSelected: isTimetableSelected,
+                isSelected: isSelected
             )
             
         } else {
             let isLastRow = indexPath.row == Categories.allCases.count - 1
+            let isSelected = selectedCategory == Categories.allCases[indexPath.row].description
             cell.configTimeTableCell(
                 title: Categories.allCases[indexPath.row].description,
                 isFirst: isFirstRow,
                 isLast: isLastRow,
-                timetableSelected: timetableSelected
+                timetableSelected: isTimetableSelected,
+                isSelected: isSelected
             )
-            
         }
         
         return cell
@@ -170,9 +188,25 @@ extension TrackerAdditionalSetupViewController: UICollectionViewDelegateFlowLayo
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let timetableSelected = timetableSelected else { return }
-        if !timetableSelected {
+        guard let isTimetableSelected,
+              let cell = collectionView.cellForItem(at: indexPath) as? TrackerAdditionalSetupCell
+        else { return }
+        if !isTimetableSelected {
             selectedCategory = Categories.allCases[indexPath.row].description
+            selectedCategoryIndexPath = indexPath
+            cell.cellIsSelected = true
+        }
+        
+//        isTimetableSelected ? returnOnTimetableReady?(selectedWeekDays) : returnOnCategoryReady?(selectedCategory ?? "", selectedCategoryIndexPath)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        guard let isTimetableSelected else { return }
+        if !isTimetableSelected {
+            guard let selectedCategoryIndexPath,
+                  let cell = collectionView.cellForItem(at: selectedCategoryIndexPath) as? TrackerAdditionalSetupCell
+            else { return }
+            cell.cellIsSelected = false
         }
     }
 }

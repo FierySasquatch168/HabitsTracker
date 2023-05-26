@@ -72,9 +72,9 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
         return imageView
     }()
     
-    override var isSelected: Bool {
+    var cellIsSelected: Bool = false {
         didSet {
-            checkImageView.isHidden = isSelected ? false : true
+            checkImageView.isHidden = !self.cellIsSelected
         }
     }
     
@@ -87,13 +87,20 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configTimeTableCell(title: String, isFirst: Bool, isLast: Bool, timetableSelected: Bool) {
+    func configTimeTableCell(title: String, isFirst: Bool, isLast: Bool, timetableSelected: Bool, isSelected: Bool) {
         cellTextLabel.text = title
         
         isFirst ? roundTopCorners() : installSeparator()
         isLast ? roundBottomCorners() : ()
-        timetableSelected ? setupTimeTableConstraints() : setupCategoryConstraints()
         
+        if timetableSelected {
+            setupTimeTableConstraints()
+            switcher.setOn(isSelected, animated: false)
+//            toggleSwitch(switcher)
+        } else {
+            setupCategoryConstraints()
+            checkImageView.isHidden = !isSelected
+        }
     }
     
     func roundTopCorners() {

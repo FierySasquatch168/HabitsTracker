@@ -9,6 +9,7 @@ import UIKit
 
 protocol TrackerToCoordinatorProtocol: AnyObject {
     var addTrackerButtonPressed: (() -> Void)? { get set }
+    var modifyTrackerButtonPressed: ((Tracker, String) -> Void)? { get set}
     var viewModel: TrackersViewModel { get }
 }
 
@@ -18,6 +19,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     private let datePickerCornerRadius: CGFloat = 8
         
     var addTrackerButtonPressed: (() -> Void)?
+    var modifyTrackerButtonPressed: ((Tracker, String) -> Void)?
+    
     let viewModel: TrackersViewModel
     
     var currentDate: Date? {
@@ -140,6 +143,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         viewModel.$completedTrackers.bind(action: { [weak self] trackerRecords in
             self?.collectionView.reloadData()
         })
+        
+        viewModel.$selectedTrackerForModifycation.bind { [weak self] tracker, categoryName in
+            guard let self, let tracker, let categoryName else { return }
+            self.modifyTrackerButtonPressed?(tracker, categoryName)
+        }
     }
     
     private func checkTheCollectionViewState() {

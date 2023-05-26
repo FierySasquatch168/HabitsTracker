@@ -9,6 +9,7 @@ import Foundation
 
 protocol TrackerMainScreenDelegate: AnyObject {
     func saveTracker(tracker: Tracker, to categoryName: String)
+    func updateTracker(tracker: Tracker, at categoryName: String)
 }
 
 final class TrackersViewModel {
@@ -23,6 +24,9 @@ final class TrackersViewModel {
     }
     @Observable
     private (set) var emptyStackViewIsHidden: Bool = false
+    
+    @Observable
+    private (set) var selectedTrackerForModifycation: (Tracker?, String?)
     
     var selectedDate: Date?
     
@@ -63,6 +67,13 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
             }
         }
     }
+    
+    func updateTracker(tracker: Tracker, at categoryName: String) {
+        do {
+            try? self.dataStore.updateTracker(tracker: tracker, at: categoryName)
+            self.checkForScheduledTrackers()
+        }
+    }
 }
 
 // MARK: - Ext ContextMenuOperator
@@ -72,7 +83,9 @@ extension TrackersViewModel {
     }
     
     func modifyTapped(at indexPath: IndexPath) {
-        
+        let trackerToModifyFromCategory = visibleCategories[indexPath.section]
+        let trackerToModify = trackerToModifyFromCategory.trackers[indexPath.row]
+        selectedTrackerForModifycation = (trackerToModify, trackerToModifyFromCategory.name)
     }
     
     func deleteTapped(at indexPath: IndexPath) {

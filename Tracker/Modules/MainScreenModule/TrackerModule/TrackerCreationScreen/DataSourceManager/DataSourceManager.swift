@@ -14,11 +14,18 @@ protocol DataSourceManagerProtocol {
     var colorCellDelegate: ColorCellDelegate? { get set }
     var categorySubtitles: String { get set }
     var scheduleSubtitles: String { get set }
+    var emojieSelectedItem: Int? { get set }
+    var colorSelectedItem: Int? { get set }
+    var selectedTrackerName: String? { get set }
     func createDataSource(collectionView: UICollectionView)
     func getTitle() -> String
+    func getColorIndex(from color: UIColor) -> Int
+    func getEmojieIndex(from emojie: String) -> Int
 }
 
 final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
+    
+    
     weak var trackerNameCellDelegate: TrackerNameCellDelegate?
     weak var settingsCellDelegate: SettingsCellDelegate?
     weak var emojieCelldelegate: EmojieCellDelegate?
@@ -28,6 +35,9 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     var emojieModel: EmojieModel
     var colorModel: ColorModel
     var titles: [String]
+    var emojieSelectedItem: Int?
+    var colorSelectedItem: Int?
+    var selectedTrackerName: String?
     
     // initialized after user picks up category
     var categorySubtitles: String = ""
@@ -51,6 +61,14 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     
     func getTitle() -> String {
         return headerLabeltext
+    }
+    
+    func getColorIndex(from color: UIColor) -> Int {
+        return colorModel.getIndex(for: color)
+    }
+    
+    func getEmojieIndex(from emojie: String) -> Int {
+        return emojieModel.getEmojieIndex(for: emojie)
     }
     
     func createDataSource(collectionView: UICollectionView) {
@@ -78,7 +96,7 @@ final class DataSourceManager: DataSourceManagerProtocol, LayoutDataProtocol {
     }
 }
 
-// MARK: - Ext Snapshot
+// MARK: - Ext snapshot
 private extension DataSourceManager {
     func createSnapshot() -> Snapshot {
         var snapshot = Snapshot()
@@ -95,11 +113,16 @@ private extension DataSourceManager {
 // MARK: - Ext Cell creation
 private extension DataSourceManager {
     func cell(collectionView: UICollectionView, indexPath: IndexPath, item: AnyHashable) -> UICollectionViewCell {
+        
+        collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredHorizontally)
+        
         switch indexPath.section {
         case 0:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerNameCell.reuseIdentifier, for: indexPath) as? TrackerNameCell else { return UICollectionViewCell() }
             cell.delegate = trackerNameCellDelegate
             cell.setupUI()
+            cell.textField.text = selectedTrackerName
+            
             return cell
             
         case 1:
@@ -125,12 +148,14 @@ private extension DataSourceManager {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerEmojieCell.reuseIdentifier, for: indexPath) as? TrackerEmojieCell else { return UICollectionViewCell() }
             cell.emojieCellDelegate = emojieCelldelegate
             cell.setupCellWithValuesOf(item: item)
+            cell.cellIsSelected = indexPath.item == emojieSelectedItem
             return cell
             
         case 3:
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TrackerColorsCell.reuseIdentifier, for: indexPath) as? TrackerColorsCell else { return UICollectionViewCell() }
             cell.colorCellDelegate = colorCellDelegate
             cell.colorLabel.backgroundColor = colorModel.getColor(for: indexPath.row)
+            cell.cellIsSelected = indexPath.item == colorSelectedItem
             return cell
             
         default:

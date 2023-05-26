@@ -10,8 +10,11 @@ import Foundation
 struct EmojieModel: Hashable {
     var emojies: [String] = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     
-//    var emojies: [String] = ["1", "2", "3", "4", "5", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝", "😪"]
     func getEmojie(for row: Int) -> String {
         return emojies[row]
+    }
+    
+    func getEmojieIndex(for emojie: String) -> Int {
+        return emojies.firstIndex(where: { $0 == emojie }) ?? 0
     }
 }

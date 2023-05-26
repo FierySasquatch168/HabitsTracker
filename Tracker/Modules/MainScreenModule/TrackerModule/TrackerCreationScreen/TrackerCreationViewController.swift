@@ -12,17 +12,19 @@ protocol TrackerCreationToCoordinatorProtocol {
     var saveTrackerTapped: (() -> Void)? { get set }
     var scheduleTapped: (() -> Void)? { get set }
     var categoryTapped: (() -> Void)? { get set }
-    var selectedCategories: [String]? { get set }
 }
 
 protocol AdditionalTrackerSetupProtocol: AnyObject {
+    var selectedCategory: String? { get }
+    var selectedCategoryIndexPath: IndexPath? { get }
+    var selectedWeekDays: [WeekDays]? { get }
+    var editingTapped: Bool? { get set }
     func transferTimeTable(from selectedWeekdays: [WeekDays])
-    func transferCategory(from selectedCategory: String)
+    func transferCategory(from selectedCategory: String, at indexPath: IndexPath?)
+    func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?)
 }
 
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
-    
-    var selectedCategories: [String]?
     var returnOnCancel: (() -> Void)?
     var saveTrackerTapped: (() -> Void)?
     var scheduleTapped: (() -> Void)?
@@ -36,13 +38,24 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var createButtonTitle = NSLocalizedString(Constants.LocalizableStringsKeys.create, comment: "Create a new tracker")
     
     // properties for cell single selection
-    private var emojieSelectedItem: Int?
-    private var colorSelectedItem: Int?
+    private var emojieSelectedItem: Int? {
+        didSet {
+            updateSelectedEmoji()
+        }
+    }
+    private var colorSelectedItem: Int? {
+        didSet {
+            updateSelectedColor()
+        }
+    }
     private var selectedItem: IndexPath?
+    private var templateCategoryIndexPath: IndexPath?
+    private var isEditingTracker: Bool?
     
     // tracker properties for model
     private var templateName: String = "" {
         didSet {
+            updateSelectedTrackerName()
             checkForCorrectTrackerInfo()
         }
     }
@@ -67,10 +80,11 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private var templateSchedule: [WeekDays] = [] {
         didSet {
             updateScheduleView()
-            createDataSource()
             collectionView.reloadData()
         }
     }
+    
+    private var templateStringID: String?
     
        
     private lazy var headerLabel: CustomHeaderLabel = {
@@ -142,7 +156,8 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         // dataSource delegates
         setDataSourceDelegates()
         // swipe down delegate
-        presentationController?.delegate = self        
+        presentationController?.delegate = self
+        
     }
     
     // MARK: Methods
@@ -163,6 +178,25 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     
     private func updateCategorySubtitles() {
         dataSourceManager?.categorySubtitles = templateCategory
+    }
+    
+    private func updateSelectedEmoji() {
+        dataSourceManager?.emojieSelectedItem = emojieSelectedItem
+    }
+    
+    private func updateSelectedColor() {
+        dataSourceManager?.colorSelectedItem = colorSelectedItem
+    }
+    
+    private func updateSelectedTrackerName() {
+        dataSourceManager?.selectedTrackerName = templateName
+    }
+    
+    private func findIndexOfSelectedCategory(with categoryName: String) -> Int {
+        return Categories
+            .allCases
+            .compactMap({ $0.description })
+            .firstIndex(of: categoryName) ?? 4
     }
 }
 
@@ -232,12 +266,48 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 
 // MARK: - Ext Timetable delegate
 extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
+    var editingTapped: Bool? {
+        get {
+            return self.isEditingTracker
+        }
+        set {
+            isEditingTracker = newValue
+        }
+    }
+    
+    var selectedWeekDays: [WeekDays]? {
+        return templateSchedule
+    }
+    
+    var selectedCategory: String? {
+        return templateCategory
+    }
+    
+    var selectedCategoryIndexPath: IndexPath? {
+        return templateCategoryIndexPath
+    }
+        
     func transferTimeTable(from selectedWeekdays: [WeekDays]) {
         templateSchedule = selectedWeekdays
     }
     
-    func transferCategory(from selectedCategory: String) {
+    func transferCategory(from selectedCategory: String, at indexPath: IndexPath?) {
         templateCategory = selectedCategory
+        templateCategoryIndexPath = indexPath
+    }
+    
+    func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?) {
+        guard let tracker, let categoryName else { return }
+        templateName = tracker.name
+        templateCategory = categoryName
+        templateSchedule = tracker.schedule
+        templateStringID = tracker.stringID
+        
+        colorSelectedItem = dataSourceManager?.getColorIndex(from: tracker.color)
+        emojieSelectedItem = dataSourceManager?.getEmojieIndex(from: tracker.emoji)
+        
+        let selectedCategoryIndex = findIndexOfSelectedCategory(with: categoryName)
+        templateCategoryIndexPath = IndexPath(item: selectedCategoryIndex, section: 0)
     }
 }
 
@@ -294,11 +364,12 @@ private extension TrackerCreationViewController {
         // create tracker
         let tracker = createTracker(name: templateName, color: templateColor, emoji: templateEmojie, schedule: templateSchedule)
         // delegate - save tracker
-        mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
+        editingTapped ?? false ? mainScreenDelegate?.updateTracker(tracker: tracker, at: templateCategory) : mainScreenDelegate?.saveTracker(tracker: tracker, to: templateCategory)
+        
     }
     
     func createTracker(name: String, color: UIColor, emoji: String, schedule: [WeekDays]) -> Tracker {
-        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: nil)
+        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: templateStringID)
     }
 }
 

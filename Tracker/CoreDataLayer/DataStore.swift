@@ -13,6 +13,7 @@ protocol DataStoreProtocol {
     func fetchRecords() -> Set<TrackerRecord>
     func fetchTrackers() -> [Tracker]
     func saveTracker(tracker: Tracker, to categoryName: String) throws
+    func updateTracker(tracker: Tracker, at categoryName: String) throws
     func updateRecords(_ id: String, with date: Date) throws
     func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
     func deleteTrackers(with id: String, from categoryName: String)
@@ -97,6 +98,14 @@ extension DataStore: DataStoreProtocol {
             try trackerCategoryStore?.saveTracker(with: trackerCoreData, to: categoryName)
         } catch {
             throw CoreDataError.failedToSaveContext
+        }
+    }
+    
+    func updateTracker(tracker: Tracker, at categoryName: String) throws {
+        do {
+            try trackerCategoryStore?.updateTracker(tracker: tracker, at: categoryName)
+        } catch {
+            throw CoreDataError.failedToUpdateTracker
         }
     }
     
