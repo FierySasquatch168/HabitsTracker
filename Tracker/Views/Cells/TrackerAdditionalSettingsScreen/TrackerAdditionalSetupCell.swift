@@ -92,10 +92,15 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
         
         isFirst ? roundTopCorners() : installSeparator()
         isLast ? roundBottomCorners() : ()
-        timetableSelected ? setupTimeTableConstraints() : setupCategoryConstraints()
         
-        checkImageView.isHidden = !isSelected
-        
+        if timetableSelected {
+            setupTimeTableConstraints()
+            switcher.setOn(isSelected, animated: false)
+//            toggleSwitch(switcher)
+        } else {
+            setupCategoryConstraints()
+            checkImageView.isHidden = !isSelected
+        }
     }
     
     func roundTopCorners() {

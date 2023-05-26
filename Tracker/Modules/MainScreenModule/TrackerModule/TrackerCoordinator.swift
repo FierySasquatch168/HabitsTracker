@@ -80,7 +80,6 @@ private extension TrackerCoordinator {
         }
         
         trackerHabitScreen.scheduleTapped = { [weak self, weak trackerHabitScreen] in
-            // TODO: think about a better way of setting the delegate
             self?.showTrackerTimeTableScreen(timetableDelegate: trackerHabitScreen)
         }
         
@@ -115,7 +114,7 @@ private extension TrackerCoordinator {
     
     func showCategorySelectionScreen(timetableDelegate: AdditionalTrackerSetupProtocol?) {
         let trackerCategoryScreen = factory.makeTrackerCategorieScreenView()
-        trackerCategoryScreen.timetableSelected = false
+        trackerCategoryScreen.isTimetableSelected = false
         trackerCategoryScreen.additionalTrackerSetupDelegate = timetableDelegate
         trackerCategoryScreen.selectedCategory = timetableDelegate?.selectedCategory
         trackerCategoryScreen.selectedCategoryIndexPath = timetableDelegate?.selectedCategoryIndexPath
@@ -137,9 +136,9 @@ private extension TrackerCoordinator {
     func showTrackerTimeTableScreen(timetableDelegate: AdditionalTrackerSetupProtocol?) {
         let trackerTimetableScreen = factory.makeTimeTableScreenView()
         
-        trackerTimetableScreen.timetableSelected = true
-        
+        trackerTimetableScreen.isTimetableSelected = true
         trackerTimetableScreen.additionalTrackerSetupDelegate = timetableDelegate
+        trackerTimetableScreen.selectedWeekDays = timetableDelegate?.selectedWeekDays
         
         trackerTimetableScreen.returnOnCancel = { [weak self, weak trackerTimetableScreen] in
             self?.router.dismissViewController(trackerTimetableScreen, animated: true, completion: nil)

@@ -17,6 +17,7 @@ protocol TrackerCreationToCoordinatorProtocol {
 protocol AdditionalTrackerSetupProtocol: AnyObject {
     var selectedCategory: String? { get }
     var selectedCategoryIndexPath: IndexPath? { get }
+    var selectedWeekDays: [WeekDays]? { get }
     func transferTimeTable(from selectedWeekdays: [WeekDays])
     func transferCategory(from selectedCategory: String, at indexPath: IndexPath?)
     func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?)
@@ -153,7 +154,6 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         // swipe down delegate
         presentationController?.delegate = self
         
-        print("selectedItem is: \(selectedItem)")
     }
     
     // MARK: Methods
@@ -231,7 +231,6 @@ extension TrackerCreationViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         selectedItem = indexPath
-        print("selectedItem is: \(selectedItem)")
         return true
     }
 
@@ -263,6 +262,10 @@ extension TrackerCreationViewController: UIAdaptivePresentationControllerDelegat
 
 // MARK: - Ext Timetable delegate
 extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
+    var selectedWeekDays: [WeekDays]? {
+        return templateSchedule
+    }
+    
     var selectedCategory: String? {
         return templateCategory
     }
