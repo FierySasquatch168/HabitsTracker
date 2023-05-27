@@ -302,6 +302,8 @@ extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
         templateCategory = categoryName
         templateSchedule = tracker.schedule
         templateStringID = tracker.stringID
+        templateColor = tracker.color
+        templateEmojie = tracker.emoji
         
         colorSelectedItem = dataSourceManager?.getColorIndex(from: tracker.color)
         emojieSelectedItem = dataSourceManager?.getEmojieIndex(from: tracker.emoji)

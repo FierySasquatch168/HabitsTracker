@@ -240,8 +240,11 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - Ext CollectionViewDelegate
 extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
-        guard indexPaths.count > 0, let indexPath = indexPaths.first else { return nil }
-        return UIContextMenuConfiguration(actionProvider: { actions in
+        guard indexPaths.count > 0,
+                let indexPath = indexPaths.first
+        else { return nil }
+                
+        return UIContextMenuConfiguration( actionProvider: { actions in
             return UIMenu(children: [
                 UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin the tracker"), handler: { [weak self] _ in
                     self?.viewModel.pinTapped(at: indexPath)
@@ -254,6 +257,11 @@ extension TrackersViewController: UICollectionViewDelegate {
                 })
             ])
         })
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackersListCollectionViewCell else { return nil }
+        return UITargetedPreview(view: cell.cellBackgroundColorImageView)
     }
 }
 

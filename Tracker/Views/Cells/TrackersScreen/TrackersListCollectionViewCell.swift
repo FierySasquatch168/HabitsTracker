@@ -99,7 +99,6 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     }
     
     func configCell(with tracker: Tracker, image: UIImage, count: Int) {
-        // category should be configured as Header
         trackerID = tracker.stringID
         emojieLabel.text = tracker.emoji
         cellBackgroundColorImageView.backgroundColor = tracker.color
@@ -122,8 +121,6 @@ private extension TrackersListCollectionViewCell {
 private extension TrackersListCollectionViewCell {
     func setupConstraints() {
         setupBackgroundColorImageView()
-        setupEmojieLabel()
-        setupTrackerNameLabel()
         setupBottomStackView()
     }
     
@@ -137,30 +134,29 @@ private extension TrackersListCollectionViewCell {
             cellBackgroundColorImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
             cellBackgroundColorImageView.heightAnchor.constraint(equalToConstant: 90)
         ])
-    }
-    
-    func setupEmojieLabel() {
-        addSubview(emojieLabel)
+        
+        cellBackgroundColorImageView.addSubview(emojieLabel)
+        
         emojieLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            emojieLabel.topAnchor.constraint(equalTo: topAnchor, constant: 12),
-            emojieLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            emojieLabel.topAnchor.constraint(equalTo: cellBackgroundColorImageView.topAnchor, constant: 12),
+            emojieLabel.leadingAnchor.constraint(equalTo: cellBackgroundColorImageView.leadingAnchor, constant: 12),
             emojieLabel.heightAnchor.constraint(equalToConstant: 24),
             emojieLabel.widthAnchor.constraint(equalToConstant: 24)
         ])
-    }
-    
-    func setupTrackerNameLabel() {
-        addSubview(trackerNameLabel)
+        
+        cellBackgroundColorImageView.addSubview(trackerNameLabel)
+        
         trackerNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            trackerNameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 44),
-            trackerNameLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
-            trackerNameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12),
+            trackerNameLabel.topAnchor.constraint(equalTo: cellBackgroundColorImageView.topAnchor, constant: 44),
+            trackerNameLabel.leadingAnchor.constraint(equalTo: cellBackgroundColorImageView.leadingAnchor, constant: 12),
+            trackerNameLabel.trailingAnchor.constraint(equalTo: cellBackgroundColorImageView.trailingAnchor, constant: -12),
             trackerNameLabel.bottomAnchor.constraint(equalTo: cellBackgroundColorImageView.bottomAnchor, constant: -12)
         ])
+        
     }
     
     func setupBottomStackView() {
