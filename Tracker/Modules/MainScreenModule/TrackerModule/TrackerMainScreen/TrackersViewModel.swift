@@ -75,7 +75,14 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
 // MARK: - Ext ContextMenuOperator
 extension TrackersViewModel {
     func pinTapped(at indexPath: IndexPath) {
+        let trackerToPinFromCategory = visibleCategories[indexPath.section]
+        let trackerToPin = trackerToPinFromCategory.trackers[indexPath.row]
         
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.dataStore.pinTracker(tracker: trackerToPin, at: trackerToPinFromCategory.name)
+            self.checkForScheduledTrackers()
+        }
     }
     
     func modifyTapped(at indexPath: IndexPath) {

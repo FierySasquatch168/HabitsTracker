@@ -72,5 +72,6 @@ struct Constants {
         static let contextMenuOperatorPin = "contextMenuOperatorPin"
         static let contextMenuOperatorModify = "contextMenuOperatorModify"
         static let contextMenuOperatorDelete = "contextMenuOperatorDelete"
+        static let pinnedCategoryName = "pinnedTrackerCategory"
     }
 }

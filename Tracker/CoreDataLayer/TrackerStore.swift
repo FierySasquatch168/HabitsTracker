@@ -9,9 +9,11 @@ import Foundation
 import CoreData
 
 protocol TrackerStoreProtocol {
-    func makeTracker(from tracker: Tracker) -> TrackerCoreData
+    func createTracker(from tracker: Tracker) -> TrackerCoreData
     func fetchTrackers(with converter: TrackerConverter) -> [Tracker]
+    func fetchCoreDataTrackers() -> [TrackerCoreData]
     func updateCoreDataTracker(from tracker: Tracker) -> TrackerCoreData?
+    func getCoreDataTracker(from tracker: Tracker) -> TrackerCoreData?
 }
 
 final class TrackerStore: NSObject {
@@ -44,7 +46,7 @@ final class TrackerStore: NSObject {
 
 // MARK: - Ext TrackerStoreProtocol
 extension TrackerStore: TrackerStoreProtocol {
-    func makeTracker(from tracker: Tracker) -> TrackerCoreData {
+    func createTracker(from tracker: Tracker) -> TrackerCoreData {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.updateWithNewValues(from: tracker)
         return trackerCoreData
@@ -59,10 +61,18 @@ extension TrackerStore: TrackerStoreProtocol {
         
     }
     
+    func fetchCoreDataTrackers() -> [TrackerCoreData] {
+        return trackerFetchedResultsController.fetchedObjects ?? []
+    }
+    
     func updateCoreDataTracker(from tracker: Tracker) -> TrackerCoreData? {
-        let existingTrackerCoreData = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.stringID == tracker.stringID })
+        let existingTrackerCoreData = getCoreDataTracker(from: tracker)
         existingTrackerCoreData?.updateWithNewValues(from: tracker)
         return existingTrackerCoreData
+    }
+    
+    func getCoreDataTracker(from tracker: Tracker) -> TrackerCoreData? {
+        return trackerFetchedResultsController.fetchedObjects?.first(where: { $0.stringID == tracker.stringID })
     }
 }
 

@@ -14,6 +14,7 @@ protocol DataStoreProtocol {
     func fetchTrackers() -> [Tracker]
     func saveTracker(tracker: Tracker, to categoryName: String)
     func updateTracker(tracker: Tracker, at categoryName: String)
+    func pinTracker(tracker: Tracker, at categoryName: String)
     func updateRecords(_ id: String, with date: Date)
     func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
     func deleteTrackers(with id: String, from categoryName: String)
@@ -41,8 +42,10 @@ final class DataStore {
     var trackerStore: TrackerStoreProtocol?
     
     private var fetchedCategories: [TrackerCategory] {
-        guard let trackerConverter else { return [] }
-        return trackerCategoryStore?.getCategories(with: trackerConverter) ?? []
+        guard let trackerConverter,
+              let fetchedCoreDataTrackers = trackerStore?.fetchCoreDataTrackers()
+        else { return [] }
+        return trackerCategoryStore?.getViewCategories(with: trackerConverter, from: fetchedCoreDataTrackers) ?? []
     }
     
     private var fetchedRecords: Set<TrackerRecord> {
@@ -89,14 +92,18 @@ extension DataStore: DataStoreProtocol {
     }
     
     func saveTracker(tracker: Tracker, to categoryName: String) {
-        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker)
-        else { return }
+        guard let trackerCoreData = trackerStore?.createTracker(from: tracker) else { return }
         try? trackerCategoryStore?.saveTracker(with: trackerCoreData, to: categoryName)
     }
     
     func updateTracker(tracker: Tracker, at categoryName: String) {
         guard let trackerCoreData = trackerStore?.updateCoreDataTracker(from: tracker) else { return }
         try? trackerCategoryStore?.updateTracker(trackerCoreData: trackerCoreData, at: categoryName)
+    }
+    
+    func pinTracker(tracker: Tracker, at categoryName: String) {
+        guard let trackerCoreData = trackerStore?.getCoreDataTracker(from: tracker) else { return }
+        try? trackerCategoryStore?.pinTracker(trackerCoreData: trackerCoreData, at: categoryName)
     }
     
     func updateRecords(_ id: String, with date: Date) {
@@ -118,17 +125,17 @@ extension DataStore: TrackerStorageDataStoreDelegate {
         return context
     }
     
-    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol,
-                           _ updates: CategoryUpdates) {
+    func didUpdateCategory(_ store: TrackerCategoryStoreProtocol, _ updates: CategoryUpdates) {
         guard let trackerConverter,
-              let trackerCategories = trackerCategoryStore?.getCategories(with: trackerConverter) else { return }
+              let trackersCoreData = trackerStore?.fetchCoreDataTrackers()
+        else { return }
+        let trackerCategories = store.getViewCategories(with: trackerConverter, from: trackersCoreData)
         dataStoreDelegate?.didUpdateCategory(trackerCategories, updates)
     }
     
-    func didUpdateRecord(_ store: TrackerRecordStoreProtocol,
-                         _ updates: RecordUpdates) {
-        guard let trackerConverter,
-              let trackerRecords = trackerRecordStore?.getTrackerRecords(with: trackerConverter) else { return }
+    func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates) {
+        guard let trackerConverter else { return }
+        let trackerRecords = store.getTrackerRecords(with: trackerConverter)
         dataStoreDelegate?.didUpdateRecords(trackerRecords, updates)
     }
 }

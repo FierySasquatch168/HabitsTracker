@@ -19,4 +19,5 @@ enum CoreDataError: Error {
     case failedToDeleteTracker
     case failedToUpdateTracker
     case failedToCreateCategoryCoreData
+    case failedToPinTracker
 }

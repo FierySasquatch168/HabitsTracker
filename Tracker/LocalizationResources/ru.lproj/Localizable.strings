@@ -53,3 +53,4 @@
 "contextMenuOperatorPin" = "Закрепить";
 "contextMenuOperatorModify" = "Редактировать";
 "contextMenuOperatorDelete" = "Удалить";
+"pinnedTrackerCategory" = "Закрепленные";

@@ -53,3 +53,4 @@
 "contextMenuOperatorPin" = "Pin";
 "contextMenuOperatorModify" = "Modify";
 "contextMenuOperatorDelete" = "Delete";
+"pinnedTrackerCategory" = "Pinned";
