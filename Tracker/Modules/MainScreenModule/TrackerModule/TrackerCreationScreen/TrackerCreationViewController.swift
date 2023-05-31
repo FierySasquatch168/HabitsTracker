@@ -371,7 +371,7 @@ private extension TrackerCreationViewController {
     }
     
     func createTracker(name: String, color: UIColor, emoji: String, schedule: [WeekDays]) -> Tracker {
-        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: templateStringID)
+        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: templateStringID, isPinned: false)
     }
 }
 

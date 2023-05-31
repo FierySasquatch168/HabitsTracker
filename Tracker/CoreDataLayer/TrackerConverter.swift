@@ -36,8 +36,9 @@ final class TrackerConverter: TrackerConverterProtocol {
 
         let color = UIColorMarshalling.color(from: hexColor)
         let schedule = WeekDays.getWeekDaysArray(from: weekDays)
+        let isPinned = trackerCoreData.isPinned
 
-        return Tracker(name: name, color: color, emoji: emojie, schedule: schedule, stringID: trackerCoreData.stringID)
+        return Tracker(name: name, color: color, emoji: emojie, schedule: schedule, stringID: trackerCoreData.stringID, isPinned: isPinned)
     }
     
     func convertStoredDataToTrackerRecord(from record: TrackerRecordCoreData) -> TrackerRecord? {

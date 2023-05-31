@@ -9,20 +9,23 @@ import Foundation
 import CoreData
 
 protocol TrackerCategoryStoreProtocol {
+    func getViewCategories(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory]
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws
+    func updateTracker(trackerCoreData: TrackerCoreData, at categoryName: String) throws
     func deleteTracker(with id: String, from categoryName: String) throws
-    func updateTracker(tracker: Tracker, at categoryName: String) throws
-    func getCategories(with converter: TrackerConverter) -> [TrackerCategory]
+    func pinTracker(trackerCoreData: TrackerCoreData, at categoryName: String) throws
 }
 
 struct CategoryUpdates {
     let insertedIndexes: IndexSet
+    let reloadedIndexes: IndexSet
     let deletedIndexes: IndexSet
 }
 
 final class TrackerCategoryStore: NSObject {
     
     var insertedIndexes: IndexSet?
+    var reloadedIndexes: IndexSet?
     var deletedIndexes: IndexSet?
 
     weak var delegate: TrackerStorageDataStoreDelegate?
@@ -55,15 +58,18 @@ final class TrackerCategoryStore: NSObject {
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         insertedIndexes = IndexSet()
+        reloadedIndexes = IndexSet()
         deletedIndexes = IndexSet()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         guard let indexesToInsert = insertedIndexes,
+              let indexesToReload = reloadedIndexes,
               let indexesToDelete = deletedIndexes
         else { return }
-        delegate?.didUpdateCategory(self, CategoryUpdates(insertedIndexes: indexesToInsert, deletedIndexes: indexesToDelete))
+        delegate?.didUpdateCategory(self, CategoryUpdates(insertedIndexes: indexesToInsert, reloadedIndexes: indexesToReload, deletedIndexes: indexesToDelete))
         insertedIndexes = nil
+        reloadedIndexes = nil
         deletedIndexes = nil
     }
     
@@ -72,10 +78,7 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
                     at indexPath: IndexPath?,
                     for type: NSFetchedResultsChangeType,
                     newIndexPath: IndexPath?) {
-        
-//        if let indexPath = newIndexPath {
-//            insertedIndexes?.insert(indexPath.item)
-//        }
+
         
         switch type {
         case .insert:
@@ -87,7 +90,10 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
                 deletedIndexes?.insert(indexPath.item)
             }
         case .move:
-            fatalError("NSFetchedResultsController didChange .move type")
+            if let indexPath, let newIndexPath {
+                deletedIndexes?.insert(indexPath.item)
+                insertedIndexes?.insert(newIndexPath.item)
+            }
         case .update:
             if let indexPath = newIndexPath {
                 deletedIndexes?.insert(indexPath.item)
@@ -100,7 +106,7 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
 
 // MARK: - Ext TrackerCategoryStoreProtocol
 extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
-    func getCategories(with converter: TrackerConverter) -> [TrackerCategory] {
+    func getCategoriesOLD(with converter: TrackerConverter) -> [TrackerCategory] {
         guard let trackerCategoryCoreDataArray = trackerFetchedResultsController.fetchedObjects,
               let viewCategories = try? trackerCategoryCoreDataArray.compactMap({ try converter.convertToViewCategory(from: $0) })
         else { return [] }
@@ -108,42 +114,52 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         return viewCategories
     }
     
-    func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws {
-        // загрузить действующую категорию с таким именем
-        if let existingCategory = trackerFetchedResultsController.fetchedObjects?.filter({ $0.name == categoryName }).first,
-           var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
-            // если она есть, поменять у нее свойство трэкерс и загрузить обратно
-            newCoreDataTrackers.append(trackerCoreData)
-            existingCategory.trackers = NSSet(array: newCoreDataTrackers)
-        } else {
-            // если ее нет, создать новую
-            let newCategory = TrackerCategoryCoreData(context: context)
-            newCategory.name = categoryName
-            newCategory.trackers = NSSet(array: [trackerCoreData])
+    func getViewCategories(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory] {        
+        // разделить trackersCoreData на закрепленные и незакрепленные
+        let pinnedTrackers = trackersCoreData.filter({ $0.isPinned })
+        let unpinnedTrackers = trackersCoreData.filter({ !$0.isPinned })
+        
+        // из закрепленных сделать отдельную вью категорию
+        let pinnedViewTrackers = (try? pinnedTrackers.compactMap({ try converter.getTracker(from: $0) })) ?? []
+        let pinnedViewCategory = TrackerCategory(
+            name: NSLocalizedString(Constants.LocalizableStringsKeys.pinnedCategoryName, comment: "Pinned  category name"),
+            trackers: pinnedViewTrackers)
+        
+        var finalViewCategories: [TrackerCategory] = []
+        finalViewCategories.append(pinnedViewCategory)
+        
+        // закрепленные разделить по категориям из кордаты
+        unpinnedTrackers.forEach { trackerCoredata in
+            let trackersCoreDataFilteredByCategoryName = unpinnedTrackers.filter({ $0.category?.name == trackerCoredata.category?.name })
+            let viewTrackersFilteredByCategoryName = (try? trackersCoreDataFilteredByCategoryName.compactMap({ try converter.getTracker(from: $0)})) ?? []
+            let viewCategory = TrackerCategory(name: trackerCoredata.category?.name ?? "Error", trackers: viewTrackersFilteredByCategoryName)
+            finalViewCategories.append(viewCategory)
         }
         
-        do {
-            try context.save()
-        } catch {
-            throw CoreDataError.failedToSaveContext
-        }
+        return finalViewCategories
     }
     
-    func updateTracker(tracker: Tracker, at categoryName: String) throws {
-        guard let storedObjects = trackerFetchedResultsController.fetchedObjects else { return }
-        var trackerToModify: TrackerCoreData?
-        for category in storedObjects {
-            guard let storedTrackers = category.trackers?.allObjects as? [TrackerCoreData] else { return }
-            if storedTrackers.contains(where: { $0.stringID == tracker.stringID }) {
-                trackerToModify = storedTrackers.first(where: { $0.stringID == tracker.stringID })
-            }
+    func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws {
+        if let existingCategory = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == categoryName }) {
+            existingCategory.addToTrackers(trackerCoreData)
+        } else {
+            let newCategory = try createTrackerCategoryCoreData(with: categoryName)
+            newCategory.addToTrackers(trackerCoreData)
         }
         
-        trackerToModify?.category?.name = categoryName
-        trackerToModify?.color = UIColorMarshalling.hexString(from: tracker.color)
-        trackerToModify?.emojie = tracker.emoji
-        trackerToModify?.name = tracker.name
-        trackerToModify?.schedule = WeekDays.getString(from: tracker.schedule)
+        try context.save()
+    }
+    
+    func updateTracker(trackerCoreData: TrackerCoreData, at categoryName: String) throws {
+        let categoryToRemoveTrackerFrom = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == trackerCoreData.category?.name })
+        categoryToRemoveTrackerFrom?.removeFromTrackers(trackerCoreData)
+        
+        if let categoryToInsertTrackerTo = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == categoryName }) {
+            categoryToInsertTrackerTo.addToTrackers(trackerCoreData)
+        } else {
+            let newCategory = try createTrackerCategoryCoreData(with: categoryName)
+            newCategory.addToTrackers(trackerCoreData)
+        }
         
         do {
             try context.save()
@@ -168,5 +184,25 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         } catch {
             throw CoreDataError.failedToDeleteTracker
         }
+    }
+    
+    func pinTracker(trackerCoreData: TrackerCoreData, at categoryName: String) throws {
+        trackerCoreData.isPinned.toggle()
+        
+        do {
+            try context.save()
+        } catch {
+            throw CoreDataError.failedToPinTracker
+        }
+    }
+}
+
+private extension TrackerCategoryStore {
+    func createTrackerCategoryCoreData(with categoryName: String) throws -> TrackerCategoryCoreData {
+        let category = TrackerCategoryCoreData(context: context)
+        category.name = categoryName
+        category.trackers = NSSet(array: [])
+        
+        return category
     }
 }

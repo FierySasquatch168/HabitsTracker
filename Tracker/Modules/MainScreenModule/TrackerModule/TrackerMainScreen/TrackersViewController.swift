@@ -162,6 +162,11 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     private func closeTheDatePicker() {
         presentedViewController?.dismiss(animated: false)
     }
+    
+    private func choosePinActionName(for indexPath: IndexPath) -> String {
+        let isPinned = viewModel.visibleCategories[indexPath.section].trackers[indexPath.row].isPinned
+        return isPinned ? NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorUnpin, comment: "Unpin") : NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin")
+    }
 }
 
 // MARK: - Ext Data Source
@@ -246,15 +251,24 @@ extension TrackersViewController: UICollectionViewDelegate {
                 
         return UIContextMenuConfiguration( actionProvider: { actions in
             return UIMenu(children: [
-                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin the tracker"), handler: { [weak self] _ in
-                    self?.viewModel.pinTapped(at: indexPath)
+                UIAction(
+                    title: self.choosePinActionName(for: indexPath),
+                    handler: { [weak self] _ in
+                        self?.viewModel.pinTapped(at: indexPath)
+                    }),
+                UIAction(
+                    title: NSLocalizedString(
+                        Constants.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"
+                    ), handler: { [weak self] _ in
+                        self?.viewModel.modifyTapped(at: indexPath)
                 }),
-                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"), handler: { [weak self] _ in
-                    self?.viewModel.modifyTapped(at: indexPath)
-                }),
-                UIAction(title: NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"), attributes: .destructive, handler: { [weak self] _ in
-                    self?.viewModel.deleteTapped(at: indexPath)
-                })
+                UIAction(
+                    title: NSLocalizedString(
+                        Constants.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"),
+                    attributes: .destructive,
+                    handler: { [weak self] _ in
+                        self?.viewModel.deleteTapped(at: indexPath)
+                    })
             ])
         })
     }

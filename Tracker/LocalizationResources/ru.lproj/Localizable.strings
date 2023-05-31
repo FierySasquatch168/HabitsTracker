@@ -51,5 +51,7 @@
 "tabBarTitletrackers" = "Трекеры";
 "tabBarTitlestatistics" = "Статистика";
 "contextMenuOperatorPin" = "Закрепить";
+"contextMenuOperatorUnpin" = "Открепить";
 "contextMenuOperatorModify" = "Редактировать";
 "contextMenuOperatorDelete" = "Удалить";
+"pinnedTrackerCategory" = "Закрепленные";

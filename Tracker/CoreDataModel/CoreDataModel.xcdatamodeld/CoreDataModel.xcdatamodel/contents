@@ -8,6 +8,7 @@
         <attribute name="color" optional="YES" attributeType="String"/>
         <attribute name="emojie" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isPinned" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="schedule" optional="YES" attributeType="String"/>
         <attribute name="stringID" optional="YES" attributeType="String"/>
