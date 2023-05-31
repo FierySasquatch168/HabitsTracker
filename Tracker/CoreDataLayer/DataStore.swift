@@ -12,9 +12,9 @@ protocol DataStoreProtocol {
     func fetchCategories() -> [TrackerCategory]
     func fetchRecords() -> Set<TrackerRecord>
     func fetchTrackers() -> [Tracker]
-    func saveTracker(tracker: Tracker, to categoryName: String) throws
-    func updateTracker(tracker: Tracker, at categoryName: String) throws
-    func updateRecords(_ id: String, with date: Date) throws
+    func saveTracker(tracker: Tracker, to categoryName: String)
+    func updateTracker(tracker: Tracker, at categoryName: String)
+    func updateRecords(_ id: String, with date: Date)
     func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
     func deleteTrackers(with id: String, from categoryName: String)
 }
@@ -88,33 +88,21 @@ extension DataStore: DataStoreProtocol {
         return fetchedRecords.filter({ $0.id.uuidString == tracker.stringID && $0.date == date }).isEmpty ? false : true
     }
     
-    func saveTracker(tracker: Tracker, to categoryName: String) throws {
-        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker, with: context)
+    func saveTracker(tracker: Tracker, to categoryName: String) {
+        guard let trackerCoreData = trackerStore?.makeTracker(from: tracker)
         else { return }
-        
-        do {
-            try trackerCategoryStore?.saveTracker(with: trackerCoreData, to: categoryName)
-        } catch {
-            throw CoreDataError.failedToSaveContext
-        }
+        try? trackerCategoryStore?.saveTracker(with: trackerCoreData, to: categoryName)
     }
     
-    func updateTracker(tracker: Tracker, at categoryName: String) throws {
-        do {
-            try trackerCategoryStore?.updateTracker(tracker: tracker, at: categoryName)
-        } catch {
-            throw CoreDataError.failedToUpdateTracker
-        }
+    func updateTracker(tracker: Tracker, at categoryName: String) {
+        guard let trackerCoreData = trackerStore?.updateCoreDataTracker(from: tracker) else { return }
+        try? trackerCategoryStore?.updateTracker(trackerCoreData: trackerCoreData, at: categoryName)
     }
     
-    func updateRecords(_ id: String, with date: Date) throws {
+    func updateRecords(_ id: String, with date: Date) {
         guard let uuid = UUID(uuidString: id) else { return }
-        do {
-            let record = TrackerRecord(id: uuid, date: date)
-            try trackerRecordStore?.updateStoredRecords(record: record)
-        } catch {
-            throw CoreDataError.failedToManageRecords
-        }
+        let record = TrackerRecord(id: uuid, date: date)
+        try? trackerRecordStore?.updateStoredRecords(record: record)
     }
     
     func deleteTrackers(with id: String, from categoryName: String) {

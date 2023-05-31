@@ -9,8 +9,9 @@ import Foundation
 import CoreData
 
 protocol TrackerStoreProtocol {
-    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData
+    func makeTracker(from tracker: Tracker) -> TrackerCoreData
     func fetchTrackers(with converter: TrackerConverter) -> [Tracker]
+    func updateCoreDataTracker(from tracker: Tracker) -> TrackerCoreData?
 }
 
 final class TrackerStore: NSObject {
@@ -43,7 +44,7 @@ final class TrackerStore: NSObject {
 
 // MARK: - Ext TrackerStoreProtocol
 extension TrackerStore: TrackerStoreProtocol {
-    func makeTracker(from tracker: Tracker, with context: NSManagedObjectContext) -> TrackerCoreData {
+    func makeTracker(from tracker: Tracker) -> TrackerCoreData {
         let trackerCoreData = TrackerCoreData(context: context)
         trackerCoreData.name = tracker.name
         trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
@@ -62,6 +63,12 @@ extension TrackerStore: TrackerStoreProtocol {
         
         return viewTrackers
         
+    }
+    
+    func updateCoreDataTracker(from tracker: Tracker) -> TrackerCoreData? {
+        let existingTrackerCoreData = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.stringID == tracker.stringID })
+        existingTrackerCoreData?.updateWithNewValues(from: tracker)
+        return existingTrackerCoreData
     }
 }
 

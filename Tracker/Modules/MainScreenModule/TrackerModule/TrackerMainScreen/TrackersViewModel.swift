@@ -61,18 +61,14 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
     func saveTracker(tracker: Tracker, to categoryName: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            do {
-                try? self.dataStore.saveTracker(tracker: tracker, to: categoryName)
-                self.checkForScheduledTrackers()
-            }
+            self.dataStore.saveTracker(tracker: tracker, to: categoryName)
+            self.checkForScheduledTrackers()
         }
     }
     
     func updateTracker(tracker: Tracker, at categoryName: String) {
-        do {
-            try? self.dataStore.updateTracker(tracker: tracker, at: categoryName)
-            self.checkForScheduledTrackers()
-        }
+        self.dataStore.updateTracker(tracker: tracker, at: categoryName)
+        self.checkForScheduledTrackers()
     }
 }
 
@@ -163,11 +159,6 @@ extension TrackersViewModel: DataStoreDelegate {
 extension TrackersViewModel {
     func plusTapped(trackerID: String?, currentDate: Date?) {
         guard let trackerID = trackerID, let currentDate = currentDate, currentDate <= Date() else { return }
-        
-        do {
-            try dataStore.updateRecords(trackerID, with: currentDate)
-        } catch {
-            print("Saving of record failed")
-        }
+        dataStore.updateRecords(trackerID, with: currentDate)
     }
 }

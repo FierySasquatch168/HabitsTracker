@@ -11,18 +11,20 @@ import CoreData
 protocol TrackerCategoryStoreProtocol {
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws
     func deleteTracker(with id: String, from categoryName: String) throws
-    func updateTracker(tracker: Tracker, at categoryName: String) throws
+    func updateTracker(trackerCoreData: TrackerCoreData, at categoryName: String) throws
     func getCategories(with converter: TrackerConverter) -> [TrackerCategory]
 }
 
 struct CategoryUpdates {
     let insertedIndexes: IndexSet
+    let reloadedIndexes: IndexSet
     let deletedIndexes: IndexSet
 }
 
 final class TrackerCategoryStore: NSObject {
     
     var insertedIndexes: IndexSet?
+    var reloadedIndexes: IndexSet?
     var deletedIndexes: IndexSet?
 
     weak var delegate: TrackerStorageDataStoreDelegate?
@@ -55,15 +57,18 @@ final class TrackerCategoryStore: NSObject {
 extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         insertedIndexes = IndexSet()
+        reloadedIndexes = IndexSet()
         deletedIndexes = IndexSet()
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         guard let indexesToInsert = insertedIndexes,
+              let indexesToReload = reloadedIndexes,
               let indexesToDelete = deletedIndexes
         else { return }
-        delegate?.didUpdateCategory(self, CategoryUpdates(insertedIndexes: indexesToInsert, deletedIndexes: indexesToDelete))
+        delegate?.didUpdateCategory(self, CategoryUpdates(insertedIndexes: indexesToInsert, reloadedIndexes: indexesToReload, deletedIndexes: indexesToDelete))
         insertedIndexes = nil
+        reloadedIndexes = nil
         deletedIndexes = nil
     }
     
@@ -72,10 +77,7 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
                     at indexPath: IndexPath?,
                     for type: NSFetchedResultsChangeType,
                     newIndexPath: IndexPath?) {
-        
-//        if let indexPath = newIndexPath {
-//            insertedIndexes?.insert(indexPath.item)
-//        }
+
         
         switch type {
         case .insert:
@@ -87,7 +89,10 @@ extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
                 deletedIndexes?.insert(indexPath.item)
             }
         case .move:
-            fatalError("NSFetchedResultsController didChange .move type")
+            if let indexPath, let newIndexPath {
+                deletedIndexes?.insert(indexPath.item)
+                insertedIndexes?.insert(newIndexPath.item)
+            }
         case .update:
             if let indexPath = newIndexPath {
                 deletedIndexes?.insert(indexPath.item)
@@ -119,21 +124,16 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         try context.save()
     }
     
-    func updateTracker(tracker: Tracker, at categoryName: String) throws {
-        guard let storedObjects = trackerFetchedResultsController.fetchedObjects else { return }
-        var trackerToModify: TrackerCoreData?
-        for category in storedObjects {
-            guard let storedTrackers = category.trackers?.allObjects as? [TrackerCoreData] else { return }
-            if storedTrackers.contains(where: { $0.stringID == tracker.stringID }) {
-                trackerToModify = storedTrackers.first(where: { $0.stringID == tracker.stringID })
-            }
-        }
+    func updateTracker(trackerCoreData: TrackerCoreData, at categoryName: String) throws {
+        let categoryToRemoveTrackerFrom = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == trackerCoreData.category?.name })
+        categoryToRemoveTrackerFrom?.removeFromTrackers(trackerCoreData)
         
-        trackerToModify?.category?.name = categoryName
-        trackerToModify?.color = UIColorMarshalling.hexString(from: tracker.color)
-        trackerToModify?.emojie = tracker.emoji
-        trackerToModify?.name = tracker.name
-        trackerToModify?.schedule = WeekDays.getString(from: tracker.schedule)
+        if let categoryToInsertTrackerTo = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == categoryName }) {
+            categoryToInsertTrackerTo.addToTrackers(trackerCoreData)
+        } else {
+            let newCategory = try createTrackerCategoryCoreData(with: categoryName)
+            newCategory.addToTrackers(trackerCoreData)
+        }
         
         do {
             try context.save()
