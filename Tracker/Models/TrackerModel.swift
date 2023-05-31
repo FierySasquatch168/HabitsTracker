@@ -19,6 +19,7 @@ struct Tracker: Identifiable {
     let emoji: String
     let schedule: [WeekDays]
     let stringID: String?
+    let isPinned: Bool
 }
 
 struct TrackerRecord: Identifiable, Hashable {
