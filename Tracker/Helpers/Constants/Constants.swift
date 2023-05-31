@@ -70,8 +70,10 @@ struct Constants {
         static let tabBarTitletrackers = "tabBarTitletrackers"
         static let tabBarTitlestatistics = "tabBarTitlestatistics"
         static let contextMenuOperatorPin = "contextMenuOperatorPin"
+        static let contextMenuOperatorUnpin = "contextMenuOperatorUnpin"
         static let contextMenuOperatorModify = "contextMenuOperatorModify"
         static let contextMenuOperatorDelete = "contextMenuOperatorDelete"
         static let pinnedCategoryName = "pinnedTrackerCategory"
+        
     }
 }

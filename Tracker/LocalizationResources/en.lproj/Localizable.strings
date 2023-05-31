@@ -51,6 +51,7 @@
 "tabBarTitletrackers" = "Trackers";
 "tabBarTitlestatistics" = "Statistics";
 "contextMenuOperatorPin" = "Pin";
+"contextMenuOperatorUnpin" = "Unpin";
 "contextMenuOperatorModify" = "Modify";
 "contextMenuOperatorDelete" = "Delete";
 "pinnedTrackerCategory" = "Pinned";
