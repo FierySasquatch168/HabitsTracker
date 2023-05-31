@@ -46,13 +46,7 @@ final class TrackerStore: NSObject {
 extension TrackerStore: TrackerStoreProtocol {
     func makeTracker(from tracker: Tracker) -> TrackerCoreData {
         let trackerCoreData = TrackerCoreData(context: context)
-        trackerCoreData.name = tracker.name
-        trackerCoreData.schedule = WeekDays.getString(from: tracker.schedule)
-        trackerCoreData.color = UIColorMarshalling.hexString(from: tracker.color)
-        trackerCoreData.emojie = tracker.emoji
-        // При сохранении задаем в модели КорДаты текстовый айди
-        trackerCoreData.stringID = tracker.id.uuidString
-        trackerCoreData.isPinned = tracker.isPinned
+        trackerCoreData.updateWithNewValues(from: tracker)
         return trackerCoreData
     }
     

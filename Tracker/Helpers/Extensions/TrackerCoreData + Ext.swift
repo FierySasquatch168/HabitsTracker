@@ -14,5 +14,6 @@ extension TrackerCoreData {
         self.isPinned = tracker.isPinned
         self.name = tracker.name
         self.schedule = WeekDays.getString(from: tracker.schedule)
+        self.stringID = tracker.id.uuidString
     }
 }
