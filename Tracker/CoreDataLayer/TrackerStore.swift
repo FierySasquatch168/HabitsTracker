@@ -51,6 +51,7 @@ extension TrackerStore: TrackerStoreProtocol {
         trackerCoreData.emojie = tracker.emoji
         // При сохранении задаем в модели КорДаты текстовый айди
         trackerCoreData.stringID = tracker.id.uuidString
+        trackerCoreData.isPinned = tracker.isPinned
         return trackerCoreData
     }
     

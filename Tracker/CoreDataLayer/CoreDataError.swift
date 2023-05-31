@@ -18,4 +18,5 @@ enum CoreDataError: Error {
     case failedToManageRecords
     case failedToDeleteTracker
     case failedToUpdateTracker
+    case failedToCreateCategoryCoreData
 }

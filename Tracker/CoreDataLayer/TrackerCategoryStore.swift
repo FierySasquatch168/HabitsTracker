@@ -109,24 +109,14 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     }
     
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws {
-        // загрузить действующую категорию с таким именем
-        if let existingCategory = trackerFetchedResultsController.fetchedObjects?.filter({ $0.name == categoryName }).first,
-           var newCoreDataTrackers = existingCategory.trackers?.allObjects as? [TrackerCoreData] {
-            // если она есть, поменять у нее свойство трэкерс и загрузить обратно
-            newCoreDataTrackers.append(trackerCoreData)
-            existingCategory.trackers = NSSet(array: newCoreDataTrackers)
+        if let existingCategory = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == categoryName }) {
+            existingCategory.addToTrackers(trackerCoreData)
         } else {
-            // если ее нет, создать новую
-            let newCategory = TrackerCategoryCoreData(context: context)
-            newCategory.name = categoryName
-            newCategory.trackers = NSSet(array: [trackerCoreData])
+            let newCategory = try createTrackerCategoryCoreData(with: categoryName)
+            newCategory.addToTrackers(trackerCoreData)
         }
         
-        do {
-            try context.save()
-        } catch {
-            throw CoreDataError.failedToSaveContext
-        }
+        try context.save()
     }
     
     func updateTracker(tracker: Tracker, at categoryName: String) throws {
@@ -168,5 +158,15 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         } catch {
             throw CoreDataError.failedToDeleteTracker
         }
+    }
+}
+
+private extension TrackerCategoryStore {
+    func createTrackerCategoryCoreData(with categoryName: String) throws -> TrackerCategoryCoreData {
+        let category = TrackerCategoryCoreData(context: context)
+        category.name = categoryName
+        category.trackers = NSSet(array: [])
+        
+        return category
     }
 }

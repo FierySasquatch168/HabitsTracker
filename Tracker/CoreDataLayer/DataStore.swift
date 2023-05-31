@@ -84,13 +84,11 @@ extension DataStore: DataStoreProtocol {
         return fetchedTrackers
     }
     
-    func isTrackerCompleted(_ tracker: Tracker,
-                          with date: Date?) -> Bool {
+    func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool {
         return fetchedRecords.filter({ $0.id.uuidString == tracker.stringID && $0.date == date }).isEmpty ? false : true
     }
     
-    func saveTracker(tracker: Tracker,
-                     to categoryName: String) throws {
+    func saveTracker(tracker: Tracker, to categoryName: String) throws {
         guard let trackerCoreData = trackerStore?.makeTracker(from: tracker, with: context)
         else { return }
         
