@@ -18,6 +18,7 @@ protocol DataStoreProtocol {
     func updateRecords(_ id: String, with date: Date)
     func isTrackerCompleted(_ tracker: Tracker, with date: Date?) -> Bool
     func deleteTrackers(with id: String, from categoryName: String)
+    func getTrackerCategory(for tracker: Tracker) -> String
 }
 
 protocol DataStoreDelegate: AnyObject {
@@ -114,6 +115,10 @@ extension DataStore: DataStoreProtocol {
     
     func deleteTrackers(with id: String, from categoryName: String) {
         try? trackerCategoryStore?.deleteTracker(with: id, from: categoryName)
+    }
+    
+    func getTrackerCategory(for tracker: Tracker) -> String {
+        return trackerStore?.getCoreDataTracker(from: tracker)?.category?.name ?? "Error"
     }
     
     

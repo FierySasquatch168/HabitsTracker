@@ -24,6 +24,12 @@ protocol AdditionalTrackerSetupProtocol: AnyObject {
     func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?)
 }
 
+protocol TrackerCreationTestable {
+    var trackerMainScreenDelegate: TrackerMainScreenDelegate? { get }
+    func saveTracker()
+    func createTracker(name: String, color: UIColor, emoji: String, schedule: [WeekDays]) -> Tracker
+}
+
 final class TrackerCreationViewController: UIViewController & TrackerCreationToCoordinatorProtocol {
     var returnOnCancel: (() -> Void)?
     var saveTrackerTapped: (() -> Void)?
@@ -85,6 +91,7 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     }
     
     private var templateStringID: String?
+    private var templateIsPinned: Bool = false
     
        
     private lazy var headerLabel: CustomHeaderLabel = {
@@ -304,6 +311,7 @@ extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
         templateStringID = tracker.stringID
         templateColor = tracker.color
         templateEmojie = tracker.emoji
+        templateIsPinned = tracker.isPinned
         
         colorSelectedItem = dataSourceManager?.getColorIndex(from: tracker.color)
         emojieSelectedItem = dataSourceManager?.getEmojieIndex(from: tracker.emoji)
@@ -359,7 +367,11 @@ private extension TrackerCreationViewController {
 }
 
 // MARK: - Ext Saving data
-private extension TrackerCreationViewController {
+extension TrackerCreationViewController: TrackerCreationTestable {
+    var trackerMainScreenDelegate: TrackerMainScreenDelegate? {
+        return mainScreenDelegate
+    }
+    
     func saveTracker() {
         // check if schedule is empty
         scheduleAllDaysIfEmpty()
@@ -371,7 +383,7 @@ private extension TrackerCreationViewController {
     }
     
     func createTracker(name: String, color: UIColor, emoji: String, schedule: [WeekDays]) -> Tracker {
-        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: templateStringID, isPinned: false)
+        return Tracker(name: name, color: color, emoji: emoji, schedule: schedule, stringID: templateStringID, isPinned: templateIsPinned)
     }
 }
 
