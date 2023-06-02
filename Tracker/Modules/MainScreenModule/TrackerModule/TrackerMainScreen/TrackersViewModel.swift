@@ -30,9 +30,9 @@ final class TrackersViewModel {
     
     var selectedDate: Date?
     
-    private var dataStore: DataStore
+    private var dataStore: DataStoreProtocol
     
-    init(dataStore: DataStore) {
+    init(dataStore: DataStoreProtocol) {
         self.dataStore = dataStore
     }
     
@@ -86,9 +86,10 @@ extension TrackersViewModel {
     }
     
     func modifyTapped(at indexPath: IndexPath) {
-        let trackerToModifyFromCategory = visibleCategories[indexPath.section]
-        let trackerToModify = trackerToModifyFromCategory.trackers[indexPath.row]
-        selectedTrackerForModifycation = (trackerToModify, trackerToModifyFromCategory.name)
+        let trackerToModify = visibleCategories[indexPath.section].trackers[indexPath.row]
+        let category = dataStore.getTrackerCategory(for: trackerToModify)
+        // TODO: Исправить название категории на категорию из кордаты
+        selectedTrackerForModifycation = (trackerToModify, category)
     }
     
     func deleteTapped(at indexPath: IndexPath) {
