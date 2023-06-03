@@ -213,56 +213,12 @@
 			isa = PBXGroup;
 			children = (
 				37AE418E29D1E893005EDD79 /* TrackerCreationViewController.swift */,
+				37FD82FE29CCB59E00EA9128 /* CollectionViewCells */,
 				3784DAE529D56FA600BC0528 /* LayoutManager */,
 				3784DAE629D56FC100BC0528 /* DataSourceManager */,
 				3767A55029D4C3BE00B1B5A9 /* LayoutDataProtocol.swift */,
 			);
 			path = TrackerCreationScreen;
-			sourceTree = "<group>";
-		};
-		3754B34529D6CF5F004E7B98 /* Cells */ = {
-			isa = PBXGroup;
-			children = (
-				3754B34729D6CF82004E7B98 /* TrackersScreen */,
-				3754B34829D6CF95004E7B98 /* TrackerSettingsScreen */,
-				3754B34929D6CFAA004E7B98 /* TrackerAdditionalSettingsScreen */,
-			);
-			path = Cells;
-			sourceTree = "<group>";
-		};
-		3754B34629D6CF63004E7B98 /* ReusableViews */ = {
-			isa = PBXGroup;
-			children = (
-				37518A3029D3358F00F0DA71 /* HeaderView.swift */,
-			);
-			path = ReusableViews;
-			sourceTree = "<group>";
-		};
-		3754B34729D6CF82004E7B98 /* TrackersScreen */ = {
-			isa = PBXGroup;
-			children = (
-				37FD830229CCB6B600EA9128 /* TrackersListCollectionViewCell.swift */,
-			);
-			path = TrackersScreen;
-			sourceTree = "<group>";
-		};
-		3754B34829D6CF95004E7B98 /* TrackerSettingsScreen */ = {
-			isa = PBXGroup;
-			children = (
-				3754A13829D189A100AEFBD5 /* TrackerNameCell.swift */,
-				37AE419629D1EA85005EDD79 /* TrackerSettingsCell.swift */,
-				37AE419029D1E9B0005EDD79 /* TrackerEmojieCell.swift */,
-				37AE419229D1E9BF005EDD79 /* TrackerColorsCell.swift */,
-			);
-			path = TrackerSettingsScreen;
-			sourceTree = "<group>";
-		};
-		3754B34929D6CFAA004E7B98 /* TrackerAdditionalSettingsScreen */ = {
-			isa = PBXGroup;
-			children = (
-				3794D44F29D5DB57006FDE95 /* TrackerAdditionalSetupCell.swift */,
-			);
-			path = TrackerAdditionalSettingsScreen;
 			sourceTree = "<group>";
 		};
 		3763D4F02A2793F100D70C4C /* SnapshotTests */ = {
@@ -351,9 +307,9 @@
 		3794D44A29D5D2AE006FDE95 /* TrackerAdditionalSetupScreen */ = {
 			isa = PBXGroup;
 			children = (
+				37E5C8ED2A2B997800C8C0E7 /* CollectionViewCell */,
+				37E5C8EF2A2B99E700C8C0E7 /* Models */,
 				3794D44B29D5D2D4006FDE95 /* TrackerAdditionalSetupViewController.swift */,
-				3794D45329D5F9AA006FDE95 /* WeekDays.swift */,
-				374F23D729DD7EE700BDF9E8 /* Categories.swift */,
 			);
 			path = TrackerAdditionalSetupScreen;
 			sourceTree = "<group>";
@@ -387,9 +343,9 @@
 		37AE419429D1EA2A005EDD79 /* TrackerMainScreen */ = {
 			isa = PBXGroup;
 			children = (
+				37E5C8EB2A2B992100C8C0E7 /* CollectionViewCell */,
 				37FD82ED29CCAC7300EA9128 /* TrackersViewController.swift */,
 				37888F052A0A4C6E00E63ECE /* TrackersViewModel.swift */,
-				37888F072A0A5E2000E63ECE /* ObservableWrapper.swift */,
 			);
 			path = TrackerMainScreen;
 			sourceTree = "<group>";
@@ -529,6 +485,47 @@
 			path = CoreDataLayer;
 			sourceTree = "<group>";
 		};
+		37E5C8EA2A2B990E00C8C0E7 /* Wrappers */ = {
+			isa = PBXGroup;
+			children = (
+				37888F072A0A5E2000E63ECE /* ObservableWrapper.swift */,
+			);
+			path = Wrappers;
+			sourceTree = "<group>";
+		};
+		37E5C8EB2A2B992100C8C0E7 /* CollectionViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				37FD830229CCB6B600EA9128 /* TrackersListCollectionViewCell.swift */,
+			);
+			path = CollectionViewCell;
+			sourceTree = "<group>";
+		};
+		37E5C8ED2A2B997800C8C0E7 /* CollectionViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				3794D44F29D5DB57006FDE95 /* TrackerAdditionalSetupCell.swift */,
+			);
+			path = CollectionViewCell;
+			sourceTree = "<group>";
+		};
+		37E5C8EE2A2B99BD00C8C0E7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				37518A3029D3358F00F0DA71 /* HeaderView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		37E5C8EF2A2B99E700C8C0E7 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3794D45329D5F9AA006FDE95 /* WeekDays.swift */,
+				374F23D729DD7EE700BDF9E8 /* Categories.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		37FD82DD29CCAC7300EA9128 = {
 			isa = PBXGroup;
 			children = (
@@ -555,7 +552,6 @@
 				37C7E6B329CDDE2F002027E3 /* Modules */,
 				37E4836B29E6BDF500870CF0 /* CoreDataLayer */,
 				37FD82FD29CCB59900EA9128 /* Models */,
-				37FD82FE29CCB59E00EA9128 /* Views */,
 				37FD830429CCB6EC00EA9128 /* Helpers */,
 				37E4836729E6BD6000870CF0 /* CoreDataModel */,
 				37B774EC2A13CFB90023B16C /* LocalizationResources */,
@@ -578,18 +574,22 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		37FD82FE29CCB59E00EA9128 /* Views */ = {
+		37FD82FE29CCB59E00EA9128 /* CollectionViewCells */ = {
 			isa = PBXGroup;
 			children = (
-				3754B34529D6CF5F004E7B98 /* Cells */,
-				3754B34629D6CF63004E7B98 /* ReusableViews */,
+				3754A13829D189A100AEFBD5 /* TrackerNameCell.swift */,
+				37AE419629D1EA85005EDD79 /* TrackerSettingsCell.swift */,
+				37AE419029D1E9B0005EDD79 /* TrackerEmojieCell.swift */,
+				37AE419229D1E9BF005EDD79 /* TrackerColorsCell.swift */,
 			);
-			path = Views;
+			path = CollectionViewCells;
 			sourceTree = "<group>";
 		};
 		37FD830429CCB6EC00EA9128 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				37E5C8EE2A2B99BD00C8C0E7 /* Views */,
+				37E5C8EA2A2B990E00C8C0E7 /* Wrappers */,
 				37A867B42A2A8282007C8831 /* ColorMarshalling */,
 				378440A529D0BA56001AE972 /* Constants */,
 				378440A229D0B274001AE972 /* CustomViews */,
