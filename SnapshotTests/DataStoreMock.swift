@@ -9,6 +9,10 @@ import Foundation
 @testable import Tracker
 
 final class DataStoreMock: DataStoreProtocol {
+    func getInfoAboutTrackersCompleted() -> Int {
+        return 0
+    }
+    
     func fetchCategories() -> [TrackerCategory] {
         return [TrackerCategory(name: "Test", trackers: fetchTrackers())]
     }

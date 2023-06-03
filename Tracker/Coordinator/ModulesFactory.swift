@@ -30,6 +30,8 @@ final class ModulesFactory: ModulesFactoryProtocol {
     let habitLabelText = HabitTrackerModel.title
     let singleEventLabeltext = SingleEventTrackerModel.title
     
+    let context = Context()
+    
     func makeSplashScreenView() -> Presentable {
         return SplashViewController()
     }
@@ -39,15 +41,18 @@ final class ModulesFactory: ModulesFactoryProtocol {
     }
     
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
-        let dataStore = DataStore()
+        var dataStore: DataStoreProtocol = DataStore(context: context.context)
         let viewModel = TrackersViewModel(dataStore: dataStore)
         let trackerVC = TrackersViewController(viewModel: viewModel)
-        dataStore.dataStoreDelegate = viewModel
-        dataStore.trackerConverter = TrackerConverter()
-        dataStore.trackerStore = TrackerStore(delegate: dataStore)
-        dataStore.trackerCategoryStore = TrackerCategoryStore(delegate: dataStore)
-        dataStore.trackerRecordStore = TrackerRecordStore(delegate: dataStore)
+        dataStore.dataStoreTrackersDelegate = viewModel
         return trackerVC
+    }
+    
+    func makeStatisticsScreenView() -> Presentable {
+        let dataStore: DataStoreStatisticsProviderProtocol = DataStore(context: context.context)
+        let statisticsService = StatisticsService(dataStore: dataStore)
+        let viewModel = StatisticsViewModel(statisticsService: statisticsService)
+        return StatisticsViewController(viewModel: viewModel)
     }
     
     func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol {
@@ -78,9 +83,5 @@ final class ModulesFactory: ModulesFactoryProtocol {
     
     func makeTimeTableScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
         return TrackerAdditionalSetupViewController()
-    }
-    
-    func makeStatisticsScreenView() -> Presentable {
-        return StatisticsViewController()
     }
 }

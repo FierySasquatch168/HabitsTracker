@@ -9,6 +9,7 @@ import Foundation
 import CoreData
 
 protocol DataStoreProtocol {
+    var dataStoreTrackersDelegate: DataStoreTrackersDelegate? { get set }
     func fetchCategories() -> [TrackerCategory]
     func fetchRecords() -> Set<TrackerRecord>
     func fetchTrackers() -> [Tracker]
@@ -21,9 +22,17 @@ protocol DataStoreProtocol {
     func getTrackerCategory(for tracker: Tracker) -> String
 }
 
-protocol DataStoreDelegate: AnyObject {
+protocol DataStoreStatisticsProviderProtocol {
+    func loadDataForStatisticsCheck() -> [TrackerRecordCoreData]
+}
+
+protocol DataStoreTrackersDelegate: AnyObject {
     func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates)
     func didUpdateRecords(_ updatedRecords: Set<TrackerRecord>, _ updates: RecordUpdates)
+}
+
+protocol DataStoreStatisticsDelegate: AnyObject {
+    func didUpdateStatistics(value: Int)
 }
 
 protocol TrackerStorageDataStoreDelegate: AnyObject {
@@ -35,8 +44,9 @@ protocol TrackerStorageDataStoreDelegate: AnyObject {
 final class DataStore {
     private let context: NSManagedObjectContext
     
-    weak var dataStoreDelegate: DataStoreDelegate?
-    
+    weak var dataStoreTrackersDelegate: DataStoreTrackersDelegate?
+    weak var dataStoreStatisticsDelegate: DataStoreStatisticsDelegate?
+        
     var trackerConverter: TrackerConverter?
     var trackerCategoryStore: TrackerCategoryStoreProtocol?
     var trackerRecordStore: TrackerRecordStoreProtocol?
@@ -59,18 +69,12 @@ final class DataStore {
         return trackerStore?.fetchTrackers(with: trackerConverter) ?? []
     }
     
-    private let persistentContainer = {
-        let container = NSPersistentContainer(name: "CoreDataModel")
-        container.loadPersistentStores { storeDescription, error in
-            if let error = error as? NSError {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        }
-        return container
-    }()
-    
-    init() {
-        self.context = persistentContainer.newBackgroundContext()
+    init(context: NSManagedObjectContext) {
+        self.context = context
+        self.trackerConverter = TrackerConverter()
+        self.trackerCategoryStore = TrackerCategoryStore(delegate: self)
+        self.trackerRecordStore = TrackerRecordStore(delegate: self)
+        self.trackerStore = TrackerStore(delegate: self)
     }
 }
 
@@ -115,13 +119,21 @@ extension DataStore: DataStoreProtocol {
     
     func deleteTrackers(with id: String, from categoryName: String) {
         try? trackerCategoryStore?.deleteTracker(with: id, from: categoryName)
+        try? trackerRecordStore?.deleteTracker(with: id)
     }
     
     func getTrackerCategory(for tracker: Tracker) -> String {
         return trackerStore?.getCoreDataTracker(from: tracker)?.category?.name ?? "Error"
     }
     
-    
+}
+
+// MARK: - Ext DataStoreStatisticsProviderProtocol
+extension DataStore: DataStoreStatisticsProviderProtocol {
+    func loadDataForStatisticsCheck() -> [TrackerRecordCoreData] {
+        let recordsCoreDataArray = trackerRecordStore?.getTrackerRecordsCoreData() ?? []
+        return recordsCoreDataArray
+    }
 }
 
 // MARK: - Ext TrackerStorageDataStoreDelegate
@@ -135,12 +147,12 @@ extension DataStore: TrackerStorageDataStoreDelegate {
               let trackersCoreData = trackerStore?.fetchCoreDataTrackers()
         else { return }
         let trackerCategories = store.getViewCategories(with: trackerConverter, from: trackersCoreData)
-        dataStoreDelegate?.didUpdateCategory(trackerCategories, updates)
+        dataStoreTrackersDelegate?.didUpdateCategory(trackerCategories, updates)
     }
     
     func didUpdateRecord(_ store: TrackerRecordStoreProtocol, _ updates: RecordUpdates) {
         guard let trackerConverter else { return }
         let trackerRecords = store.getTrackerRecords(with: trackerConverter)
-        dataStoreDelegate?.didUpdateRecords(trackerRecords, updates)
+        dataStoreTrackersDelegate?.didUpdateRecords(trackerRecords, updates)
     }
 }

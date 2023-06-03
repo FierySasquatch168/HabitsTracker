@@ -55,3 +55,8 @@
 "contextMenuOperatorModify" = "Modify";
 "contextMenuOperatorDelete" = "Delete";
 "pinnedTrackerCategory" = "Pinned";
+"statisticsEmptyStateText" = "There's nothing to track yet";
+"statisticsTrackersChecked" = "Trackers checked";
+"statisticsIdealDays" = "Ideal days";
+"statisticsBestPeriod" = "Best period";
+"statisticsAverage" = "Average";

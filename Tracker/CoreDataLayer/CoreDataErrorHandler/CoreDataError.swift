@@ -20,4 +20,6 @@ enum CoreDataError: Error {
     case failedToUpdateTracker
     case failedToCreateCategoryCoreData
     case failedToPinTracker
+    case failedToLoadStatistics
+    case failedToDeleteRecord
 }
