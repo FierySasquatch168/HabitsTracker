@@ -13,6 +13,7 @@ struct Constants {
         static let splashImage = "SplashImage"
         static let plus = "plus"
         static let emptyState = "EmptyState"
+        static let statisticsEmptyState = "StatisticsEmptyState"
         static let trackersTabIcon = "record.circle.fill"
         static let statisticsTabIcon = "hare.fill"
         static let checkmark = "checkmark"
@@ -74,6 +75,10 @@ struct Constants {
         static let contextMenuOperatorModify = "contextMenuOperatorModify"
         static let contextMenuOperatorDelete = "contextMenuOperatorDelete"
         static let pinnedCategoryName = "pinnedTrackerCategory"
-        
+        static let statisticsEmptyStateText = "statisticsEmptyStateText"
+        static let statisticsTrackersChecked = "statisticsTrackersChecked"
+        static let statisticsIdealDays = "statisticsIdealDays"
+        static let statisticsBestPeriod = "statisticsBestPeriod"
+        static let statisticsAverage = "statisticsAverage"
     }
 }

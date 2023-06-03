@@ -153,7 +153,7 @@ extension TrackersViewModel {
 }
 
 // MARK: - Ext DataStoreDelegate
-extension TrackersViewModel: DataStoreDelegate {
+extension TrackersViewModel: DataStoreTrackersDelegate {
     func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates) {
         visibleCategories = updatedCategories
     }

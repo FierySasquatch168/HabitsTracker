@@ -10,6 +10,8 @@ import CoreData
 
 protocol TrackerRecordStoreProtocol {
     func getTrackerRecords(with converter: TrackerConverter) -> Set<TrackerRecord>
+    func getTrackerRecordsCoreData() -> [TrackerRecordCoreData]
+    func deleteTracker(with id: String) throws
     func updateStoredRecords(record: TrackerRecord) throws
 }
 
@@ -73,6 +75,21 @@ extension TrackerRecordStore: TrackerRecordStoreProtocol {
     func getTrackerRecords(with converter: TrackerConverter) -> Set<TrackerRecord> {
         guard let existingRecords = trackerFetchedResultsController.fetchedObjects else { return [] }
         return Set(existingRecords.compactMap({ converter.convertStoredDataToTrackerRecord(from: $0) }))
+    }
+    
+    func getTrackerRecordsCoreData() -> [TrackerRecordCoreData] {
+        return trackerFetchedResultsController.fetchedObjects ?? []
+    }
+    
+    func deleteTracker(with id: String) throws {
+        guard let trackerRecordCoreData = trackerFetchedResultsController.fetchedObjects?.filter({ $0.id?.uuidString == id }).first else { return }
+        context.delete(trackerRecordCoreData)
+        
+        do {
+            try context.save()
+        } catch {
+            throw CoreDataError.failedToDeleteRecord
+        }
     }
 }
 

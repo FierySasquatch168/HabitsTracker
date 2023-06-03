@@ -55,3 +55,8 @@
 "contextMenuOperatorModify" = "Редактировать";
 "contextMenuOperatorDelete" = "Удалить";
 "pinnedTrackerCategory" = "Закрепленные";
+"statisticsEmptyStateText" = "Отслеживать пока нечего";
+"statisticsTrackersChecked" = "Трекеров завершено";
+"statisticsIdealDays" = "Идеальные дни";
+"statisticsBestPeriod" = "Лучший период";
+"statisticsAverage" = "Среднее значение";
