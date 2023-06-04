@@ -40,8 +40,8 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     var layoutManager: LayoutManagerProtocol?
     var dataSourceManager: DataSourceManagerProtocol?
     
-    private var cancelButtonTitle = NSLocalizedString(Constants.LocalizableStringsKeys.cancel, comment: "Abort the operation")
-    private var createButtonTitle = NSLocalizedString(Constants.LocalizableStringsKeys.create, comment: "Create a new tracker")
+    private var cancelButtonTitle = NSLocalizedString(K.LocalizableStringsKeys.cancel, comment: "Abort the operation")
+    private var createButtonTitle = NSLocalizedString(K.LocalizableStringsKeys.create, comment: "Create a new tracker")
     
     // properties for cell single selection
     private var emojieSelectedItem: Int? {

@@ -11,7 +11,7 @@ final class CustomDismissButton: UIButton {
 
     init() {
         super.init(frame: .zero)
-        let image = UIImage(systemName: Constants.Icons.xmark)
+        let image = UIImage(systemName: K.Icons.xmark)
         setImage(image, for: .normal)
         tintColor = .YPBlack
         clipsToBounds = true

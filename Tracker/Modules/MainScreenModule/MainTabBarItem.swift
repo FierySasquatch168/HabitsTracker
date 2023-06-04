@@ -14,18 +14,18 @@ enum MainTabBarItem: String {
     var tabImage: UIImage? {
         switch self {
         case .trackers:
-            return UIImage(systemName: Constants.Icons.trackersTabIcon)
+            return UIImage(systemName: K.Icons.trackersTabIcon)
         case .statistics:
-            return UIImage(systemName: Constants.Icons.statisticsTabIcon)
+            return UIImage(systemName: K.Icons.statisticsTabIcon)
         }
     }
     
     var title: String {
         switch self {
         case .trackers:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.tabBarTitletrackers, comment: "Tracker title")
+            return NSLocalizedString(K.LocalizableStringsKeys.tabBarTitletrackers, comment: "Tracker title")
         case .statistics:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.tabBarTitlestatistics, comment: "Statistics title")
+            return NSLocalizedString(K.LocalizableStringsKeys.tabBarTitlestatistics, comment: "Statistics title")
         }
     }
 }

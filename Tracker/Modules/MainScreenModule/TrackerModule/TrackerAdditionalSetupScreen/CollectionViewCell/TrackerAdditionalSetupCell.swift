@@ -37,7 +37,7 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
     private lazy var checkImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.tintColor = .YPBlue
-        imageView.image = UIImage(systemName: Constants.Icons.checkmark)
+        imageView.image = UIImage(systemName: K.Icons.checkmark)
         imageView.clipsToBounds = true
         imageView.backgroundColor = .clear
         imageView.isHidden = true

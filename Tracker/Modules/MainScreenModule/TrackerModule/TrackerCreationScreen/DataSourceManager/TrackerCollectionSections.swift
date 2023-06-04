@@ -16,13 +16,13 @@ enum TrackerCollectionSections: String, CaseIterable {
     var name: String {
         switch self {
         case .name:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.name, comment: "Name")
+            return NSLocalizedString(K.LocalizableStringsKeys.name, comment: "Name")
         case .settings:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.settings, comment: "Settings")
+            return NSLocalizedString(K.LocalizableStringsKeys.settings, comment: "Settings")
         case .emojies:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.emojis, comment: "Emojis")
+            return NSLocalizedString(K.LocalizableStringsKeys.emojis, comment: "Emojis")
         case .colors:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.colors, comment: "Colors")
+            return NSLocalizedString(K.LocalizableStringsKeys.colors, comment: "Colors")
         }
     }
     

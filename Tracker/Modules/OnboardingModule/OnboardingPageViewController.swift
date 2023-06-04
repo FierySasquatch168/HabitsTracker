@@ -26,7 +26,7 @@ final class OnboardingPageViewController: UIPageViewController, OnboardingProtoc
     }()
     
     private lazy var finishButton: CustomActionButton = {
-        let button = CustomActionButton(title: "Вот это технологии!", appearance: .confirm)
+        let button = CustomActionButton(title: NSLocalizedString(K.LocalizableStringsKeys.suchTechnology, comment: "Introduction"), appearance: .confirm)
         button.addTarget(self, action: #selector(finishdButtonTapped), for: .touchUpInside)
         return button
     }()

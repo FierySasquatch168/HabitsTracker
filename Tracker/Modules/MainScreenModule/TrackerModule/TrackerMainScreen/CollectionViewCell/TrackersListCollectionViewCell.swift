@@ -56,7 +56,7 @@ final class TrackersListCollectionViewCell: UICollectionViewCell {
     lazy var plusButton: UIButton = {
         let button = UIButton()
         // image
-        button.setImage(UIImage(systemName: Constants.Icons.plus), for: .normal)
+        button.setImage(UIImage(systemName: K.Icons.plus), for: .normal)
         button.tintColor = .YPWhite
         button.clipsToBounds = true
         // layer

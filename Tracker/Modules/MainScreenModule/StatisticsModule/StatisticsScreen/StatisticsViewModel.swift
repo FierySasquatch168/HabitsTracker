@@ -29,7 +29,7 @@ private extension StatisticsViewModel {
             let statistics = try statisticsService.getStatistics().compactMap({
                 switch $0 {
                 case .finished(let trackersCount):
-                    let title = NSLocalizedString(Constants.LocalizableStringsKeys.statisticsTrackersChecked, comment: "Trackers finished")
+                    let title = NSLocalizedString(K.LocalizableStringsKeys.statisticsTrackersChecked, comment: "Trackers finished")
                     return trackersCount == 0 ? nil : StatisticsModel(number: trackersCount, title: title)
                 }
             })

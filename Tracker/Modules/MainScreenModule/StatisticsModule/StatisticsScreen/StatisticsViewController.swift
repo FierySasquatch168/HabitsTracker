@@ -24,7 +24,7 @@ final class StatisticsViewController: UIViewController {
     
     private let emptyStateImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: Constants.Icons.statisticsEmptyState)
+        imageView.image = UIImage(named: K.Icons.statisticsEmptyState)
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -32,7 +32,7 @@ final class StatisticsViewController: UIViewController {
     
     private let emptyStateTextLabel: UILabel = {
         let label = UILabel()
-        let text = NSLocalizedString(Constants.LocalizableStringsKeys.statisticsEmptyStateText, comment: "String showed when there is no statistics to show")
+        let text = NSLocalizedString(K.LocalizableStringsKeys.statisticsEmptyStateText, comment: "String showed when there is no statistics to show")
         let attrs = [
             NSAttributedString.Key.font : UIFont(name: CustomFonts.YPMedium.rawValue, size: 12),
             NSAttributedString.Key.foregroundColor : UIColor.YPBlack

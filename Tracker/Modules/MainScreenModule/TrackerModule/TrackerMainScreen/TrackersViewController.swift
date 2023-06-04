@@ -20,6 +20,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
     var addTrackerButtonPressed: (() -> Void)?
     var modifyTrackerButtonPressed: ((Tracker, String) -> Void)?
+    var analyticsService: AnalyticsService?
     
     let viewModel: TrackersViewModel
     
@@ -55,7 +56,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private lazy var searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
-        textField.placeholder = NSLocalizedString(Constants.LocalizableStringsKeys.search, comment: "Search")
+        textField.placeholder = NSLocalizedString(K.LocalizableStringsKeys.search, comment: "Search")
         textField.delegate = self
         return textField
     }()
@@ -76,7 +77,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private let emptyStateImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: Constants.Icons.emptyState)
+        imageView.image = UIImage(named: K.Icons.emptyState)
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -84,7 +85,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private let emptyStateTextLabel: UILabel = {
         let label = UILabel()
-        let text = NSLocalizedString(Constants.LocalizableStringsKeys.emptyStateTitle, comment: "String showed when there is no trackers to show")
+        let text = NSLocalizedString(K.LocalizableStringsKeys.emptyStateTitle, comment: "String showed when there is no trackers to show")
         let attrs = [
             NSAttributedString.Key.font : UIFont(name: CustomFonts.YPMedium.rawValue, size: 12),
             NSAttributedString.Key.foregroundColor : UIColor.YPBlack
@@ -127,6 +128,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         transferTheCurrentDateToViewModel()
         checkTheCollectionViewState()
         
+        analyticsService?.report(event: .open, params: .noParameters)
+        
     }
     
     //MARK: Methods
@@ -165,7 +168,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private func choosePinActionName(for indexPath: IndexPath) -> String {
         let isPinned = viewModel.visibleCategories[indexPath.section].trackers[indexPath.row].isPinned
-        return isPinned ? NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorUnpin, comment: "Unpin") : NSLocalizedString(Constants.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin")
+        return isPinned ? NSLocalizedString(K.LocalizableStringsKeys.contextMenuOperatorUnpin, comment: "Unpin") : NSLocalizedString(K.LocalizableStringsKeys.contextMenuOperatorPin, comment: "Pin")
     }
 }
 
@@ -194,7 +197,7 @@ extension TrackersViewController: UICollectionViewDataSource {
         cell.trackersListCellDelegate = self
         // properties for the cell
         let properties = viewModel.configureCellProperties(with: currentDate, at: indexPath)
-        let trackerImage = properties.completed ? UIImage(systemName: Constants.Icons.checkmark) ?? UIImage() : UIImage(systemName: Constants.Icons.plus) ?? UIImage()
+        let trackerImage = properties.completed ? UIImage(systemName: K.Icons.checkmark) ?? UIImage() : UIImage(systemName: K.Icons.plus) ?? UIImage()
         // cell configuration
         cell.configCell(with: properties.tracker, image: trackerImage, count: properties.count)
         return cell
@@ -220,6 +223,7 @@ extension TrackersViewController: UICollectionViewDataSource {
 @objc private extension TrackersViewController {
     func addTracker() {
         addTrackerButtonPressed?()
+        analyticsService?.report(event: .click, params: .addTrack)
     }
     
     func reloadTheDate() {
@@ -258,16 +262,20 @@ extension TrackersViewController: UICollectionViewDelegate {
                     }),
                 UIAction(
                     title: NSLocalizedString(
-                        Constants.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"
+                        K.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"
                     ), handler: { [weak self] _ in
                         self?.viewModel.modifyTapped(at: indexPath)
+                        // Analytics
+                        self?.analyticsService?.report(event: .click, params: .edit)
                 }),
                 UIAction(
                     title: NSLocalizedString(
-                        Constants.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"),
+                        K.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"),
                     attributes: .destructive,
                     handler: { [weak self] _ in
                         self?.viewModel.deleteTapped(at: indexPath)
+                        // Analytics
+                        self?.analyticsService?.report(event: .click, params: .delete)
                     })
             ])
         })
@@ -283,6 +291,7 @@ extension TrackersViewController: UICollectionViewDelegate {
 extension TrackersViewController: TrackersListCollectionViewCellDelegate {
     func plusTapped(trackerID: String?) {
         viewModel.plusTapped(trackerID: trackerID, currentDate: currentDate)
+        analyticsService?.report(event: .click, params: .checkTrack)
     }
 }
 
@@ -304,7 +313,7 @@ private extension TrackersViewController {
     }
     
     func setupLeftButtonItem() {
-        let leftItem = UIBarButtonItem(image: UIImage(systemName: Constants.Icons.plus), style: .plain, target: self, action: #selector(addTracker))
+        let leftItem = UIBarButtonItem(image: UIImage(systemName: K.Icons.plus), style: .plain, target: self, action: #selector(addTracker))
         leftItem.tintColor = .YPBlack
         navigationItem.leftBarButtonItem = leftItem
     }

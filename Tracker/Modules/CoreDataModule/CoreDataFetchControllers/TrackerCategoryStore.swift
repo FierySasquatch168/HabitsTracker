@@ -122,7 +122,7 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         // из закрепленных сделать отдельную вью категорию
         let pinnedViewTrackers = (try? pinnedTrackers.compactMap({ try converter.getTracker(from: $0) })) ?? []
         let pinnedViewCategory = TrackerCategory(
-            name: NSLocalizedString(Constants.LocalizableStringsKeys.pinnedCategoryName, comment: "Pinned  category name"),
+            name: NSLocalizedString(K.LocalizableStringsKeys.pinnedCategoryName, comment: "Pinned  category name"),
             trackers: pinnedViewTrackers)
         
         var finalViewCategories: [TrackerCategory] = []

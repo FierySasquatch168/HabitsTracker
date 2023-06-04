@@ -33,7 +33,7 @@ final class StatisticsTableViewCell: UITableViewCell {
         stackView.addArrangedSubview(cellCountLabel)
         stackView.addArrangedSubview(cellTitleLabel)
         stackView.backgroundColor = .systemBackground
-        stackView.layer.cornerRadius = 14
+        stackView.layer.cornerRadius = 16
         stackView.spacing = 7
         stackView.layoutMargins = UIEdgeInsets(top: 11, left: 11, bottom: 11, right: 11)
         stackView.isLayoutMarginsRelativeArrangement = true

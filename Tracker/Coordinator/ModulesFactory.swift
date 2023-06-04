@@ -31,6 +31,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
     let singleEventLabeltext = SingleEventTrackerModel.title
     
     let context = Context()
+    let analyticsService = AnalyticsService()
     
     func makeSplashScreenView() -> Presentable {
         return SplashViewController()
@@ -44,6 +45,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
         var dataStore: DataStoreProtocol = DataStore(context: context.context)
         let viewModel = TrackersViewModel(dataStore: dataStore)
         let trackerVC = TrackersViewController(viewModel: viewModel)
+        trackerVC.analyticsService = analyticsService
         dataStore.dataStoreTrackersDelegate = viewModel
         return trackerVC
     }

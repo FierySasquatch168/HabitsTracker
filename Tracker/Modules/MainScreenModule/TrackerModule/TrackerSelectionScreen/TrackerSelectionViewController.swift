@@ -19,9 +19,9 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
     var headToSingleEvent: (() -> Void)?
     var returnOnCancel: (() -> Void)?
     
-    private var headerLabeltext = NSLocalizedString(Constants.LocalizableStringsKeys.trackerCreation, comment: "Creation of a new tracker")
-    private var habitsButtonHeader = NSLocalizedString(Constants.LocalizableStringsKeys.habbit, comment: "Habbit to plan")
-    private var singleEventButtonHeader = NSLocalizedString(Constants.LocalizableStringsKeys.singleEvent, comment: "Single event with no firm schedule")
+    private var headerLabeltext = NSLocalizedString(K.LocalizableStringsKeys.trackerCreation, comment: "Creation of a new tracker")
+    private var habitsButtonHeader = NSLocalizedString(K.LocalizableStringsKeys.habbit, comment: "Habbit to plan")
+    private var singleEventButtonHeader = NSLocalizedString(K.LocalizableStringsKeys.singleEvent, comment: "Single event with no firm schedule")
     
     private lazy var headerLabel: CustomHeaderLabel = {
         let label = CustomHeaderLabel(headerText: headerLabeltext)

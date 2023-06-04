@@ -28,10 +28,10 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     private var headerTitle: String?
     private var readyButtonTitle: String?
     
-    private var timetableScreenTitle = NSLocalizedString(Constants.LocalizableStringsKeys.schedule, comment: "Schedule")
-    private var categoryScreenTitle = NSLocalizedString(Constants.LocalizableStringsKeys.category, comment: "Category")
-    private var timetableDoneButtonTitle = NSLocalizedString(Constants.LocalizableStringsKeys.ready, comment: "When the tracker is ready to be saved")
-    private var categoryDoneButtonTitle = NSLocalizedString(Constants.LocalizableStringsKeys.addCategory, comment: "To add a category")
+    private var timetableScreenTitle = NSLocalizedString(K.LocalizableStringsKeys.schedule, comment: "Schedule")
+    private var categoryScreenTitle = NSLocalizedString(K.LocalizableStringsKeys.category, comment: "Category")
+    private var timetableDoneButtonTitle = NSLocalizedString(K.LocalizableStringsKeys.ready, comment: "When the tracker is ready to be saved")
+    private var categoryDoneButtonTitle = NSLocalizedString(K.LocalizableStringsKeys.addCategory, comment: "To add a category")
     
     // data for transfering between the screens
     var selectedWeekDays: [WeekDays]?

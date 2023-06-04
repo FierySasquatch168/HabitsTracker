@@ -13,38 +13,38 @@ enum WeekDays: Int, CustomStringConvertible, CaseIterable {
     var shortName: String {
         switch self {
         case .monday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.shortNameMon, comment: "ShortDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.shortNameMon, comment: "ShortDayName")
         case .tuesday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.shortNameTue, comment: "ShortDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.shortNameTue, comment: "ShortDayName")
         case .wednesday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.shortNameWed, comment: "ShortDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.shortNameWed, comment: "ShortDayName")
         case .thursday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.shortNameThu, comment: "ShortDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.shortNameThu, comment: "ShortDayName")
         case .friday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.shortNameFri, comment: "ShortDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.shortNameFri, comment: "ShortDayName")
         case .saturday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.shortNameSat, comment: "ShortDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.shortNameSat, comment: "ShortDayName")
         case .sunday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.shortNameSun, comment: "ShortDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.shortNameSun, comment: "ShortDayName")
         }
     }
     
     var description: String {
         switch self {
         case .monday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.longNameMon, comment: "FullDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.longNameMon, comment: "FullDayName")
         case .tuesday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.longNameTue, comment: "FullDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.longNameTue, comment: "FullDayName")
         case .wednesday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.longNameWed, comment: "FullDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.longNameWed, comment: "FullDayName")
         case .thursday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.longNameThu, comment: "FullDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.longNameThu, comment: "FullDayName")
         case .friday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.longNameFri, comment: "FullDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.longNameFri, comment: "FullDayName")
         case .saturday:
-             return NSLocalizedString(Constants.LocalizableStringsKeys.longNameSat, comment: "FullDayName")
+             return NSLocalizedString(K.LocalizableStringsKeys.longNameSat, comment: "FullDayName")
         case .sunday:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.longNameSun, comment: "FullDayName")
+            return NSLocalizedString(K.LocalizableStringsKeys.longNameSun, comment: "FullDayName")
         }
     }
     
@@ -72,6 +72,6 @@ enum WeekDays: Int, CustomStringConvertible, CaseIterable {
     }
     
     static func populateShortWeekDaysSubtitle(from weekDay: [WeekDays]) -> String {
-        return weekDay.count == WeekDays.allCases.count ? NSLocalizedString(Constants.LocalizableStringsKeys.allDays, comment: "") : weekDay.map({ $0.shortName }).joined(separator: ", ")
+        return weekDay.count == WeekDays.allCases.count ? NSLocalizedString(K.LocalizableStringsKeys.allDays, comment: "") : weekDay.map({ $0.shortName }).joined(separator: ", ")
     }
 }

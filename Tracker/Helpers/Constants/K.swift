@@ -1,5 +1,5 @@
 //
-//  Constants.swift
+//  K.swift
 //  Tracker
 //
 //  Created by Aleksandr Eliseev on 26.03.2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Constants {
+struct K {
     struct Icons {
         static let xmark = "xmark"
         static let splashImage = "SplashImage"
@@ -80,5 +80,6 @@ struct Constants {
         static let statisticsIdealDays = "statisticsIdealDays"
         static let statisticsBestPeriod = "statisticsBestPeriod"
         static let statisticsAverage = "statisticsAverage"
+        static let suchTechnology = "suchTechnology"
     }
 }

@@ -20,7 +20,7 @@ final class TrackerNameCell: UICollectionViewCell {
         textField.backgroundColor = .YPBackground
         textField.layer.cornerRadius = 10
         // text
-        textField.placeholder = NSLocalizedString(Constants.LocalizableStringsKeys.enterTrackerName, comment: "Enter tracker name")
+        textField.placeholder = NSLocalizedString(K.LocalizableStringsKeys.enterTrackerName, comment: "Enter tracker name")
         textField.textInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
         textField.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
         // alignment

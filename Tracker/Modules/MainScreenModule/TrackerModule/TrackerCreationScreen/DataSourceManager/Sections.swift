@@ -20,9 +20,9 @@ enum Sections: String, CaseIterable {
         case .trackerSettings:
             return ""
         case .emojies:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.emojis, comment: "Emojies")
+            return NSLocalizedString(K.LocalizableStringsKeys.emojis, comment: "Emojies")
         case .colors:
-            return NSLocalizedString(Constants.LocalizableStringsKeys.colors, comment: "Colors")
+            return NSLocalizedString(K.LocalizableStringsKeys.colors, comment: "Colors")
         }
     }
 }
