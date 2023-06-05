@@ -153,6 +153,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     private func bind() {
         viewModel.$emptyStackViewIsHidden.bind(action: { [weak self] isHidden in
             self?.emptyStateStackView.isHidden = isHidden
+            self?.filterButton.isHidden = !isHidden
         })
         
         viewModel.$visibleCategories.bind(action: { [weak self] trackerCategories in
