@@ -40,6 +40,9 @@ extension CustomActionButton {
             layer.borderWidth = 1
             layer.borderColor = UIColor.YPRed?.cgColor
             isEnabled = true
+        case .hidden:
+            isHidden = true
+            isEnabled = false
         }
         
     }
@@ -47,6 +50,6 @@ extension CustomActionButton {
 
 extension CustomActionButton {
     enum Appearance {
-        case disabled, confirm, cancel
+        case disabled, confirm, cancel, hidden
     }
 }

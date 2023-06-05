@@ -33,4 +33,15 @@ enum AdditionalSetupEnum {
             return ""
         }
     }
+    
+    var readyButtonAppearance: CustomActionButton.Appearance {
+        switch self {
+        case .schedule(_):
+            return .confirm
+        case .category(_):
+            return .confirm
+        case .filters(_):
+            return .hidden
+        }
+    }
 }

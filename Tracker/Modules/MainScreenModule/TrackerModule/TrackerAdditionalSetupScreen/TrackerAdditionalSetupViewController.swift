@@ -9,7 +9,6 @@ import UIKit
 
 protocol TrackerAdditionalSetupToCoordinatorProtocol: AnyObject {
     var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol? { get set }
-//    var isTimetableSelected: Bool? { get set }
     var returnOnCancel: (() -> Void)? { get set } // убрать в отдельный протокол
     var returnOnTimetableReady: (([WeekDays]?) -> Void)? { get set }
     var returnOnCategoryReady: ((String?) -> Void)? { get set }
@@ -28,7 +27,6 @@ protocol TrackerFilterSetupProtocol: AnyObject {
 
 final class TrackerAdditionalSetupViewController: UIViewController, TrackerAdditionalSetupToCoordinatorProtocol, TrackerFilterSetupProtocol {
     weak var additionalTrackerSetupDelegate: AdditionalTrackerSetupProtocol?
-//    var isTimetableSelected: Bool?
     var returnOnCancel: (() -> Void)?
     var returnOnTimetableReady: (([WeekDays]?) -> Void)?
     var returnOnCategoryReady: ((String?) -> Void)?
@@ -86,7 +84,10 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     }()
     
     private lazy var readyButton: CustomActionButton = {
-        let button = CustomActionButton(title: readyButtonTitle ?? "ButtonTitleTransferError", appearance: .confirm)
+        let button = CustomActionButton(
+            title: additionalSetupCase?.readyButtonTitle ?? "ButtonTitleTransferError",
+            appearance: additionalSetupCase?.readyButtonAppearance ?? .hidden
+        )
         button.addTarget(self, action: #selector(readyDidTap), for: .touchUpInside)
         return button
     }()
@@ -96,21 +97,15 @@ final class TrackerAdditionalSetupViewController: UIViewController, TrackerAddit
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .YPWhite
-        chooseReadyButtonTitle()
-        setupConstraints()
         presentationController?.delegate = self
+        
+        setupConstraints()
         checkIfAlreadySelectedItem()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         additionalSetupCase = nil
-    }
-    
-    
-    private func chooseReadyButtonTitle() {
-        guard let additionalSetupCase else { return }
-        readyButtonTitle = additionalSetupCase.readyButtonTitle
     }
     
     private func addTimetableIfNeeded(day: WeekDays) {
