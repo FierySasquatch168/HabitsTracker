@@ -9,7 +9,8 @@ import UIKit
 
 protocol TrackerToCoordinatorProtocol: AnyObject {
     var addTrackerButtonPressed: (() -> Void)? { get set }
-    var modifyTrackerButtonPressed: ((Tracker, String) -> Void)? { get set}
+    var modifyTrackerButtonPressed: ((Tracker, String) -> Void)? { get set }
+    var filterButtonPressed: (() -> Void)? { get set }
     var viewModel: TrackersViewModel { get }
 }
 
@@ -20,6 +21,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         
     var addTrackerButtonPressed: (() -> Void)?
     var modifyTrackerButtonPressed: ((Tracker, String) -> Void)?
+    var filterButtonPressed: (() -> Void)?
+    
     var analyticsService: AnalyticsService?
     
     let viewModel: TrackersViewModel
@@ -104,6 +107,19 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         stackView.addArrangedSubview(emptyStateTextLabel)
         
         return stackView
+    }()
+    
+    private lazy var filterButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .YPBlue
+        button.layer.cornerRadius = 16
+        button.clipsToBounds = true
+        button.layer.masksToBounds = true
+        button.setTitleColor(.YPWhite, for: .normal)
+        button.setTitle(NSLocalizedString(K.LocalizableStringsKeys.filterButtonTitle, comment: "Filter"), for: .normal)
+        button.titleLabel?.font = UIFont(name: CustomFonts.YPRegular.rawValue, size: 17)
+        button.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
+        return button
     }()
     
     // MARK: Lifecycle
@@ -231,6 +247,10 @@ extension TrackersViewController: UICollectionViewDataSource {
         checkTheCollectionViewState()
         closeTheDatePicker()
     }
+    
+    func filterButtonTapped() {
+        filterButtonPressed?()
+    }
 }
 
 // MARK: - Ext DelegateFlowLayout
@@ -337,6 +357,7 @@ private extension TrackersViewController {
         setupMainStackView()
         setupEmptyStateStackView()
         setupDatePicker()
+        setupFilterButton()
     }
     
     func setupMainStackView() {
@@ -364,6 +385,18 @@ private extension TrackersViewController {
     func setupDatePicker() {
         NSLayoutConstraint.activate([
             datePicker.widthAnchor.constraint(equalToConstant: 100)
+        ])
+    }
+    
+    func setupFilterButton() {
+        view.addSubview(filterButton)
+        filterButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            filterButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 130),
+            filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -130),
+            filterButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -17),
+            filterButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
 }

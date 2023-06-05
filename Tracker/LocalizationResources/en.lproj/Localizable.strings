@@ -17,6 +17,7 @@
 "newSingleEvent" = "New single event";
 "category" = "Category";
 "schedule" = "Schedule";
+"filters" = "Filters";
 "cancel" = "Cancel";
 "create" = "Create";
 "addCategory" = "Add category";
@@ -61,3 +62,7 @@
 "statisticsBestPeriod" = "Best period";
 "statisticsAverage" = "Average";
 "suchTechnology" = "Such a technology!";
+"filterButtonTitle" = "Filters";
+"trackersForTodayFilter" = "Today's trackers";
+"finishedTrackersFilter" = "Finished trackers";
+"unfinishedTrackersFilter" = "Unfinished trackers";

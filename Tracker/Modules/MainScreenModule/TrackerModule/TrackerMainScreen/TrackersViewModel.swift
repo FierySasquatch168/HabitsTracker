@@ -12,6 +12,11 @@ protocol TrackerMainScreenDelegate: AnyObject {
     func updateTracker(tracker: Tracker, at categoryName: String)
 }
 
+protocol FiltersDelegate: AnyObject {
+    var selectedFilter: Filters? { get }
+    func transferFilter(from selectedFilter: Filters?)
+}
+
 final class TrackersViewModel {
             
     @Observable
@@ -29,6 +34,7 @@ final class TrackersViewModel {
     private (set) var selectedTrackerForModifycation: (Tracker?, String?)
     
     var selectedDate: Date?
+    private var filterSelected: Filters?
     
     private var dataStore: DataStoreProtocol
     
@@ -168,5 +174,17 @@ extension TrackersViewModel {
     func plusTapped(trackerID: String?, currentDate: Date?) {
         guard let trackerID = trackerID, let currentDate = currentDate, currentDate <= Date() else { return }
         dataStore.updateRecords(trackerID, with: currentDate)
+    }
+}
+
+// MARK: - Ext Filters Delegate
+extension TrackersViewModel: FiltersDelegate {
+    var selectedFilter: Filters? {
+        return filterSelected
+    }
+    
+    func transferFilter(from selectedFilter: Filters?) {
+        guard let selectedFilter else { return }
+        filterSelected = selectedFilter
     }
 }

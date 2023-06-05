@@ -17,6 +17,7 @@
 "newSingleEvent" = "Новое нерегулярное событие";
 "category" = "Категория";
 "schedule" = "Расписание";
+"filters" = "Фильтры";
 "cancel" = "Отменить";
 "create" = "Создать";
 "addCategory" = "Добавить категорию";
@@ -61,3 +62,7 @@
 "statisticsBestPeriod" = "Лучший период";
 "statisticsAverage" = "Среднее значение";
 "suchTechnology" = "Вот это технологии!";
+"filterButtonTitle" = "Фильтры";
+"trackersForTodayFilter" = "Трекеры на сегодня";
+"finishedTrackersFilter" = "Завершенные трекеры";
+"unfinishedTrackersFilter" = "Незавершенные трекеры";

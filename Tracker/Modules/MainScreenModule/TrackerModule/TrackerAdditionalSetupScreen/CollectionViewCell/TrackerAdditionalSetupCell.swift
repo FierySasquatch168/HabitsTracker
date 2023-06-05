@@ -87,20 +87,25 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configTimeTableCell(title: String, isFirst: Bool, isLast: Bool, timetableSelected: Bool, isSelected: Bool) {
+    func setupCellLayout(title: String, isFirst: Bool, isLast: Bool) {
         cellTextLabel.text = title
-        
         isFirst ? roundTopCorners() : installSeparator()
         isLast ? roundBottomCorners() : ()
-        
-        if timetableSelected {
-            setupTimeTableConstraints()
-            switcher.setOn(isSelected, animated: false)
-//            toggleSwitch(switcher)
-        } else {
-            setupCategoryConstraints()
-            checkImageView.isHidden = !isSelected
-        }
+    }
+    
+    func configFiltersCell(isSelected: Bool) {
+        setupCategoryConstraints()
+        checkImageView.isHidden = !isSelected
+    }
+    
+    func configScheduleCell(isSelected: Bool) {
+        setupTimeTableConstraints()
+        switcher.setOn(isSelected, animated: false)
+    }
+    
+    func configCategoryCell(isSelected: Bool) {
+        setupCategoryConstraints()
+        checkImageView.isHidden = !isSelected
     }
     
     func roundTopCorners() {

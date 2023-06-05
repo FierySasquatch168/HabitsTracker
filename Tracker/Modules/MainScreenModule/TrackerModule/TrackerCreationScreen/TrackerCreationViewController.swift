@@ -16,11 +16,10 @@ protocol TrackerCreationToCoordinatorProtocol {
 
 protocol AdditionalTrackerSetupProtocol: AnyObject {
     var selectedCategory: String? { get }
-    var selectedCategoryIndexPath: IndexPath? { get }
     var selectedWeekDays: [WeekDays]? { get }
     var editingTapped: Bool? { get set }
-    func transferTimeTable(from selectedWeekdays: [WeekDays])
-    func transferCategory(from selectedCategory: String, at indexPath: IndexPath?)
+    func transferSchedule(from selectedWeekdays: [WeekDays]?)
+    func transferCategory(from selectedCategory: String?)
     func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?)
 }
 
@@ -49,13 +48,14 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
             updateSelectedEmoji()
         }
     }
+    
     private var colorSelectedItem: Int? {
         didSet {
             updateSelectedColor()
         }
     }
+    
     private var selectedItem: IndexPath?
-    private var templateCategoryIndexPath: IndexPath?
     private var isEditingTracker: Bool?
     
     // tracker properties for model
@@ -65,11 +65,13 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
             checkForCorrectTrackerInfo()
         }
     }
+    
     private var templateColor: UIColor = .clear {
         didSet {
             checkForCorrectTrackerInfo()
         }
     }
+    
     private var templateEmojie: String = "" {
         didSet {
             checkForCorrectTrackerInfo()
@@ -198,13 +200,6 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
     private func updateSelectedTrackerName() {
         dataSourceManager?.selectedTrackerName = templateName
     }
-    
-    private func findIndexOfSelectedCategory(with categoryName: String) -> Int {
-        return Categories
-            .allCases
-            .compactMap({ $0.description })
-            .firstIndex(of: categoryName) ?? 4
-    }
 }
 
 // MARK: - Ext CollectionViewDelegate
@@ -289,18 +284,15 @@ extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
     var selectedCategory: String? {
         return templateCategory
     }
-    
-    var selectedCategoryIndexPath: IndexPath? {
-        return templateCategoryIndexPath
-    }
         
-    func transferTimeTable(from selectedWeekdays: [WeekDays]) {
+    func transferSchedule(from selectedWeekdays: [WeekDays]?) {
+        guard let selectedWeekdays else { return }
         templateSchedule = selectedWeekdays
     }
     
-    func transferCategory(from selectedCategory: String, at indexPath: IndexPath?) {
+    func transferCategory(from selectedCategory: String?) {
+        guard let selectedCategory else { return }
         templateCategory = selectedCategory
-        templateCategoryIndexPath = indexPath
     }
     
     func populateTheTemplatesWithSelectedTrackerToModify(with tracker: Tracker?, for categoryName: String?) {
@@ -316,8 +308,6 @@ extension TrackerCreationViewController: AdditionalTrackerSetupProtocol {
         colorSelectedItem = dataSourceManager?.getColorIndex(from: tracker.color)
         emojieSelectedItem = dataSourceManager?.getEmojieIndex(from: tracker.emoji)
         
-        let selectedCategoryIndex = findIndexOfSelectedCategory(with: categoryName)
-        templateCategoryIndexPath = IndexPath(item: selectedCategoryIndex, section: 0)
     }
 }
 

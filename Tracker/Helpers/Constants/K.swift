@@ -36,6 +36,7 @@ struct K {
         static let newHabbit = "newHabbit"
         static let newSingleEvent = "newSingleEvent"
         static let category = "category"
+        static let filters = "filters"
         static let schedule = "schedule"
         static let cancel = "cancel"
         static let create = "create"
@@ -81,5 +82,10 @@ struct K {
         static let statisticsBestPeriod = "statisticsBestPeriod"
         static let statisticsAverage = "statisticsAverage"
         static let suchTechnology = "suchTechnology"
+        static let filterButtonTitle = "filterButtonTitle"
+        static let trackersForToday = "trackersForTodayFilter"
+        static let finished = "finishedTrackersFilter"
+        static let unfinished = "unfinishedTrackersFilter"
+        
     }
 }

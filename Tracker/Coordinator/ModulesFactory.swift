@@ -16,9 +16,10 @@ protocol ModulesFactoryProtocol {
     func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol
     func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
     func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
-    func makeTrackerCategorieScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
-    func makeTimeTableScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
+    func makeTrackerCategorieScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
+    func makeTimeTableScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
     func makeStatisticsScreenView() -> Presentable
+    func makeFiltersScreenView(filtersDelegate: FiltersDelegate?) -> Presentable & TrackerFilterSetupProtocol
 }
 
 final class ModulesFactory: ModulesFactoryProtocol {
@@ -79,11 +80,25 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return trackerCreationVC
     }
     
-    func makeTrackerCategorieScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
-        return TrackerAdditionalSetupViewController()
+    func makeTrackerCategorieScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
+        let categoryScreenVC = TrackerAdditionalSetupViewController()
+        categoryScreenVC.additionalSetupCase = .category(timetableDelegate?.selectedCategory)
+        categoryScreenVC.additionalTrackerSetupDelegate = timetableDelegate
+        return categoryScreenVC
     }
     
-    func makeTimeTableScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
-        return TrackerAdditionalSetupViewController()
+    func makeTimeTableScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
+        let scheduleScreenVC = TrackerAdditionalSetupViewController()
+        scheduleScreenVC.additionalSetupCase = .schedule(timetableDelegate?.selectedWeekDays)
+        scheduleScreenVC.additionalTrackerSetupDelegate = timetableDelegate
+//        scheduleScreenVC.selectedWeekDays = timetableDelegate?.selectedWeekDays
+        return scheduleScreenVC
+    }
+    
+    func makeFiltersScreenView(filtersDelegate: FiltersDelegate?) -> Presentable & TrackerFilterSetupProtocol {
+        let filterVC = TrackerAdditionalSetupViewController()
+        filterVC.additionalSetupCase = .filters(filtersDelegate?.selectedFilter)
+        filterVC.filterSetupDelegate = filtersDelegate
+        return filterVC
     }
 }
