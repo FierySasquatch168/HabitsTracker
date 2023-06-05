@@ -170,7 +170,7 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     }
     
     private func checkTheCollectionViewState() {
-        viewModel.checkForScheduledTrackers()
+        viewModel.filterVisibleCategoriesBySelectedFilter()
         viewModel.checkForEmptyState()
     }
     
@@ -318,7 +318,7 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
 // MARK: - Ext TextFieldDelegate
 extension TrackersViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        string.isEmpty ? viewModel.checkForScheduledTrackers() : viewModel.filterTrackers(with: string)
+        string.isEmpty ? viewModel.filterVisibleCategoriesBySelectedFilter() : viewModel.filterTrackersBy(string)
         return true
     }
 }

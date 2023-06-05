@@ -39,7 +39,7 @@ enum AdditionalSetupEnum {
         case .schedule(_):
             return .confirm
         case .category(_):
-            return .confirm
+            return .hidden
         case .filters(_):
             return .hidden
         }

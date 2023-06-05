@@ -8,7 +8,7 @@
 import Foundation
 
 enum Filters: CaseIterable {
-    case trackersForToday, finished, unfinished
+    case all, trackersForToday, finished, unfinished
     
     var description: String {
         switch self {
@@ -18,6 +18,8 @@ enum Filters: CaseIterable {
             return NSLocalizedString(K.LocalizableStringsKeys.finished, comment: "finished trackers")
         case .unfinished:
             return NSLocalizedString(K.LocalizableStringsKeys.unfinished, comment: "unfinished trackers")
+        case .all:
+            return NSLocalizedString(K.LocalizableStringsKeys.allTrackers, comment: "allTrackers")
         }
     }
 }

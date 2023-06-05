@@ -86,6 +86,7 @@ struct K {
         static let trackersForToday = "trackersForTodayFilter"
         static let finished = "finishedTrackersFilter"
         static let unfinished = "unfinishedTrackersFilter"
+        static let allTrackers = "allTrackersFilter"
         
     }
 }

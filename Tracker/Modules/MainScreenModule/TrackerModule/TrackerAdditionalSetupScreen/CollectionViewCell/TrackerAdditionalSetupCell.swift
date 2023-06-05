@@ -58,7 +58,7 @@ final class TrackerAdditionalSetupCell: UICollectionViewCell {
     private lazy var categoryStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.distribution = .fill
+        stackView.distribution = .equalSpacing
         stackView.alignment = .center
         stackView.addArrangedSubview(cellTextLabel)
         stackView.addArrangedSubview(checkImageView)
