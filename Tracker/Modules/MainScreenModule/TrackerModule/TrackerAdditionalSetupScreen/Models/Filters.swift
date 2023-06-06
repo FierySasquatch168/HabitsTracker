@@ -22,4 +22,13 @@ enum Filters: CaseIterable {
             return NSLocalizedString(K.LocalizableStringsKeys.allTrackers, comment: "allTrackers")
         }
     }
+    
+    var date: Date? {
+        switch self {
+        case .all, .finished, .unfinished:
+            return nil
+        case .trackersForToday:
+            return Date().customlyFormatted()
+        }
+    }
 }

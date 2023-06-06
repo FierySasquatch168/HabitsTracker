@@ -19,27 +19,13 @@ protocol FiltersDelegate: AnyObject {
 
 final class TrackersViewModel {
             
-    @Observable
-    private (set) var completedTrackers: Set<TrackerRecord> = []
-    @Observable
-    private (set) var visibleCategories: [TrackerCategory] = [] {
-        didSet {
-            checkForEmptyState()
-        }
-    }
-    @Observable
-    private (set) var emptyStackViewIsHidden: Bool = false
-    
-    @Observable
-    private (set) var selectedTrackerForModifycation: (Tracker?, String?)
+    @Observable private (set) var completedTrackers: Set<TrackerRecord> = []
+    @Observable private (set) var visibleCategories: [TrackerCategory] = []
+    @Observable private (set) var emptyStackViewIsHidden: Bool = false
+    @Observable private (set) var selectedTrackerForModifycation: (Tracker?, String?)
+    @Observable private (set) var filterSelected: Filters = .all
     
     var selectedDate: Date?
-    
-    private var filterSelected: Filters = .all {
-        didSet {
-            filterVisibleCategoriesBySelectedFilter()
-        }
-    }
     
     private var dataStore: DataStoreProtocol
     
@@ -71,7 +57,6 @@ final class TrackersViewModel {
         case .all:
             checkForScheduledTrackers(for: selectedDate)
         case .trackersForToday:
-            // TODO: Менять дату на дэйтпикере
             selectedDate = getCurrentDate(from: Date())
             checkForScheduledTrackers(for: selectedDate)
         case .finished:
@@ -81,8 +66,6 @@ final class TrackersViewModel {
         case .none:
             break
         }
-
-        checkForEmptyState()
     }
 }
 
@@ -152,7 +135,6 @@ extension TrackersViewModel {
     
     private func getScheduledTrackers(for weekDay: WeekDays) -> [TrackerCategory] {
         var scheduledCategories: [TrackerCategory] = []
-        
         dataStore.fetchCategories().forEach { category in
             let filteredTrackers = category.trackers.filter({ $0.schedule.contains(weekDay) })
             if !filteredTrackers.isEmpty { scheduledCategories.append(TrackerCategory(name: category.name, trackers: filteredTrackers)) }
