@@ -52,8 +52,8 @@ final class TrackersViewModel {
         case .all:
             checkForScheduledTrackers(for: selectedDate)
         case .trackersForToday:
-            selectedDate = getCurrentDate(from: Date())
-            checkForScheduledTrackers(for: selectedDate)
+            let today = getCurrentDate(from: Date())
+            checkForScheduledTrackers(for: today)
         case .finished:
             filterTrackersDependingOnCheck(checked: true, for: selectedDate)
         case .unfinished:
@@ -70,7 +70,7 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.dataStore.saveTracker(tracker: tracker, to: categoryName)
-            filterVisibleCategoriesBySelectedFilter()
+            self.filterVisibleCategoriesBySelectedFilter()
         }
     }
     
@@ -89,7 +89,7 @@ extension TrackersViewModel {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.dataStore.pinTracker(tracker: trackerToPin, at: trackerToPinFromCategory.name)
-            filterVisibleCategoriesBySelectedFilter()
+            self.filterVisibleCategoriesBySelectedFilter()
         }
     }
     
@@ -105,7 +105,7 @@ extension TrackersViewModel {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
             self.dataStore.deleteTrackers(with: trackerToDelete.stringID ?? "", from: trackerDeletingFromCategory.name)
-            filterVisibleCategoriesBySelectedFilter()
+            self.filterVisibleCategoriesBySelectedFilter()
         }
     }
 }
@@ -113,12 +113,12 @@ extension TrackersViewModel {
 // MARK: - Ext Collection view checkers
 extension TrackersViewModel {
     func checkForScheduledTrackers(for date: Date?) {
-        let weekDay = getStringDayOfTheWeek(for: selectedDate)
+        let weekDay = getStringDayOfTheWeek(for: date)
         visibleCategories = getScheduledTrackers(for: weekDay)
     }
     
     func filterTrackersDependingOnCheck(checked: Bool, for date: Date?) {
-        let weekDay = getStringDayOfTheWeek(for: selectedDate)
+        let weekDay = getStringDayOfTheWeek(for: date)
         let filteredCheckedTrackerIds = getRecordsIdsForSelectedDate()
         visibleCategories = getTrackersFilteredBy(checked: checked, for: filteredCheckedTrackerIds, on: weekDay)
         
