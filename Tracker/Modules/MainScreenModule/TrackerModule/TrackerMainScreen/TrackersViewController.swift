@@ -252,6 +252,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     
     func filterButtonTapped() {
         filterButtonPressed?()
+        analyticsService?.report(event: .click, params: .filter)
     }
 }
 

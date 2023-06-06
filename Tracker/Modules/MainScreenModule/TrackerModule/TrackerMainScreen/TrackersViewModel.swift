@@ -39,16 +39,12 @@ final class TrackersViewModel {
     func filterTrackersBy(_ string: String) {
         var temporaryCategories: [TrackerCategory] = []
         
-        for category in visibleCategories {
+        visibleCategories.forEach { category in
             let filteredTrackers = category.trackers.filter({ $0.name.lowercased().contains(string.lowercased()) })
-            if !filteredTrackers.isEmpty {
-                let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
-                temporaryCategories.append(filteredCategory)
-                visibleCategories = temporaryCategories
-            } else {
-                visibleCategories = temporaryCategories
-            }
+            if !filteredTrackers.isEmpty { temporaryCategories.append(TrackerCategory(name: category.name, trackers: filteredTrackers)) }
         }
+        
+        visibleCategories = temporaryCategories
     }
     
     func filterVisibleCategoriesBySelectedFilter() {
