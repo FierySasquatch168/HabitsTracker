@@ -151,11 +151,8 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     //MARK: Methods
     
     private func bind() {
-        viewModel.$emptyStackViewIsHidden.bind(action: { [weak self] isHidden in
-            self?.emptyStateStackView.isHidden = isHidden
-        })
-        
         viewModel.$visibleCategories.bind(action: { [weak self] trackerCategories in
+            self?.emptyStateStackView.isHidden = !trackerCategories.isEmpty
             self?.collectionView.reloadData()
         })
         
@@ -177,7 +174,6 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
     
     private func checkTheCollectionViewState() {
         viewModel.filterVisibleCategoriesBySelectedFilter()
-        viewModel.checkForEmptyState()
     }
     
     private func transferTheCurrentDateToViewModel() {

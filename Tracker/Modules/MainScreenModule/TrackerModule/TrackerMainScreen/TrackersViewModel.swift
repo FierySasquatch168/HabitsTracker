@@ -21,7 +21,6 @@ final class TrackersViewModel {
             
     @Observable private (set) var completedTrackers: Set<TrackerRecord> = []
     @Observable private (set) var visibleCategories: [TrackerCategory] = []
-    @Observable private (set) var emptyStackViewIsHidden: Bool = false
     @Observable private (set) var selectedTrackerForModifycation: (Tracker?, String?)
     @Observable private (set) var filterSelected: Filters = .all
     
@@ -117,10 +116,6 @@ extension TrackersViewModel {
 
 // MARK: - Ext Collection view checkers
 extension TrackersViewModel {
-    func checkForEmptyState() {
-        emptyStackViewIsHidden = visibleCategories.isEmpty ? false : true
-    }
-    
     func checkForScheduledTrackers(for date: Date?) {
         let weekDay = getStringDayOfTheWeek(for: selectedDate)
         visibleCategories = getScheduledTrackers(for: weekDay)
