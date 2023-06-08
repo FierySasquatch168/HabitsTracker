@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol Routable {
+protocol Routable: AnyObject {
     func setupRootViewController(viewController: Presentable)
     func presentViewController(_ viewController: Presentable, animated: Bool, presentationStyle: UIModalPresentationStyle)
     func dismissViewController(_ viewController: Presentable?, animated: Bool, completion: (() -> Void)?)

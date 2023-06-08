@@ -39,7 +39,10 @@ final class ModulesFactory: ModulesFactoryProtocol {
     }
     
     func makeOnboardingScreenView() -> OnboardingProtocol & Presentable {
-        return OnboardingPageViewController()
+        return OnboardingPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal
+        )
     }
     
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
@@ -91,7 +94,6 @@ final class ModulesFactory: ModulesFactoryProtocol {
         let scheduleScreenVC = TrackerAdditionalSetupViewController()
         scheduleScreenVC.additionalSetupCase = .schedule(timetableDelegate?.selectedWeekDays)
         scheduleScreenVC.additionalTrackerSetupDelegate = timetableDelegate
-//        scheduleScreenVC.selectedWeekDays = timetableDelegate?.selectedWeekDays
         return scheduleScreenVC
     }
     

@@ -166,6 +166,8 @@ final class TrackerCreationViewController: UIViewController & TrackerCreationToC
         setDataSourceDelegates()
         // swipe down delegate
         presentationController?.delegate = self
+        // dismissKeyboard when tapped around
+        hideKeyboardWhenTappedAround()
         
     }
     

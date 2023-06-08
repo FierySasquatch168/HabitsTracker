@@ -8,6 +8,10 @@
 import Foundation
 
 struct K {
+    struct APIKey {
+        static let apiKeyString = "0c756c19-a93c-45a0-95c7-5d158a879bd1"
+    }
+    
     struct Icons {
         static let xmark = "xmark"
         static let splashImage = "SplashImage"

@@ -9,6 +9,8 @@ import Foundation
 @testable import Tracker
 
 final class DataStoreMock: DataStoreProtocol {
+    var dataStoreTrackersDelegate: DataStoreTrackersDelegate?
+    
     func getInfoAboutTrackersCompleted() -> Int {
         return 0
     }

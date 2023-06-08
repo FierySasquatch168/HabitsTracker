@@ -7,19 +7,8 @@
 
 import Foundation
 
-enum ReportEvents {
-    case open
-    case close
-    case click
-    
-    var name: String {
-        switch self {
-        case .open:
-            return "open"
-        case .close:
-            return "close"
-        case .click:
-            return "click"
-        }
-    }
+enum ReportEvents: String {
+    case open = "open"
+    case close = "close"
+    case click = "click"
 }

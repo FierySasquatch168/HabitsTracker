@@ -17,7 +17,6 @@ final class SnapshotTests: XCTestCase {
         let vc = TrackersViewController(viewModel: viewModel)
         let trackerCreationVC = TrackerCreationVCSpy()
         trackerCreationVC.trackerMainScreenDelegate = viewModel
-        
         trackerCreationVC.saveTracker()
         
         assertSnapshots(matching: vc, as: [.image(traits: .init(userInterfaceStyle: .light))])
@@ -29,7 +28,6 @@ final class SnapshotTests: XCTestCase {
         let vc = TrackersViewController(viewModel: viewModel)
         let trackerCreationVC = TrackerCreationVCSpy()
         trackerCreationVC.trackerMainScreenDelegate = viewModel
-        
         trackerCreationVC.saveTracker()
         
         assertSnapshots(matching: vc, as: [.image(traits: .init(userInterfaceStyle: .dark))])

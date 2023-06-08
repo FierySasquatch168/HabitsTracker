@@ -14,7 +14,7 @@ protocol StatisticsServiceProtocol {
 final class StatisticsService {
     weak var dataStoreStatisticsDelegate: DataStoreStatisticsDelegate?
     
-    let dataStore: DataStoreStatisticsProviderProtocol
+    private let dataStore: DataStoreStatisticsProviderProtocol
     
     init(dataStore: DataStoreStatisticsProviderProtocol) {
         self.dataStore = dataStore

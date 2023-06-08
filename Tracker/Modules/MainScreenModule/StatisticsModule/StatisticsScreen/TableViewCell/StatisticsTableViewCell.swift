@@ -20,10 +20,7 @@ final class StatisticsTableViewCell: UITableViewCell {
         return label
     }()
     
-    private var gradientImageView: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
+    private var gradientImageView = UIImageView()
     
     private lazy var mainStackView: UIStackView = {
         let stackView = UIStackView()

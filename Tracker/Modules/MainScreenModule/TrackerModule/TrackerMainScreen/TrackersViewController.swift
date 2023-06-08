@@ -144,8 +144,17 @@ final class TrackersViewController: UIViewController & TrackerToCoordinatorProto
         transferTheCurrentDateToViewModel()
         checkTheCollectionViewState()
         
+        hideKeyboardWhenTappedAround()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         analyticsService?.report(event: .open, params: .noParameters)
-        
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        analyticsService?.report(event: .close, params: .noParameters)
     }
     
     //MARK: Methods
@@ -276,29 +285,30 @@ extension TrackersViewController: UICollectionViewDelegate {
                 let indexPath = indexPaths.first
         else { return nil }
                 
-        return UIContextMenuConfiguration( actionProvider: { actions in
+        return UIContextMenuConfiguration( actionProvider: { [weak self] actions in
+            guard let self else { return UIMenu() }
             return UIMenu(children: [
                 UIAction(
                     title: self.choosePinActionName(for: indexPath),
-                    handler: { [weak self] _ in
-                        self?.viewModel.pinTapped(at: indexPath)
+                    handler: { _ in
+                        self.viewModel.pinTapped(at: indexPath)
                     }),
                 UIAction(
                     title: NSLocalizedString(
                         K.LocalizableStringsKeys.contextMenuOperatorModify, comment: "Modify the tracker"
-                    ), handler: { [weak self] _ in
-                        self?.viewModel.modifyTapped(at: indexPath)
+                    ), handler: { _ in
+                        self.viewModel.modifyTapped(at: indexPath)
                         // Analytics
-                        self?.analyticsService?.report(event: .click, params: .edit)
+                        self.analyticsService?.report(event: .click, params: .edit)
                 }),
                 UIAction(
                     title: NSLocalizedString(
                         K.LocalizableStringsKeys.contextMenuOperatorDelete, comment: "Delete the tracker"),
                     attributes: .destructive,
-                    handler: { [weak self] _ in
-                        self?.viewModel.deleteTapped(at: indexPath)
+                    handler: { _ in
+                        self.viewModel.deleteTapped(at: indexPath)
                         // Analytics
-                        self?.analyticsService?.report(event: .click, params: .delete)
+                        self.analyticsService?.report(event: .click, params: .delete)
                     })
             ])
         })
@@ -322,6 +332,11 @@ extension TrackersViewController: TrackersListCollectionViewCellDelegate {
 extension TrackersViewController: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         string.isEmpty ? viewModel.filterVisibleCategoriesBySelectedFilter() : viewModel.filterTrackersBy(string)
+        return true
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        viewModel.filterVisibleCategoriesBySelectedFilter()
         return true
     }
 }

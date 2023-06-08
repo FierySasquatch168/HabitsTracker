@@ -9,7 +9,7 @@ import YandexMobileMetrica
 
 final class AnalyticsService {
     static func activate() {
-        guard let configuration = YMMYandexMetricaConfiguration(apiKey: "0c756c19-a93c-45a0-95c7-5d158a879bd1") else { return }
+        guard let configuration = YMMYandexMetricaConfiguration(apiKey: K.APIKey.apiKeyString) else { return }
         
         YMMYandexMetrica.activate(with: configuration)
     }
@@ -17,12 +17,12 @@ final class AnalyticsService {
     func report(event: ReportEvents, params: ReportParameters) {
         switch (event, params) {
         case (.open, _):
-            YMMYandexMetrica.reportEvent(event.name)
+            YMMYandexMetrica.reportEvent(event.rawValue)
         case (.close, _):
-            YMMYandexMetrica.reportEvent(event.name)
+            YMMYandexMetrica.reportEvent(event.rawValue)
         case (.click, _):
-            YMMYandexMetrica.reportEvent(event.name, parameters: params.parameters) { error in
-                print("REPORT ERROR: %@", error.localizedDescription)
+            YMMYandexMetrica.reportEvent(event.rawValue, parameters: params.parameters) { error in
+                fatalError("REPORT ERROR: %@ \(error.localizedDescription)")
             }
         }
     }
