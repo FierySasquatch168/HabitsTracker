@@ -143,7 +143,7 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         if let existingCategory = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == categoryName }) {
             existingCategory.addToTrackers(trackerCoreData)
         } else {
-            let newCategory = try createTrackerCategoryCoreData(with: categoryName)
+            let newCategory = createTrackerCategoryCoreData(with: categoryName)
             newCategory.addToTrackers(trackerCoreData)
         }
         
@@ -151,18 +151,12 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     }
     
     func updateTracker(trackerCoreData: TrackerCoreData, at categoryName: String) throws {
-        let categoryToRemoveTrackerFrom = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == trackerCoreData.category?.name })
-        categoryToRemoveTrackerFrom?.removeFromTrackers(trackerCoreData)
-        
-        if let categoryToInsertTrackerTo = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == categoryName }) {
-            categoryToInsertTrackerTo.addToTrackers(trackerCoreData)
-        } else {
-            let newCategory = try createTrackerCategoryCoreData(with: categoryName)
-            newCategory.addToTrackers(trackerCoreData)
-        }
+        removeTracker(trackerCoreData: trackerCoreData)
+        insertTracker(trackerCoreData: trackerCoreData, at: categoryName)
         
         do {
             try context.save()
+//            print(trackerFetchedResultsController.fetchedObjects)
         } catch {
             throw CoreDataError.failedToUpdateTracker
         }
@@ -170,17 +164,16 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
     
     func deleteTracker(with id: String, from categoryName: String) throws {
         guard let trackerCategoryCoreData = trackerFetchedResultsController.fetchedObjects?.filter({ $0.name == categoryName }).first,
-              var coreDataTrackers = trackerCategoryCoreData.trackers?.allObjects as? [TrackerCoreData],
+              let coreDataTrackers = trackerCategoryCoreData.trackers?.allObjects as? [TrackerCoreData],
               let trackerToDelete = coreDataTrackers.filter({ $0.stringID == id }).first
         else { return }
         
-        
-        coreDataTrackers.removeAll(where: { $0.stringID == id })
+        if trackerCategoryCoreData.trackers?.count == 1 { deleteCategory(with: categoryName) }
         context.delete(trackerToDelete)
-        coreDataTrackers.isEmpty ? context.delete(trackerCategoryCoreData) : ()
         
         do {
             try context.save()
+//            print(trackerFetchedResultsController.fetchedObjects)
         } catch {
             throw CoreDataError.failedToDeleteTracker
         }
@@ -198,11 +191,31 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
 }
 
 private extension TrackerCategoryStore {
-    func createTrackerCategoryCoreData(with categoryName: String) throws -> TrackerCategoryCoreData {
+    func createTrackerCategoryCoreData(with categoryName: String) -> TrackerCategoryCoreData {
         let category = TrackerCategoryCoreData(context: context)
         category.name = categoryName
         category.trackers = NSSet(array: [])
         
         return category
+    }
+    
+    func deleteCategory(with categoryName: String?) {
+        guard let categoryToDelete = trackerFetchedResultsController.fetchedObjects?.filter({ $0.name == categoryName }).first else { return }
+        context.delete(categoryToDelete)
+    }
+    
+    func removeTracker(trackerCoreData: TrackerCoreData) {
+        let categoryToRemoveTrackerFrom = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == trackerCoreData.category?.name })
+        categoryToRemoveTrackerFrom?.removeFromTrackers(trackerCoreData)
+        if categoryToRemoveTrackerFrom?.trackers?.count == 0 { deleteCategory(with: categoryToRemoveTrackerFrom?.name) }
+    }
+    
+    func insertTracker(trackerCoreData: TrackerCoreData, at categoryName: String) {
+        if let categoryToInsertTrackerTo = trackerFetchedResultsController.fetchedObjects?.first(where: { $0.name == categoryName }) {
+            categoryToInsertTrackerTo.addToTrackers(trackerCoreData)
+        } else {
+            let newCategory = createTrackerCategoryCoreData(with: categoryName)
+            newCategory.addToTrackers(trackerCoreData)
+        }
     }
 }
