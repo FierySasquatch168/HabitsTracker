@@ -201,20 +201,17 @@ private extension TrackerCategoryStore {
     }
     
     func createPinnedViewCategory(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory] {
-        var pinnedViewCategoryArray: [TrackerCategory] = []
         let pinnedTrackers = trackersCoreData.filter({ $0.isPinned })
         // из закрепленных сделать отдельную вью категорию
         if !pinnedTrackers.isEmpty {
             let pinnedViewTrackers = (try? pinnedTrackers.compactMap({ try converter.getTracker(from: $0) })) ?? []
-            pinnedViewCategoryArray.append(
-                TrackerCategory(
+            return [TrackerCategory(
                 name: NSLocalizedString(K.LocalizableStringsKeys.pinnedCategoryName, comment: "Pinned  category name"),
                 trackers: pinnedViewTrackers
-                )
-            )
+                )]
         }
         
-        return pinnedViewCategoryArray
+        return []
     }
     
     func createUnpinnedViewCategory(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory] {
