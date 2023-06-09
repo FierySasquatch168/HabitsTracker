@@ -114,29 +114,12 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         return viewCategories
     }
     
-    func getViewCategories(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory] {        
+    func getViewCategories(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory] {
         // разделить trackersCoreData на закрепленные и незакрепленные
-        let pinnedTrackers = trackersCoreData.filter({ $0.isPinned })
-        let unpinnedTrackers = trackersCoreData.filter({ !$0.isPinned })
+        let pinnedViewTrackers = createPinnedViewCategory(with: converter, from: trackersCoreData)
+        let unpinnedTrackers = createUnpinnedViewCategory(with: converter, from: trackersCoreData)
         
-        // из закрепленных сделать отдельную вью категорию
-        let pinnedViewTrackers = (try? pinnedTrackers.compactMap({ try converter.getTracker(from: $0) })) ?? []
-        let pinnedViewCategory = TrackerCategory(
-            name: NSLocalizedString(K.LocalizableStringsKeys.pinnedCategoryName, comment: "Pinned  category name"),
-            trackers: pinnedViewTrackers)
-        
-        var finalViewCategories: [TrackerCategory] = []
-        finalViewCategories.append(pinnedViewCategory)
-        
-        // закрепленные разделить по категориям из кордаты
-        unpinnedTrackers.forEach { trackerCoredata in
-            let trackersCoreDataFilteredByCategoryName = unpinnedTrackers.filter({ $0.category?.name == trackerCoredata.category?.name })
-            let viewTrackersFilteredByCategoryName = (try? trackersCoreDataFilteredByCategoryName.compactMap({ try converter.getTracker(from: $0)})) ?? []
-            let viewCategory = TrackerCategory(name: trackerCoredata.category?.name ?? "Error", trackers: viewTrackersFilteredByCategoryName)
-            finalViewCategories.append(viewCategory)
-        }
-        
-        return finalViewCategories
+        return pinnedViewTrackers.isEmpty ? unpinnedTrackers : (pinnedViewTrackers + unpinnedTrackers)
     }
     
     func saveTracker(with trackerCoreData: TrackerCoreData, to categoryName: String) throws {
@@ -156,7 +139,6 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         
         do {
             try context.save()
-//            print(trackerFetchedResultsController.fetchedObjects)
         } catch {
             throw CoreDataError.failedToUpdateTracker
         }
@@ -173,7 +155,6 @@ extension TrackerCategoryStore: TrackerCategoryStoreProtocol {
         
         do {
             try context.save()
-//            print(trackerFetchedResultsController.fetchedObjects)
         } catch {
             throw CoreDataError.failedToDeleteTracker
         }
@@ -217,5 +198,44 @@ private extension TrackerCategoryStore {
             let newCategory = createTrackerCategoryCoreData(with: categoryName)
             newCategory.addToTrackers(trackerCoreData)
         }
+    }
+    
+    func createPinnedViewCategory(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory] {
+        var pinnedViewCategoryArray: [TrackerCategory] = []
+        let pinnedTrackers = trackersCoreData.filter({ $0.isPinned })
+        // из закрепленных сделать отдельную вью категорию
+        if !pinnedTrackers.isEmpty {
+            let pinnedViewTrackers = (try? pinnedTrackers.compactMap({ try converter.getTracker(from: $0) })) ?? []
+            pinnedViewCategoryArray.append(
+                TrackerCategory(
+                name: NSLocalizedString(K.LocalizableStringsKeys.pinnedCategoryName, comment: "Pinned  category name"),
+                trackers: pinnedViewTrackers
+                )
+            )
+        }
+        
+        return pinnedViewCategoryArray
+    }
+    
+    func createUnpinnedViewCategory(with converter: TrackerConverter, from trackersCoreData: [TrackerCoreData]) -> [TrackerCategory] {
+        var unpinnedViewCategoryArray: [TrackerCategory] = []
+        let unpinnedTrackers = trackersCoreData.filter({ !$0.isPinned })
+        
+        // закрепленные разделить по категориям из кордаты
+        unpinnedTrackers.forEach { trackerCoredata in
+            let trackersCoreDataFilteredByCategoryName = unpinnedTrackers.filter({ $0.category?.name == trackerCoredata.category?.name })
+            let viewTrackersFilteredByCategoryName = (try? trackersCoreDataFilteredByCategoryName.compactMap({ try converter.getTracker(from: $0)})) ?? []
+            
+            let viewCategory = TrackerCategory(
+                name: trackerCoredata.category?.name ?? "Error in TrackerCategoryStore getViewCategories",
+                trackers: viewTrackersFilteredByCategoryName)
+            
+            if !unpinnedViewCategoryArray.contains(where: { $0.name == viewCategory.name }) {
+                unpinnedViewCategoryArray.append(viewCategory)
+            }
+            
+        }
+        
+        return unpinnedViewCategoryArray
     }
 }
