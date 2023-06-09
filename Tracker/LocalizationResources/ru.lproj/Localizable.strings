@@ -1,0 +1,69 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Aleksandr Eliseev on 16.05.2023.
+  
+*/
+
+"emptyState.title" = "Что будем отслеживать?";
+"search" = "Поиск";
+"enterTrackerName" = "Введите название трекера";
+"trackers" = "Трекеры";
+"tracker.creation" = "Создание трекера";
+"habbit" = "Привычка";
+"singleEvent" = "Нерегулярное событие";
+"newHabbit" = "Новая привычка";
+"newSingleEvent" = "Новое нерегулярное событие";
+"category" = "Категория";
+"schedule" = "Расписание";
+"filters" = "Фильтры";
+"cancel" = "Отменить";
+"create" = "Создать";
+"addCategory" = "Добавить категорию";
+"ready" = "Готово";
+"colors" = "Цвета";
+"emojis" = "Эмоджи";
+"name" = "Название";
+"settings" = "Настройки";
+"important" = "Важное";
+"joyfullThings" = "Радостные мелочи";
+"feeling" = "Самочувствие";
+"habits" = "Привычки";
+"attentiveness" = "Внимательность";
+"sport" = "Спорт";
+"shortNameMon" = "Пн";
+"shortNameTue" = "Вт";
+"shortNameWed" = "Ср";
+"shortNameThu" = "Чт";
+"shortNameFri" = "Пт";
+"shortNameSat" = "Сб";
+"shortNameSun" = "Вс";
+"longNameMon" = "Понедельник";
+"longNameTue" = "Вторник";
+"longNameWed" = "Среда";
+"longNameThu" = "Четверг";
+"longNameFri" = "Пятница";
+"longNameSat" = "Суббота";
+"longNameSun" = "Воскресенье";
+"allDays" = "Все дни";
+"blueOnboardingText" = "Отслеживайте только то, что хотите";
+"redOnboardingText" = "Даже если это не литры воды или йога";
+"tabBarTitletrackers" = "Трекеры";
+"tabBarTitlestatistics" = "Статистика";
+"contextMenuOperatorPin" = "Закрепить";
+"contextMenuOperatorUnpin" = "Открепить";
+"contextMenuOperatorModify" = "Редактировать";
+"contextMenuOperatorDelete" = "Удалить";
+"pinnedTrackerCategory" = "Закрепленные";
+"statisticsEmptyStateText" = "Отслеживать пока нечего";
+"statisticsTrackersChecked" = "Трекеров завершено";
+"statisticsIdealDays" = "Идеальные дни";
+"statisticsBestPeriod" = "Лучший период";
+"statisticsAverage" = "Среднее значение";
+"suchTechnology" = "Вот это технологии!";
+"filterButtonTitle" = "Фильтры";
+"trackersForTodayFilter" = "Трекеры на сегодня";
+"finishedTrackersFilter" = "Завершенные трекеры";
+"unfinishedTrackersFilter" = "Незавершенные трекеры";
+"allTrackersFilter" = "Все трекеры";

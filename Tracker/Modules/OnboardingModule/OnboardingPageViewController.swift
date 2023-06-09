@@ -18,16 +18,16 @@ final class OnboardingPageViewController: UIPageViewController, OnboardingProtoc
        let pageControl = UIPageControl()
         pageControl.numberOfPages = pages.count
         pageControl.currentPage = 0
-        
-        
         pageControl.currentPageIndicatorTintColor = .YPBlack
         pageControl.pageIndicatorTintColor = .YPBlack?.withAlphaComponent(0.3)
+        pageControl.addTarget(self, action: #selector(changeViewControllerOnTap), for: .touchUpInside)
         return pageControl
     }()
     
     private lazy var finishButton: CustomActionButton = {
-        let button = CustomActionButton(title: "Вот это технологии!", appearance: .confirm)
-        button.addTarget(self, action: #selector(finishdButtonTapped), for: .touchUpInside)
+        let button = CustomActionButton(title: NSLocalizedString(K.LocalizableStringsKeys.suchTechnology, comment: "Introduction"), appearance: .confirm)
+        button.addTarget(self, action: #selector(finishButtonTapped), for: .touchUpInside)
+        button.overrideUserInterfaceStyle = .light
         return button
     }()
     
@@ -38,10 +38,10 @@ final class OnboardingPageViewController: UIPageViewController, OnboardingProtoc
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        setPageViewControllers()
         dataSource = self
         delegate = self
-        setPageViewControllers()
+        
         setupConstraints()
         
     }
@@ -60,34 +60,18 @@ final class OnboardingPageViewController: UIPageViewController, OnboardingProtoc
 
 extension OnboardingPageViewController: UIPageViewControllerDataSource {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard let viewControllerIndex = pages.firstIndex(of: viewController) else {
-            return nil
-        }
-        
+        guard let viewControllerIndex = pages.firstIndex(of: viewController) else { return nil }
         let previousIndex = viewControllerIndex - 1
-        
-        guard previousIndex >= 0 else {
-            return pages.last
-        }
-        
+        guard previousIndex >= 0 else { return pages.last }
         return pages[previousIndex]
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard let viewControllerIndex = pages.firstIndex(of: viewController) else {
-            return nil
-        }
-        
+        guard let viewControllerIndex = pages.firstIndex(of: viewController) else { return nil }
         let nextIndex = viewControllerIndex + 1
-        
-        guard nextIndex < pages.count else {
-            return pages.first
-        }
-        
+        guard nextIndex < pages.count else { return pages.first }
         return pages[nextIndex]
     }
-    
-    
 }
 
 extension OnboardingPageViewController: UIPageViewControllerDelegate {
@@ -95,13 +79,20 @@ extension OnboardingPageViewController: UIPageViewControllerDelegate {
         if let currentViewController = pageViewController.viewControllers?.first,
            let currentIndex = pages.firstIndex(of: currentViewController) {
             pageControl.currentPage = currentIndex
+            print("currentIndex is: \(currentIndex)")
         }
     }
 }
 
 @objc private extension OnboardingPageViewController {
-     func finishdButtonTapped() {
+    func finishButtonTapped() {
         onFinish?()
+    }
+    
+    func changeViewControllerOnTap(_ sender: UIPageControl) {
+        let selectedPage = sender.currentPage < pages.count - 1 ? sender.currentPage + 1 : sender.currentPage - 1
+        self.setViewControllers([pages[selectedPage]], direction: .forward, animated: true, completion: nil)
+        
     }
 }
 

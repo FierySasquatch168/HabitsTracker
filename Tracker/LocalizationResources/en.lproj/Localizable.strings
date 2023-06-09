@@ -1,0 +1,69 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Aleksandr Eliseev on 16.05.2023.
+  
+*/
+
+"emptyState.title" = "What are we going to track?";
+"search" = "Search";
+"enterTrackerName" = "Enter a name for the tracker";
+"trackers" = "Trackers";
+"tracker.creation" = "Tracker creation";
+"habbit" = "Habbit";
+"singleEvent" = "Single event";
+"newHabbit" = "New habbit";
+"newSingleEvent" = "New single event";
+"category" = "Category";
+"schedule" = "Schedule";
+"filters" = "Filters";
+"cancel" = "Cancel";
+"create" = "Create";
+"addCategory" = "Add category";
+"ready" = "Ready";
+"colors" = "Colors";
+"emojis" = "Emojis";
+"name" = "Name";
+"settings" = "Settings";
+"important" = "Important";
+"joyfullThings" = "Joyfull Things";
+"feeling" = "Feeling";
+"habits" = "Habits";
+"attentiveness" = "Attentiveness";
+"sport" = "Sport";
+"shortNameMon" = "Mon";
+"shortNameTue" = "Tue";
+"shortNameWed" = "Wed";
+"shortNameThu" = "Thu";
+"shortNameFri" = "Fri";
+"shortNameSat" = "Sat";
+"shortNameSun" = "Sun";
+"longNameMon" = "Monday";
+"longNameTue" = "Tuesday";
+"longNameWed" = "Wednesday";
+"longNameThu" = "Thursday";
+"longNameFri" = "Friday";
+"longNameSat" = "Saturday";
+"longNameSun" = "Sunday";
+"allDays" = "Every day";
+"blueOnboardingText" = "Track only what you want";
+"redOnboardingText" = "Even if it's not litres of water or yoga";
+"tabBarTitletrackers" = "Trackers";
+"tabBarTitlestatistics" = "Statistics";
+"contextMenuOperatorPin" = "Pin";
+"contextMenuOperatorUnpin" = "Unpin";
+"contextMenuOperatorModify" = "Modify";
+"contextMenuOperatorDelete" = "Delete";
+"pinnedTrackerCategory" = "Pinned";
+"statisticsEmptyStateText" = "There's nothing to track yet";
+"statisticsTrackersChecked" = "Trackers checked";
+"statisticsIdealDays" = "Ideal days";
+"statisticsBestPeriod" = "Best period";
+"statisticsAverage" = "Average";
+"suchTechnology" = "Such a technology!";
+"filterButtonTitle" = "Filters";
+"trackersForTodayFilter" = "Today's trackers";
+"finishedTrackersFilter" = "Finished trackers";
+"unfinishedTrackersFilter" = "Unfinished trackers";
+"allTrackersFilter" = "All trackers";

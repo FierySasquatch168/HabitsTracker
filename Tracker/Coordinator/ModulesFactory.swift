@@ -13,12 +13,13 @@ protocol ModulesFactoryProtocol {
     func makeSplashScreenView() -> Presentable
     func makeOnboardingScreenView() -> OnboardingProtocol & Presentable
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol
-    func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate
-    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
-    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
-    func makeTrackerCategorieScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
-    func makeTimeTableScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
+    func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol
+    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
+    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol
+    func makeTrackerCategorieScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
+    func makeTimeTableScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol
     func makeStatisticsScreenView() -> Presentable
+    func makeFiltersScreenView(filtersDelegate: FiltersDelegate?) -> Presentable & TrackerFilterSetupProtocol
 }
 
 final class ModulesFactory: ModulesFactoryProtocol {
@@ -30,33 +31,41 @@ final class ModulesFactory: ModulesFactoryProtocol {
     let habitLabelText = HabitTrackerModel.title
     let singleEventLabeltext = SingleEventTrackerModel.title
     
+    let context = Context()
+    let analyticsService = AnalyticsService()
+    
     func makeSplashScreenView() -> Presentable {
         return SplashViewController()
     }
     
     func makeOnboardingScreenView() -> OnboardingProtocol & Presentable {
-        return OnboardingPageViewController()
+        return OnboardingPageViewController(
+            transitionStyle: .scroll,
+            navigationOrientation: .horizontal
+        )
     }
     
     func makeTrackerScreenView() -> Presentable & TrackerToCoordinatorProtocol {
-        let dataStore = DataStore()
+        var dataStore: DataStoreProtocol = DataStore(context: context.context)
         let viewModel = TrackersViewModel(dataStore: dataStore)
         let trackerVC = TrackersViewController(viewModel: viewModel)
-        dataStore.dataStoreDelegate = viewModel
-        dataStore.trackerConverter = TrackerConverter()
-        dataStore.trackerStore = TrackerStore(delegate: dataStore)
-        dataStore.trackerCategoryStore = TrackerCategoryStore(delegate: dataStore)
-        dataStore.trackerRecordStore = TrackerRecordStore(delegate: dataStore)
+        trackerVC.analyticsService = analyticsService
+        dataStore.dataStoreTrackersDelegate = viewModel
         return trackerVC
     }
     
-    func makeTrackerSelectionScreenView(with mainScreenDelegate: TrackerMainScreenDelegate?) -> Presentable & TrackerSelectionCoordinatorProtocol & TrackerViceMainScreenDelegate {
-        let trackerSelectionVC = TrackerSelectionViewController()
-        trackerSelectionVC.mainScreenDelegate = mainScreenDelegate
-        return trackerSelectionVC
+    func makeStatisticsScreenView() -> Presentable {
+        let dataStore: DataStoreStatisticsProviderProtocol = DataStore(context: context.context)
+        let statisticsService = StatisticsService(dataStore: dataStore)
+        let viewModel = StatisticsViewModel(statisticsService: statisticsService)
+        return StatisticsViewController(viewModel: viewModel)
     }
     
-    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
+    func makeTrackerSelectionScreenView() -> Presentable & TrackerSelectionCoordinatorProtocol {
+        return TrackerSelectionViewController()
+    }
+    
+    func makeTrackerHabitScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = mainScreenDelegate
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), settings: habitSettings)
@@ -65,7 +74,7 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return trackerCreationVC
     }
     
-    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerViceMainScreenDelegate?) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
+    func makeTrackerSingleEventScreenView(with mainScreenDelegate: TrackerMainScreenDelegate) -> Presentable & TrackerCreationToCoordinatorProtocol & AdditionalTrackerSetupProtocol {
         let trackerCreationVC = TrackerCreationViewController()
         trackerCreationVC.mainScreenDelegate = mainScreenDelegate
         trackerCreationVC.layoutManager = LayoutManager(headerCreator: HeaderCreator(), settings: singleEventSettings)
@@ -74,15 +83,24 @@ final class ModulesFactory: ModulesFactoryProtocol {
         return trackerCreationVC
     }
     
-    func makeTrackerCategorieScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
-        return TrackerAdditionalSetupViewController()
+    func makeTrackerCategorieScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
+        let categoryScreenVC = TrackerAdditionalSetupViewController()
+        categoryScreenVC.additionalSetupCase = .category(timetableDelegate?.selectedCategory)
+        categoryScreenVC.additionalTrackerSetupDelegate = timetableDelegate
+        return categoryScreenVC
     }
     
-    func makeTimeTableScreenView() -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
-        return TrackerAdditionalSetupViewController()
+    func makeTimeTableScreenView(timetableDelegate: AdditionalTrackerSetupProtocol?) -> Presentable & TrackerAdditionalSetupToCoordinatorProtocol {
+        let scheduleScreenVC = TrackerAdditionalSetupViewController()
+        scheduleScreenVC.additionalSetupCase = .schedule(timetableDelegate?.selectedWeekDays)
+        scheduleScreenVC.additionalTrackerSetupDelegate = timetableDelegate
+        return scheduleScreenVC
     }
     
-    func makeStatisticsScreenView() -> Presentable {
-        return StatisticsViewController()
+    func makeFiltersScreenView(filtersDelegate: FiltersDelegate?) -> Presentable & TrackerFilterSetupProtocol {
+        let filterVC = TrackerAdditionalSetupViewController()
+        filterVC.additionalSetupCase = .filters(filtersDelegate?.selectedFilter)
+        filterVC.filterSetupDelegate = filtersDelegate
+        return filterVC
     }
 }

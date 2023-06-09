@@ -23,11 +23,11 @@ final class OnboardingViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         switch color {
         case .blue:
-            backgroundImageView.image = UIImage(named: Constants.Icons.onboardingBackgroundBlue)
-            textLabel.text = Constants.Strings.blueOnboardingText
+            backgroundImageView.image = UIImage(named: K.Icons.onboardingBackgroundBlue)
+            textLabel.text = NSLocalizedString(K.LocalizableStringsKeys.blueOnboardingText, comment: "")
         case .red:
-            backgroundImageView.image = UIImage(named: Constants.Icons.onboardingBackgroundRed)
-            textLabel.text = Constants.Strings.redOnboardingText
+            backgroundImageView.image = UIImage(named: K.Icons.onboardingBackgroundRed)
+            textLabel.text = NSLocalizedString(K.LocalizableStringsKeys.redOnboardingText, comment: "")
         }        
     }
     

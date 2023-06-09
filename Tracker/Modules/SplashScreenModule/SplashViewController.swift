@@ -12,7 +12,7 @@ final class SplashViewController: UIViewController {
     
     private lazy var splashImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: Constants.Icons.splashImage)
+        imageView.image = UIImage(named: K.Icons.splashImage)
         imageView.clipsToBounds = true
         return imageView
     }()

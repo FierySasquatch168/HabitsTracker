@@ -9,24 +9,26 @@ import Foundation
 
 protocol TrackerMainScreenDelegate: AnyObject {
     func saveTracker(tracker: Tracker, to categoryName: String)
+    func updateTracker(tracker: Tracker, at categoryName: String)
+}
+
+protocol FiltersDelegate: AnyObject {
+    var selectedFilter: Filters? { get }
+    func transferFilter(from selectedFilter: Filters?)
 }
 
 final class TrackersViewModel {
             
-    @Observable
-    private (set) var completedTrackers: Set<TrackerRecord> = []
-    @Observable
-    private (set) var visibleCategories: [TrackerCategory] = [] {
-        didSet {
-            checkForEmptyState()
-        }
-    }
-    @Observable
-    private (set) var emptyStackViewIsHidden: Bool = false
+    @Observable private (set) var completedTrackers: Set<TrackerRecord> = []
+    @Observable private (set) var visibleCategories: [TrackerCategory] = []
+    @Observable private (set) var selectedTrackerForModifycation: (Tracker?, String?)
+    @Observable private (set) var filterSelected: Filters = .all
     
-    private var dataStore: DataStore
+    var selectedDate: Date?
     
-    init(dataStore: DataStore) {
+    private var dataStore: DataStoreProtocol
+    
+    init(dataStore: DataStoreProtocol) {
         self.dataStore = dataStore
     }
     
@@ -34,18 +36,30 @@ final class TrackersViewModel {
         return date.customlyFormatted()
     }
     
-    func filterTrackers(with string: String) {
+    func filterTrackersBy(_ string: String) {
         var temporaryCategories: [TrackerCategory] = []
         
-        for category in visibleCategories {
+        visibleCategories.forEach { category in
             let filteredTrackers = category.trackers.filter({ $0.name.lowercased().contains(string.lowercased()) })
-            if !filteredTrackers.isEmpty {
-                let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
-                temporaryCategories.append(filteredCategory)
-                visibleCategories = temporaryCategories
-            } else {
-                visibleCategories = temporaryCategories
-            }
+            if !filteredTrackers.isEmpty { temporaryCategories.append(TrackerCategory(name: category.name, trackers: filteredTrackers)) }
+        }
+        
+        visibleCategories = temporaryCategories
+    }
+    
+    func filterVisibleCategoriesBySelectedFilter() {
+        switch selectedFilter {
+        case .all:
+            checkForScheduledTrackers(for: selectedDate)
+        case .trackersForToday:
+            let today = getCurrentDate(from: Date())
+            checkForScheduledTrackers(for: today)
+        case .finished:
+            filterTrackersDependingOnCheck(checked: true, for: selectedDate)
+        case .unfinished:
+            filterTrackersDependingOnCheck(checked: false, for: selectedDate)
+        case .none:
+            break
         }
     }
 }
@@ -55,37 +69,100 @@ extension TrackersViewModel: TrackerMainScreenDelegate {
     func saveTracker(tracker: Tracker, to categoryName: String) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            do {
-                try? self.dataStore.saveTracker(tracker: tracker, to: categoryName)
-                self.checkForScheduledTrackers(with: getCurrentDate(from: Date()))
-            }
+            self.dataStore.saveTracker(tracker: tracker, to: categoryName)
+            self.filterVisibleCategoriesBySelectedFilter()
+        }
+    }
+    
+    func updateTracker(tracker: Tracker, at categoryName: String) {
+        self.dataStore.updateTracker(tracker: tracker, at: categoryName)
+        filterVisibleCategoriesBySelectedFilter()
+    }
+}
+
+// MARK: - Ext ContextMenuOperator
+extension TrackersViewModel {
+    func pinTapped(at indexPath: IndexPath) {
+        let trackerToPinFromCategory = visibleCategories[indexPath.section]
+        let trackerToPin = trackerToPinFromCategory.trackers[indexPath.row]
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.dataStore.pinTracker(tracker: trackerToPin, at: trackerToPinFromCategory.name)
+            self.filterVisibleCategoriesBySelectedFilter()
+        }
+    }
+    
+    func modifyTapped(at indexPath: IndexPath) {
+        let trackerToModify = visibleCategories[indexPath.section].trackers[indexPath.row]
+        let category = dataStore.getTrackerCategory(for: trackerToModify)
+        selectedTrackerForModifycation = (trackerToModify, category)
+    }
+    
+    func deleteTapped(at indexPath: IndexPath) {
+        let trackerDeletingFromCategory = visibleCategories[indexPath.section]
+        let trackerToDelete = trackerDeletingFromCategory.trackers[indexPath.row]
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.dataStore.deleteTrackers(with: trackerToDelete.stringID ?? "", from: trackerDeletingFromCategory.name)
+            self.filterVisibleCategoriesBySelectedFilter()
         }
     }
 }
 
 // MARK: - Ext Collection view checkers
 extension TrackersViewModel {
-    func checkForEmptyState() {
-        emptyStackViewIsHidden = visibleCategories.isEmpty ? false : true
+    func checkForScheduledTrackers(for date: Date?) {
+        let weekDay = getStringDayOfTheWeek(for: date)
+        visibleCategories = getScheduledTrackers(for: weekDay)
     }
     
-    func checkForScheduledTrackers(with currentDate: Date?) {
-        // TODO: rewrite to do everything through CoreData
-        guard let stringDayOfWeek = currentDate?.weekdayNameStandalone,
-              let weekDay = WeekDays.getWeekDay(from: stringDayOfWeek)
-        else { return }
-        var temporaryCategories: [TrackerCategory] = []
+    func filterTrackersDependingOnCheck(checked: Bool, for date: Date?) {
+        let weekDay = getStringDayOfTheWeek(for: date)
+        let filteredCheckedTrackerIds = getRecordsIdsForSelectedDate()
+        visibleCategories = getTrackersFilteredBy(checked: checked, for: filteredCheckedTrackerIds, on: weekDay)
         
-        for category in dataStore.fetchCategories() {
+    }
+    
+    private func getScheduledTrackers(for weekDay: WeekDays) -> [TrackerCategory] {
+        var scheduledCategories: [TrackerCategory] = []
+        dataStore.fetchCategories().forEach { category in
             let filteredTrackers = category.trackers.filter({ $0.schedule.contains(weekDay) })
-            if !filteredTrackers.isEmpty {
-                let filteredCategory = TrackerCategory(name: category.name, trackers: filteredTrackers)
-                temporaryCategories.append(filteredCategory)
-                visibleCategories = temporaryCategories
-            } else {
-                visibleCategories = temporaryCategories
-            }
+            if !filteredTrackers.isEmpty { scheduledCategories.append(TrackerCategory(name: category.name, trackers: filteredTrackers)) }
         }
+        
+        return scheduledCategories
+    }
+    
+    private func getRecordsIdsForSelectedDate() -> [String] {
+        var filteredCheckedTrackerIds: [String] = []
+        dataStore.fetchRecords().forEach { record in
+            record.date == selectedDate?.customlyFormatted() ? filteredCheckedTrackerIds.append(record.id.uuidString) : ()
+        }
+        
+        return filteredCheckedTrackerIds
+    }
+    
+    private func getTrackersFilteredBy(checked: Bool, for ids: [String], on weekDay: WeekDays) -> [TrackerCategory] {
+        var filteredCategories: [TrackerCategory] = []
+        dataStore.fetchCategories().forEach { category in
+            let filteredTrackers = category
+                .trackers
+                .filter(
+                    { checked ? ids.contains($0.stringID ?? "") : !ids.contains($0.stringID ?? "")
+                        && $0.schedule.contains(weekDay)
+                    }
+                )
+            
+            if !filteredTrackers.isEmpty { filteredCategories.append(TrackerCategory(name: category.name, trackers: filteredTrackers)) }
+        }
+        
+        return filteredCategories
+    }
+    
+    private func getStringDayOfTheWeek(for date: Date?) -> WeekDays {
+        guard let weekDayName = date?.weekdayNameStandalone else { return .saturday }
+        return WeekDays.getWeekDay(from: weekDayName) ?? .sunday
     }
 }
 
@@ -113,7 +190,7 @@ extension TrackersViewModel {
 }
 
 // MARK: - Ext DataStoreDelegate
-extension TrackersViewModel: DataStoreDelegate {
+extension TrackersViewModel: DataStoreTrackersDelegate {
     func didUpdateCategory(_ updatedCategories: [TrackerCategory], _ updates: CategoryUpdates) {
         visibleCategories = updatedCategories
     }
@@ -127,11 +204,18 @@ extension TrackersViewModel: DataStoreDelegate {
 extension TrackersViewModel {
     func plusTapped(trackerID: String?, currentDate: Date?) {
         guard let trackerID = trackerID, let currentDate = currentDate, currentDate <= Date() else { return }
-        
-        do {
-            try dataStore.updateRecords(trackerID, with: currentDate)
-        } catch {
-            print("Saving of record failed")
-        }
+        dataStore.updateRecords(trackerID, with: currentDate)
+    }
+}
+
+// MARK: - Ext Filters Delegate
+extension TrackersViewModel: FiltersDelegate {
+    var selectedFilter: Filters? {
+        return filterSelected
+    }
+    
+    func transferFilter(from selectedFilter: Filters?) {
+        guard let selectedFilter else { return }
+        filterSelected = selectedFilter
     }
 }

@@ -7,14 +7,10 @@
 
 import UIKit
 
-protocol TrackerSelectionCoordinatorProtocol {
+protocol TrackerSelectionCoordinatorProtocol: AnyObject {
     var headToHabit: (() -> Void)? { get set }
     var headToSingleEvent: (() -> Void)? { get set }
     var returnOnCancel: (() -> Void)? { get set }
-}
-
-protocol TrackerViceMainScreenDelegate: AnyObject {
-    func saveTracker(tracker: Tracker, to category: String)
 }
 
 final class TrackerSelectionViewController: UIViewController & TrackerSelectionCoordinatorProtocol {
@@ -23,11 +19,9 @@ final class TrackerSelectionViewController: UIViewController & TrackerSelectionC
     var headToSingleEvent: (() -> Void)?
     var returnOnCancel: (() -> Void)?
     
-    weak var mainScreenDelegate: TrackerMainScreenDelegate?
-    
-    private var headerLabeltext = "Создание трекера"
-    private var habitsButtonHeader = "Привычка"
-    private var singleEventButtonHeader = "Нерегулярное событие"
+    private var headerLabeltext = NSLocalizedString(K.LocalizableStringsKeys.trackerCreation, comment: "Creation of a new tracker")
+    private var habitsButtonHeader = NSLocalizedString(K.LocalizableStringsKeys.habbit, comment: "Habbit to plan")
+    private var singleEventButtonHeader = NSLocalizedString(K.LocalizableStringsKeys.singleEvent, comment: "Single event with no firm schedule")
     
     private lazy var headerLabel: CustomHeaderLabel = {
         let label = CustomHeaderLabel(headerText: headerLabeltext)
@@ -137,13 +131,6 @@ private extension TrackerSelectionViewController {
             headerLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 25),
             headerLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
-    }
-}
-
-// MARK: - Ext TrackerViceMainScreenDelegate
-extension TrackerSelectionViewController: TrackerViceMainScreenDelegate {
-    func saveTracker(tracker: Tracker, to category: String) {
-        mainScreenDelegate?.saveTracker(tracker: tracker, to: category)
     }
 }
 
